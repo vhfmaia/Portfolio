@@ -352,8 +352,6 @@ The weld and the flaw tips are the region where the contact opens and closes, so
 └── README.md                             # Technical documentation
 ```
 
-The earlier single-crown model (wheel axis on $Y$, $m_n = 3.0$ mm) and its results remain available in the repository history.
-
 ---
 
 ## 10. Author & Contact
