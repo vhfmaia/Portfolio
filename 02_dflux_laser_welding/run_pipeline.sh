@@ -1,7 +1,7 @@
 #!/bin/bash
 # ==============================================================================
 # Circumferential Laser Welding Simulation Pipeline
-# Sequentially Coupled Thermo-Mechanical FEA (Abaqus / SIMULIA / 3DEXPERIENCE)
+# Sequentially Coupled Thermo-Mechanical FEA (Abaqus/Standard)
 # Author: Victor Maia (vhfm08@gmail.com)
 #
 # Usage:
@@ -36,26 +36,14 @@ echo "  Circumferential Laser Welding Simulation Pipeline"
 echo "  Mode: ${TARGET} | Parallel Cores: ${CPUS}"
 echo "=================================================================="
 
-# 1. Environment & Launcher Auto-Detection
-if [ -n "${GRID_PRODUCT_PATH:-}" ] && [ -f "${GRID_PRODUCT_PATH}/linux_a64/code/bin/SMALauncher" ]; then
-    echo "[INFO] 3DEXPERIENCE Grid environment detected via GRID_PRODUCT_PATH."
-    LAUNCHER="${GRID_PRODUCT_PATH}/linux_a64/code/bin/SMALauncher"
-    RUN_ABQ="${LAUNCHER} abaqus"
-    RUN_PY="${LAUNCHER} python"
-elif command -v SMALauncher >/dev/null 2>&1; then
-    echo "[INFO] Native SMALauncher command detected."
-    LAUNCHER="SMALauncher"
-    RUN_ABQ="${LAUNCHER} abaqus"
-    RUN_PY="${LAUNCHER} python"
-elif command -v abaqus >/dev/null 2>&1; then
-    echo "[INFO] Standard Abaqus command detected."
-    RUN_ABQ="abaqus"
-    RUN_PY="abaqus python"
-else
-    echo "[WARNING] Abaqus launcher not found in PATH. Defaulting to 'abaqus'."
-    RUN_ABQ="abaqus"
-    RUN_PY="abaqus python"
+# 1. Abaqus launcher (override with the ABAQUS_CMD environment variable)
+LAUNCHER="${ABAQUS_CMD:-abaqus}"
+if ! command -v "${LAUNCHER}" >/dev/null 2>&1; then
+    echo "[ERROR] Abaqus launcher '${LAUNCHER}' not found. Set ABAQUS_CMD to the launcher of your installation."
+    exit 1
 fi
+RUN_ABQ="${LAUNCHER}"
+RUN_PY="${LAUNCHER} python"
 
 # Function: Run Thermal Simulation
 run_thermal_fea() {

@@ -12,9 +12,9 @@ Author: Victor Maia (vhfm08@gmail.com)
 *INCLUDE, INPUT=Gear_Shaft_bearing_sets.inp
 **
 ** ==================================================================
-** 3. MULTI-ZONE TIE DEFINITIONS (OS DOIS TIEs)
-** Tie 1: Une o dentado C3D10 ao anel C3D20 da coroa dentada
-** Tie 2: Une o miolo C3D10 ao anel C3D20 da caixa do diferencial
+** 2. MULTI-ZONE TIE DEFINITIONS
+** Tie 1: toothed rim (C3D10) to the structured ring (C3D20) of the crown gear
+** Tie 2: carrier body (C3D10) to the structured ring (C3D20) of the differential carrier
 ** ==================================================================
 *TIE, NAME=TIE_CROWN, TYPE=SURFACE TO SURFACE
 TIE_CROWN_TOOTH, TIE_CROWN_DIAMETER
@@ -23,7 +23,7 @@ TIE_CROWN_TOOTH, TIE_CROWN_DIAMETER
 TIE_DIFF_VOLUME, TIE_DIFF_DIAMETER
 **
 ** ==================================================================
-** 4. INTERFACE CONTACT DEFINITIONS (OS DOIS CONTACTOS)
+** 3. INTERFACE CONTACT DEFINITIONS
 ** Contact 1: sound laser weld over 252 deg (bonded, no separation)
 ** Contact 2: frictional contact over 360 deg; it carries the load across the unbonded
 **            weld flaw (108 deg, theta = 36 to 144 deg, 30% of the circumference)
@@ -44,12 +44,12 @@ CONTACT_DIFF_WELD, CONTACT_CROWN_WELD
 CONTACT_DIFF_PENALTY, CONTACT_CROWN_PENALTY
 **
 ** ==================================================================
-** 5. CARRIER SHAFT BEARING SUPPORT (KINEMATIC COUPLING + BOUNDARY CONDITION)
+** 4. CARRIER SHAFT BEARING SUPPORT (KINEMATIC COUPLING + BOUNDARY CONDITION)
 ** Reference node RP_BEARING on the wheel axis (X = 0, Y = 0, Z = 0)
-** Coupling 1: Apoio radial e tangencial do veio do diferencial (DOFs 1 e 2)
-** Coupling 2: Nos comuns aos dois apoios (DOFs 1, 2 e 3)
-** Coupling 3: Encosto axial do diferencial (DOF 3)
-** BC: Encastre do no de referencia -> RM3 = binario de reacao em torno de Z
+** Coupling 1: radial and tangential support of the carrier shaft (DOFs 1 and 2)
+** Coupling 2: nodes shared by both supports (DOFs 1, 2 and 3)
+** Coupling 3: axial shoulder of the carrier (DOF 3)
+** BC: reference node fully fixed -> RM3 = reaction torque about Z
 ** ==================================================================
 *NODE, NSET=RP_BEARING
 600001, 0.0, 0.0, 0.0
@@ -75,7 +75,7 @@ BEARING_NODES_Z, 1.0
 RP_BEARING, 1, 6, 0.0
 **
 ** ==================================================================
-** 6. DYNAMIC TORQUE ROLLING STEP VIA DLOAD USER SUBROUTINE
+** 5. DYNAMIC TORQUE ROLLING STEP VIA DLOAD USER SUBROUTINE
 ** Total time: 1.20 s (0.20 s stationary ramp + 1.00 s rolling across all 60 teeth)
 ** Transmits 270 N.m through tooth flanks (SURF_TOOTH) -> weld interface -> carrier
 ** ==================================================================

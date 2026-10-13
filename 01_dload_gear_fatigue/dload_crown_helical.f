@@ -304,7 +304,8 @@ subroutine dload(f, kstep, kinc, time, noel, npt, layer, kspt, coords, jltyp, sn
     if (drive_mode_step(istep) /= mode) return
     m = merge(1, 2, mode == 1)
 
-    ! 2. Safety check: ensure tables are ready (guaranteed thread-safe under OpenMP/SMP)
+    ! 2. Safety check: the tables are built by UEXTERNALDB before the first call; this guard
+    !    only covers a missing call, and the critical section takes effect when compiled with OpenMP
     if (.not. is_init) then
         !$omp critical
         if (.not. is_init) call init_contact_tables()
