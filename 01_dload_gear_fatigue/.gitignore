@@ -2,6 +2,7 @@
 vtk_results/
 *.zip
 preview_*.png
+run_pipeline_*.out
 
 # Local working files (mesh and generated includes, see README section 4.1)
 Gear_Shaft_geometry.inp

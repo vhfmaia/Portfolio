@@ -165,19 +165,19 @@ The inactive flank integrates to zero in each step. Theory: $F_t = T / r_b = 329
 
 ### 5.2 Finite Element Reactions at the Bearing Reference Node
 
-Drive load case on the full assembly (1.49 million equations), reaction at `RP_BEARING`:
+Drive + coast analysis on the full assembly (1.49 million equations), reaction at `RP_BEARING`:
 
-| Quantity | Theory | Abaqus | Deviation |
-| :--- | :---: | :---: | :---: |
-| Reaction torque $RM_3$ | $-270.0\text{ N}\cdot\text{m}$ | $-270.13\text{ N}\cdot\text{m}$ | $0.05\%$ |
-| Transverse force $\sqrt{RF_1^2 + RF_2^2}$ | $3299.0\text{ N}$ | $3298.8\text{ N}$ | $0.01\%$ |
-| Axial force $RF_3$ | $1445.6\text{ N}$ | $1446.3\text{ N}$ | $0.05\%$ |
+| Quantity | Theory (drive / coast) | Abaqus, drive | Abaqus, coast | Largest deviation |
+| :--- | :---: | :---: | :---: | :---: |
+| Reaction torque $RM_3$ | $\mp 270.0\text{ N}\cdot\text{m}$ | $-270.13\text{ N}\cdot\text{m}$ | $+270.18\text{ N}\cdot\text{m}$ | $0.07\%$ |
+| Transverse force $\sqrt{RF_1^2 + RF_2^2}$ | $3299.0\text{ N}$ | $3298.8\text{ N}$ | $3299.4\text{ N}$ | $0.01\%$ |
+| Axial force $RF_3$ | $\pm 1445.6\text{ N}$ | $+1446.3\text{ N}$ | $-1446.7\text{ N}$ | $0.08\%$ |
 
-Mean values over the complete rolling phase ($t = 0.200$ to $1.200$ s, 251 increments, analysis completed in 300 increments of 0.004 s). The three reactions oscillate by $\pm 0.9\%$ about their mean through the revolution. The direction of the transverse force rotates by 1.44° per increment, i.e. 360.0° in the 1.00 s rolling phase. The coast step has been verified by integration (Section 5.1) and not yet by a finite element run.
+Mean values over the complete rolling phase of each step (step time $0.200$ to $1.200$ s, 251 increments; each step completed in 300 increments of 0.004 s). The three reactions oscillate about their mean through the revolution by $\pm 1.0\%$ in drive and $\pm 1.2\%$ in coast. The direction of the transverse force rotates by 1.44° per increment, i.e. 360.0° in the 1.00 s rolling phase. The reaction torque and the axial force change sign from drive to coast, as expected for a helical gear under torque reversal.
 
-### 5.3 Stress Results of the Drive Revolution
+### 5.3 Stress Results of the Drive and Coast Revolutions
 
-Nodal maximum principal stress over the drive revolution at 270 N·m, from the 31 field output frames (one every 10 increments, i.e. every 14.4° of load travel). The peak is the highest value of the cycle and the range is the principal stress range defined in Section 6:
+Nodal maximum principal stress over the drive revolution at 270 N·m, from its 31 field output frames (one every 10 increments, i.e. every 14.4° of load travel). The peak is the highest value of the cycle and the range is the principal stress range defined in Section 6:
 
 | Zone | Peak | Range | Location |
 | :--- | :---: | :---: | :--- |
@@ -188,12 +188,25 @@ Nodal maximum principal stress over the drive revolution at 270 N·m, from the 3
 | Crown ring (`DIAMETER_CROWN`) | $62.1\text{ MPa}$ | $64.8\text{ MPa}$ | First node row next to the flaw end |
 | Carrier | $58.8\text{ MPa}$ | $64.3\text{ MPa}$ | First node row next to the flaw end |
 
-![Front view of the maximum principal stress with the two flaw ends marked](../99_images_and_miscelania/stress_front_view_flaw_ends.png)
+![Front view of the maximum principal stress in drive and in coast, with the two flaw ends marked](../99_images_and_miscelania/stress_front_view_flaw_ends.png)
 
-*Front view along Z at t = 0.96 s (load at 273.6°), nodal maximum principal stress at 270 N·m. The two circles mark the ends of the unbonded arc of the weld interface.*
+*Front view along Z with the load at 273.6° in both steps (step time 0.96 s), nodal maximum principal stress at 270 N·m: drive on the left, coast on the right. The circles mark the ends of the unbonded arc of the weld interface, with the stress at each end in that frame.*
 
-- **Elastic response:** the equivalent plastic strain is zero in every frame and the largest displacement is 0.028 mm.
-- **Governing location:** the two ends of the unbonded arc, at the start of the weld seam, carry the highest stress of the assembly, above the tooth root.
+Complete drive + coast cycle (270 N·m in both directions, 61 frames), compared with the drive revolution alone:
+
+| Zone | Peak, drive | Range, drive | Peak, drive + coast | Range, drive + coast |
+| :--- | :---: | :---: | :---: | :---: |
+| Toothed rim (tooth root) | $95.5\text{ MPa}$ | $115.9\text{ MPa}$ | $96.4\text{ MPa}$ | $195.6\text{ MPa}$ |
+| Weld interface, ends of the flaw | $136.0\text{ MPa}$ | $136.0\text{ MPa}$ | $192.6\text{ MPa}$ | $327.2\text{ MPa}$ |
+| Crown ring, first node row next to the flaw end | $62.1\text{ MPa}$ | $64.8\text{ MPa}$ | $62.1\text{ MPa}$ | $126.0\text{ MPa}$ |
+| Carrier, first node row next to the flaw end | $58.8\text{ MPa}$ | $64.3\text{ MPa}$ | $97.1\text{ MPa}$ | $163.2\text{ MPa}$ |
+
+- **Coast is the more severe direction at the flaw:** with the same torque, the flaw end at $\theta = 36°$ reaches 192.6 MPa in coast against 136.0 MPa in drive (151.5 MPa at the other end, $\theta = 143°$).
+- **Torque reversal more than doubles the range at the flaw:** the same node goes from 192.6 MPa in tension to a minimum principal stress of $-135.7$ MPa, so the range rises from 136.0 to 327.2 MPa.
+- **Tooth root in alternating bending:** the range is about twice the peak (195.6 against 96.4 MPa), which is the fully reversed case of ISO 6336 (Section 7.4).
+
+- **Governing location:** the two ends of the unbonded arc, at the start of the weld seam, carry the highest stress of the assembly, above the tooth root, in drive and in coast.
+- **Drive revolution:** the equivalent plastic strain is zero in every frame and the largest displacement is 0.028 mm.
 - **Flaw ends are not converged values:** the bonded-to-unbonded transition is a sharp corner, so the stress there grows with mesh refinement. These values rank the location; they are not to be compared with an S-N curve until the notch is modelled with its reference radius (Section 7.4).
 - **Tooth root values are sampled:** one frame every 14.4° covers 2.4 tooth pitches, so no single tooth is captured at its worst mesh position. The tooth-root peak and range are lower bounds; a field output at every increment is needed for the root assessment.
 
@@ -215,9 +228,10 @@ Nodal maximum principal stress over the drive revolution at 270 N·m, from the 3
 ```bash
 python compile_vtk_to_gif.py                  # extracts gear_helical_vtk.zip to vtk_results/ on first use
 python compile_vtk_to_gif.py --frames 0,8,16  # PNG previews of selected frames
+python compile_vtk_to_gif.py --vtk-dir DIR --output FILE.gif
 ```
 
-The angular position of the load is located in every frame from the most stressed elements of the toothed rim and fitted with a constant angular speed (largest deviation 0.5°). The VTK files are not stored in the repository (about 1.1 GB per revolution).
+The angular position of the load is located in every frame from the most stressed elements of the toothed rim and fitted with a constant angular speed, separately in each step (largest deviation 0.6°); the footer of the animation names the active step. The VTK files are not stored in the repository (about 1.1 GB per revolution).
 
 ---
 

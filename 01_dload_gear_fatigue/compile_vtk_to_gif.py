@@ -17,10 +17,13 @@ for the fatigue evaluation.
                         the meshing tooth, and section and camera follow the load.
 
 Writes a stable animated GIF with one global indexed palette (no colour flicker).
+Runs with several steps (drive + coast) are handled step by step: the load position
+is fitted separately in each step and the active step is named in the footer.
 
 Usage:
     python compile_vtk_to_gif.py                 # all frames -> gear_torque_simulation.gif
     python compile_vtk_to_gif.py --frames 0,8,16 # preview: PNG per selected frame
+    python compile_vtk_to_gif.py --vtk-dir DIR --output FILE.gif
 """
 
 import os
@@ -47,17 +50,22 @@ FRAME_PATTERN = "*_[0-9][0-9][0-9][0-9].vtk"   # leaves out the fatigue cycle su
 POINT_FIELD = "S_Max_Principal"    # nodal average, plotted in the three panels
 LOAD_FIELD = "Von_Mises"           # element centroid, used only to locate the loaded tooth
 
-T_RAMP = 0.20                 # s, end of the load ramp (load starts travelling after it)
+T_RAMP = 0.20                 # s, end of the load ramp of each step (load starts travelling after it)
 STRESS_MAX = 100.0            # MPa, top of the colour scale (bottom is 0: compression is not coloured)
 PANEL = 640                   # px, side of each square viewport
 FOOTER = 72                   # px, strip below the viewports (legend, time, caption)
 FPS = 6
 CAPTION = "Ring gear welded to differential case (30% weld defect)  |  270 Nm as a travelling tooth load"
+STEP_LABELS = {"DRIVE": "drive", "COAST": "coast (regeneration)"}   # keyword in the step name -> footer label
 
 parser = argparse.ArgumentParser(description="Compile VTK frames into a 3-viewport GIF.")
 parser.add_argument("--frames", default=None,
                     help="comma-separated frame indices to render as PNG previews")
+parser.add_argument("--vtk-dir", default=VTK_DIR, help="folder with the VTK frames")
+parser.add_argument("--output", default=OUTPUT_GIF, help="output GIF file")
 args = parser.parse_args()
+VTK_DIR = os.path.abspath(args.vtk_dir)
+OUTPUT_GIF = os.path.abspath(args.output)
 
 # -------------------------------------------------------------
 # 1. Locate the VTK frames (extract the ZIP on first use)
@@ -110,15 +118,22 @@ centroids = mesh.cell_centers().points
 del first
 
 
-def read_time(fpath):
+def read_header(fpath):
+    """Total time, step name and step time from the title line of a frame."""
     with open(fpath, "rb") as f:
         f.readline()
         parts = f.readline().decode("ascii", errors="ignore").split()
-    return float(parts[parts.index("Time") + 1])
+    total_time = float(parts[parts.index("Time") + 1])
+    if "Step" in parts:
+        return total_time, parts[parts.index("Step") + 1], float(parts[parts.index("StepTime") + 1])
+    return total_time, "", total_time
 
 
 print("[INFO] Reading stress fields ...")
-times = np.array([read_time(f) for f in vtk_files])
+headers = [read_header(f) for f in vtk_files]
+times = np.array([h[0] for h in headers])
+step_names = [h[1] for h in headers]
+step_times = np.array([h[2] for h in headers])
 point_stress, load_stress = [], []
 for fpath in vtk_files:
     frame = pv.read(fpath)
@@ -145,16 +160,20 @@ for i, vm in enumerate(load_stress):
         raw_phi[i] = np.arctan2(np.sin(rim_angle[hot]).mean(), np.cos(rim_angle[hot]).mean())
 del load_stress
 
-rolling = (times >= T_RAMP - 1e-6) & ~np.isnan(raw_phi)
-phi_unwrapped = np.unwrap(raw_phi[rolling])
-omega, phi_ramp = np.polyfit(times[rolling] - T_RAMP, phi_unwrapped, 1)
-phi = phi_ramp + omega * np.clip(times - T_RAMP, 0.0, None)
-travel_deg = np.abs(np.rad2deg(phi - phi_ramp))
-fit_err = np.rad2deg(np.abs(phi_unwrapped - (phi_ramp + omega * (times[rolling] - T_RAMP)))).max()
+phi = np.zeros(total_frames)
+travel_deg = np.zeros(total_frames)
+for step in dict.fromkeys(step_names):
+    in_step = np.array([name == step for name in step_names])
+    rolling = in_step & (step_times >= T_RAMP - 1e-6) & ~np.isnan(raw_phi)
+    phi_unwrapped = np.unwrap(raw_phi[rolling])
+    omega, phi_ramp = np.polyfit(step_times[rolling] - T_RAMP, phi_unwrapped, 1)
+    phi[in_step] = phi_ramp + omega * np.clip(step_times[in_step] - T_RAMP, 0.0, None)
+    travel_deg[in_step] = np.abs(np.rad2deg(phi[in_step] - phi_ramp))
+    fit_err = np.rad2deg(np.abs(phi_unwrapped - (phi_ramp + omega * (step_times[rolling] - T_RAMP)))).max()
 
-print(f"[KINEMATICS] Load starts at {np.rad2deg(phi_ramp):.1f} deg and travels at "
-      f"{np.rad2deg(omega):.1f} deg/s ({travel_deg[-1]:.1f} deg in total)")
-print(f"[KINEMATICS] Largest deviation from constant speed: {fit_err:.1f} deg")
+    print(f"[KINEMATICS] {step or 'Step'}: load starts at {np.rad2deg(phi_ramp):.1f} deg and travels at "
+          f"{np.rad2deg(omega):.1f} deg/s ({travel_deg[in_step][-1]:.1f} deg in total)")
+    print(f"[KINEMATICS] {step or 'Step'}: largest deviation from constant speed {fit_err:.1f} deg")
 
 # -------------------------------------------------------------
 # 4. Colour scale and legend
@@ -293,10 +312,13 @@ def render_frame(idx):
             draw.line([(k * PANEL, 0), (k * PANEL, PANEL)], fill="#9a9da5", width=1)
     draw.line([(0, PANEL), (3 * PANEL, PANEL)], fill="#9a9da5", width=1)
 
-    if times[idx] < T_RAMP - 1e-6:
+    if step_times[idx] < T_RAMP - 1e-6:
         stage = "load ramp"
     else:
         stage = f"load position {travel_deg[idx]:.1f}°"
+    for keyword, label in STEP_LABELS.items():
+        if keyword in step_names[idx].upper():
+            stage = f"{label}   |   {stage}"
     img.paste(legend_strip, (4, PANEL + 1))
     draw.text((1.5 * PANEL, PANEL + 26), f"t = {times[idx]:.2f} s   |   {stage}",
               fill="black", font=font_title, anchor="ma")
@@ -309,7 +331,7 @@ def render_frame(idx):
 # -------------------------------------------------------------
 if args.frames:
     for idx in [int(s) for s in args.frames.split(",")]:
-        out_png = os.path.join(script_dir, f"preview_{idx:04d}.png")
+        out_png = os.path.join(os.path.dirname(OUTPUT_GIF), f"preview_{idx:04d}.png")
         render_frame(idx).save(out_png)
         print(f"[INFO] Preview written: {out_png}")
     sys.exit(0)

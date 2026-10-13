@@ -360,14 +360,21 @@ def export_odb_to_vtk(odb_name, step_names=None, output_prefix="gear_vtk"):
     if use_bulk and tensor_frames > 1:
         cycle_filename = "%s_fatigue_cycle.vtk" % output_prefix
         print("[INFO] Evaluating the load cycle over %d frames -> %s" % (tensor_frames, cycle_filename))
-        cycle_data = cycle_fatigue_fields(tensor_filename, num_nodes)
-        for name, values in cycle_data:
-            print("[INFO]   %-24s %.1f to %.1f MPa" % (name, values.min(), values.max()))
-        write_vtk(cycle_filename, "Abaqus ODB Export Fatigue Cycle %d frames" % tensor_frames,
-                  points, cells, cell_types, cycle_data, [])
+        # The frames are already on disk: a failure here must not stop the pipeline
+        try:
+            cycle_data = cycle_fatigue_fields(tensor_filename, num_nodes)
+            for name, values in cycle_data:
+                print("[INFO]   %-24s %.1f to %.1f MPa" % (name, values.min(), values.max()))
+            write_vtk(cycle_filename, "Abaqus ODB Export Fatigue Cycle %d frames" % tensor_frames,
+                      points, cells, cell_types, cycle_data, [])
+        except Exception as error:
+            print("[WARNING] Fatigue cycle file not written (%s)." % error)
     else:
         print("[WARNING] Fatigue cycle file not written (nodal stress tensor not available).")
-    os.remove(tensor_filename)
+    try:
+        os.remove(tensor_filename)
+    except OSError:
+        pass
 
     print("[INFO] Export completed successfully: %d frames." % f_idx)
 
