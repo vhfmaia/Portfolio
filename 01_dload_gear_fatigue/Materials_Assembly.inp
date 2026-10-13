@@ -20,7 +20,7 @@
 **   - Core bulk properties (cross-section 16-40 mm, rim width b = 30 mm):
 **       * Young's modulus E = 210,000 MPa, Poisson's ratio nu = 0.30
 **       * Density rho = 7.85e-9 tonne/mm^3 (7850 kg/m^3)
-**       * Core yield strength Rp0.2 = 750.0 MPa (calibrated from Renault / Husson et al.)
+**       * Core yield strength Rp0.2 = 750.0 MPa (calibrated from Husson et al., 2014)
 **       * Core tensile strength Rm = 1050.0 MPa, elongation A5 = 10%
 **       * Thermal expansion alpha = 1.15e-5 K^-1
 ** ------------------------------------------------------------------------------

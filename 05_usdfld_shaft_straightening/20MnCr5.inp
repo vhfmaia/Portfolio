@@ -18,7 +18,7 @@
 **    - Base Alloy: 20MnCr5 (DIN EN 10084 / WNr. 1.7147 / SAE 5120 equivalent).
 **    - Transmission Shaft CAD Geometry: Authentic automotive secondary shaft
 **      (arvore_secundaria_husson.step / husson_shaft.step, L = 285.5 mm).
-**    - Carburizing & Oil Quench Heat Treatment: Lot E industrial batch (Arts et Metiers / Renault).
+**    - Carburizing & Oil Quench Heat Treatment: Lot E industrial batch (Husson et al., 2014).
 **    - Microhardness Profile across Depth: Measured Vickers HV0.1 from outer case
 **      surface (d = 0.0 mm, 60.5 HRC / ~700 HV) to ductile core (d > 2.0 mm, 30.0 HRC / ~300 HV).
 **    - Effective Case Depth (CHD / Eht 550 HV1): d_case = 0.60 mm.
