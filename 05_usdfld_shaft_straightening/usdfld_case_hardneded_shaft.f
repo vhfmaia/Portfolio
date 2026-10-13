@@ -2,7 +2,7 @@
 ! ABAQUS/STANDARD USER DEFINED FIELD SUBROUTINE: USDFLD
 !=======================================================================
 ! Project:    05. Secondary Transmission Shaft Straightening & Springback
-! Model CAD:  arvore_secundaria_husson.step (L = 294.1 mm)
+! Model CAD:  husson_shaft.step (Z = -8.6 to 285.5 mm, L = 294.1 mm)
 ! Subroutine: USDFLD (User Defined Field)
 ! Solver:     Abaqus/Standard (Implicit)
 ! Language:   Fortran 2008 / Fixed-Free Form Compatible
@@ -14,7 +14,7 @@
 !     d(r, z) = R_outer(z) - sqrt((x - x0)^2 + (y - y0)^2)
 !
 ! Outer radius profile R_outer(z) is mapped according to the CAD 
-! geometry of the secondary shaft (arvore_secundaria_husson.step):
+! geometry of the secondary shaft (husson_shaft.step):
 !   - Bearing Seat 1 (Z < 35 mm):          R = 12.5 mm  (Dia 25 mm)
 !   - Main Central Span (35 <= Z <= 180):   R = 19.0 mm  (Dia 38 mm) [Punch zone]
 !   - Stepped Shoulder (180 < Z <= 250):   R = 25.5 mm  (Dia 51 mm)
@@ -80,7 +80,7 @@
 
       !-----------------------------------------------------------------
       ! 2. Piecewise Outer Radius Mapping (Stepped Shaft Profile)
-      !    Calibrated to arvore_secundaria_husson.step
+      !    Calibrated to husson_shaft.step
       !-----------------------------------------------------------------
       IF (Z_CURR .LT. 35.0D0) THEN
          R_OUTER = 12.5D0

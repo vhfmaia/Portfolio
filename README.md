@@ -101,7 +101,7 @@ The portfolio demonstrates a complete engineering R&D cycle comparing two distin
 </p>
 
 <div align="justify">
-Three-point press straightening and springback of a case-hardened 20MnCr5 secondary transmission shaft, on the benchmark geometry of Husson et al. (<i>L</i> = 285.5 mm, DOI: <a href="https://doi.org/10.1007/s00170-014-5688-8">10.1007/s00170-014-5688-8</a>). A <code>USDFLD</code> subroutine maps the radial depth below the surface to a field variable at every integration point, so the carburized case and the core are one continuous material with depth-dependent properties, without partitioning the geometry into layers.
+Three-point press straightening and springback of a case-hardened 20MnCr5 secondary transmission shaft, on the benchmark geometry of Husson et al. (<i>L</i> = 294.1 mm, DOI: <a href="https://doi.org/10.1007/s00170-014-5688-8">10.1007/s00170-014-5688-8</a>). A <code>USDFLD</code> subroutine maps the radial depth below the surface to a field variable at every integration point, so the carburized case and the core are one continuous material with depth-dependent properties, without partitioning the geometry into layers.
 </div>
 
 #### Key Modelling Features:

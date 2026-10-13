@@ -6,7 +6,7 @@
 ** Material:     20MnCr5 (DIN EN 10084 / 1.7147 / AISI 5120 Equivalent)
 ** Treatment:    Gas Carburized, Accelerated Oil Quenched & Tempered (180 deg C)
 ** Case Depth:   Effective Case Depth CHD = 0.60 mm (Eht 550 HV1)
-** Subroutine:   USDFLD (User Defined Field Subroutine: USDFLD.f)
+** Subroutine:   USDFLD (usdfld_case_hardneded_shaft.f)
 ** Formulation:  Chaboche 2-Backstress Nonlinear Kinematic Hardening (Armstrong-Frederick)
 **               Coupled with Voce Exponential Isotropic Hardening via USDFLD FV1
 ** Units System: SI Metric (mm, N, tonne, MPa, mJ, s)
@@ -16,8 +16,8 @@
 ** ==============================================================================
 ** 1. DIRECT EXPERIMENTAL MEASUREMENTS (Husson et al., 2014, IJAMT, DOI: 10.1007/s00170-014-5688-8):
 **    - Base Alloy: 20MnCr5 (DIN EN 10084 / WNr. 1.7147 / SAE 5120 equivalent).
-**    - Transmission Shaft CAD Geometry: Authentic automotive secondary shaft
-**      (arvore_secundaria_husson.step / husson_shaft.step, L = 285.5 mm).
+**    - Transmission Shaft CAD Geometry: secondary shaft of the benchmark
+**      (husson_shaft.step, Z = -8.6 to 285.5 mm, overall length 294.1 mm).
 **    - Carburizing & Oil Quench Heat Treatment: Lot E industrial batch (Husson et al., 2014).
 **    - Microhardness Profile across Depth: Measured Vickers HV0.1 from outer case
 **      surface (d = 0.0 mm, 60.5 HRC / ~700 HV) to ductile core (d > 2.0 mm, 30.0 HRC / ~300 HV).

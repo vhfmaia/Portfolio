@@ -22,7 +22,7 @@ To ensure coaxiality and satisfy stringent powertrain <b>Total Indicated Runout 
 </p>
 
 <div align="justify">
-This repository documents an advanced, high-fidelity three-dimensional finite element analysis (FEA) framework implemented in <b>Abaqus/Standard</b>. The pipeline models the complete non-linear mechanical response of a case-hardened secondary transmission shaft based on industrial benchmarking geometry (<code>arvore_secundaria_husson.step</code>):
+This repository documents an advanced, high-fidelity three-dimensional finite element analysis (FEA) framework implemented in <b>Abaqus/Standard</b>. The pipeline models the complete non-linear mechanical response of a case-hardened secondary transmission shaft based on industrial benchmarking geometry (<code>husson_shaft.step</code>):
 </div>
 
 1. **Initial Quenching Residual Stress Pre-Equilibrium:** Dissipation of self-equilibrating thermal-martensitic residual stress tensors (-350 to -500 MPa compressive case, +150 to +250 MPa tensile core);
@@ -92,9 +92,9 @@ A critical requirement in high-precision finite element analysis is <b>parameter
 #### Data Source Classification Matrix:
 
 1. **Direct Experimental Measurements (Primary Source: Husson et al., 2014):**
-   * *Benchmark Publication:* Rémi Husson, Cyrille Baudouin, Régis Bigot, E. Surand, *"Consideration of residual stress and geometry during heat treatment to decrease shaft bending"*, *The International Journal of Advanced Manufacturing Technology* (2014) 72:1455–1463, DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8) (Arts et Métiers ParisTech / Renault SAS Powertrain).
+   * *Benchmark Publication:* Rémi Husson, Cyrille Baudouin, Régis Bigot, Edoardo Sura, *"Consideration of residual stress and geometry during heat treatment to decrease shaft bending"*, *The International Journal of Advanced Manufacturing Technology* (2014) 72:1455–1463, DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8) (Arts et Métiers ParisTech / Renault SAS Powertrain).
    * *Base Steel Alloy:* 20MnCr5 (DIN EN 10084, WNr. 1.7147, SAE 5120 equivalent).
-   * *CAD Component Geometry:* Authentic secondary transmission countershaft (`arvore_secundaria_husson.step` / `husson_shaft.step`, total length $L = 285.5\text{ mm}$), featuring Ø25 mm splines, Ø38 mm central bearing journal, Ø51 mm shoulder, Ø66.9 mm helical gear, and 4 transverse lubrication cross-holes.
+   * *CAD Component Geometry:* Secondary transmission countershaft of the benchmark (`husson_shaft.step`, $Z = -8.6$ to $285.5\text{ mm}$, overall length $L = 294.1\text{ mm}$), featuring Ø25 mm splines, Ø38 mm central bearing journal, Ø51 mm shoulder, Ø66.9 mm helical gear, and 4 transverse lubrication cross-holes.
    * *Heat Treatment Condition:* Gas carburized, liquid oil quenched ($860^\circ\text{C}$), and tempered ($180^\circ\text{C}$) (Industrial experimental batch **Lot E**).
    * *Microhardness Depth Profile:* Directly measured Vickers microhardness values ($HV_{0.1}$) spanning from the outer surface ($d = 0.0\text{ mm}$, $60.5\text{ HRC}$ / $\sim 700\text{ HV}$) through the case boundary down to the ductile base core ($d > 2.0\text{ mm}$, $30.0\text{ HRC}$ / $\sim 300\text{ HV}$).
    * *Effective Case Depth (CHD / Eht 550 HV1):* Measured at $d_{\text{case}} = 0.60\text{ mm}$.
@@ -117,7 +117,7 @@ A critical requirement in high-precision finite element analysis is <b>parameter
 
 | Parameter | Identifier in Deck | Value Range | Physical Significance | Exact Provenance & Calibration Origin |
 | :--- | :--- | :---: | :--- | :--- |
-| **Field Variable 1** | `FIELD(1)` / `FV1` | 0.00–25.0 mm | Radial depth from external surface $d(r,z) = R_{\text{outer}}(z) - r$ | Computed dynamically at integration points via `GETVRM('COORD', ...)` in `USDFLD.f` |
+| **Field Variable 1** | `FIELD(1)` / `FV1` | 0.00–25.0 mm | Radial depth from external surface $d(r,z) = R_{\text{outer}}(z) - r$ | Computed dynamically at integration points via `GETVRM('COORD', ...)` in `usdfld_case_hardneded_shaft.f` |
 | **Initial Yield Stress** | $\sigma_{y,0}$ | 1900.0 &rarr; 750.0 MPa | Size of initial elastic yield domain | Measured microhardness profile (Husson 2014, Lot E) converted via Tabor's relation |
 | **Kinematic Modulus 1** | $C_1$ | 125.0 &rarr; 80.0 GPa | Initial kinematic hardening tangent modulus | Cyclic push-pull data (Lang & Vöhringer 1995) + inverse FEA optimization |
 | **Dynamic Recovery 1** | $\gamma_1$ | 180.0 &rarr; 120.0 | Backstress saturation rate for component 1 | Fitted from nonlinear transition shoulder of initial backstress $\boldsymbol{\alpha}_1$ |
@@ -172,7 +172,7 @@ $$\sigma_y(p) = \sigma_{y,0}(FV_1) + Q_\infty(FV_1) \left( 1 - e^{-b(FV_1) \, p}
 ## 4. Finite Element Discretization Strategy: The Industrial Tetrahedral Approach
 
 <div align="justify">
-In academic textbooks, cylindrical shafts are frequently discretized using idealized structured hexahedral meshes (such as <code>C3D8I</code> with O-grid blocking). However, in realistic automotive transmission shafts—such as the actual secondary shaft analyzed here (<code>arvore_secundaria_husson.step</code>)—the geometry features:
+In academic textbooks, cylindrical shafts are frequently discretized using idealized structured hexahedral meshes (such as <code>C3D8I</code> with O-grid blocking). However, in realistic automotive transmission shafts—such as the actual secondary shaft analyzed here (<code>husson_shaft.step</code>)—the geometry features:
 </div>
 
 1. **Cross-Drilled Lubrication Holes:** Transverse internal channels (Ø3.5 mm and Ø8.0 mm) drilled through the shaft core to supply oil to bearing journals;
@@ -269,11 +269,11 @@ Traditional <code>C3D10</code> elements distribute equivalent nodal forces unequ
 ## 7. Subroutine Architecture & Integration (`USDFLD`)
 
 <div align="justify">
-The user subroutine is packaged as a standalone modern Fortran 2008 file (<code>src/USDFLD.f</code>). At every material integration point:
+The user subroutine is packaged as a standalone modern Fortran 2008 file (<code>usdfld_case_hardneded_shaft.f</code>). At every material integration point:
 </div>
 
 1. `CALL GETVRM('COORD', ...)` extracts the current 3D coordinates (<i>x</i>, <i>y</i>, <i>z</i>);
-2. The outer radius profile <i>R</i><sub>outer</sub>(<i>z</i>) is evaluated piecewise based on the shaft stepped CAD geometry (`arvore_secundaria_husson.step`):
+2. The outer radius profile <i>R</i><sub>outer</sub>(<i>z</i>) is evaluated piecewise based on the shaft stepped CAD geometry (`husson_shaft.step`):
    * Seat 1 (<i>Z</i> &lt; 35 mm): <i>R</i> = 12.5 mm (Ø25 mm);
    * Central Journal (35 &le; <i>Z</i> &le; 180 mm): <i>R</i> = 19.0 mm (Ø38 mm, punch contact section);
    * Shoulder (180 &lt; <i>Z</i> &le; 250 mm): <i>R</i> = 25.5 mm (Ø51 mm);
@@ -291,47 +291,25 @@ $$d(r, z) = R_{\text{outer}}(z) - \sqrt{(x - x_0)^2 + (y - y_0)^2}$$
 
 ```text
 05_usdfld_shaft_straightening/
-├── src/
-│   └── USDFLD.f                      # Fortran 2008 user subroutine (Stepped radius & PEEQ tracking)
-├── model/
-│   ├── master_straightening.inp      # Master input deck orchestrating 3-step solution
-│   ├── secondary_shaft_c3d10m.inp    # 3D quadratic tetrahedral mesh (C3D10M) with lubrication holes
-│   ├── material_chaboche_gradient.inp# Field-dependent Chaboche kinematic hardening deck
-│   ├── step0_prestress_equil.inp     # Initial quenching stress field & isostatic balance
-│   ├── step1_punch_stroke.inp        # Displacement-controlled bending contact step
-│   └── step2_springback_unload.inp   # Punch retraction and TIR springback step
-├── cad/
-│   └── arvore_secundaria_husson.step # Native 3D CAD model of secondary transmission shaft
-├── scripts/
-│   ├── verify_material_curve.py      # Analytical Chaboche cyclic hysteresis curve generator
-│   ├── run_simulation_pipeline.py    # Automated batch executor & convergence monitor
-│   └── extract_springback_tir.py     # Python script to extract centerline runout from ODB
+├── usdfld_case_hardneded_shaft.f     # USDFLD user subroutine (stepped outer radius, depth field variable, PEEQ)
+├── 20MnCr5.inp                       # Depth-dependent Chaboche + Voce material deck (include file)
+├── husson_shaft.step                 # CAD geometry of the secondary transmission shaft
 └── README.md                         # Technical report & documentation
 ```
+
+The mesh and the master input deck of the three-step analysis are not stored in the repository. The model is rebuilt from the CAD geometry following Sections 4 and 5.
 
 ---
 
 ## 9. Execution Guide (Abaqus / SIMULIA 3DEXPERIENCE)
 
-### Automated Pipeline Execution
-
-Execute the full straightening and springback extraction pipeline via the provided Python driver:
+With a master deck that includes the material card and assigns it to the shaft section (`*INCLUDE, INPUT=20MnCr5.inp`, see the header of that file):
 
 ```bash
-python scripts/run_simulation_pipeline.py --job shaft_straightening --cpus 8
+abaqus job=shaft_straightening input=<master_deck>.inp user=usdfld_case_hardneded_shaft.f cpus=8 interactive
 ```
 
-### Manual Command-Line Execution
-
-#### 1. Execute 3-Step Abaqus/Standard Simulation with Subroutine
-```bash
-abaqus job=shaft_straightening input=model/master_straightening.inp user=src/USDFLD.f cpus=8 interactive
-```
-
-#### 2. Extract Residual Runout (TIR) from ODB
-```bash
-abaqus python scripts/extract_springback_tir.py shaft_straightening.odb --output-plot tir_profile.png
-```
+The residual runout is evaluated from the displacement $U_y$ of the centerline nodes after the unloading step (Section 5, Step 2).
 
 ---
 
@@ -352,7 +330,7 @@ The simulation results demonstrate excellent correlation with physical press str
 
 ## 11. Standards & References
 
-1. **Li, F., et al. (2014):** *Study on the straightening process of shaft with case-hardening layer*, The International Journal of Advanced Manufacturing Technology, 74(5-8), 5688. [DOI: 10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8).
+1. **Husson, R., Baudouin, C., Bigot, R., & Sura, E. (2014):** *Consideration of residual stress and geometry during heat treatment to decrease shaft bending*, The International Journal of Advanced Manufacturing Technology, 72(9-12), 1455–1463. [DOI: 10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8).
 2. **Chaboche, J. L. (1986):** *Time-independent constitutive theories for cyclic plasticity*, International Journal of Plasticity, 2(2), 149–188.
 3. **Chaboche, J. L. (1989):** *Constitutive equations for cyclic plasticity and cyclic viscoplasticity*, International Journal of Plasticity, 5(3), 247–302.
 4. **Armstrong, P. J., & Frederick, C. O. (1966):** *A mathematical representation of the multiaxial Bauschinger effect*, CEGB Report RD/B/N 731, Central Electricity Generating Board.
