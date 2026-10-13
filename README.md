@@ -61,10 +61,10 @@ Sequentially coupled thermo-mechanical analysis of circumferential laser welding
 </div>
 
 #### Key Thermal, Metallurgical & Mechanical Highlights:
-- **3D Conical Gaussian Heat Source:** Analytically normalized peak flux *Q*<sub>0</sub> = 4.6935 × 10⁵ mW/mm³ with 10° linear power ramp-up, 360° steady weld, and 10° crater-filling ramp-down overlap.
+- **3D Conical Gaussian Heat Source:** Analytically normalized peak flux *Q*<sub>0</sub> = 4.4598 × 10⁵ mW/mm³ with 10° linear power ramp-up, 360° steady weld, and 10° crater-filling ramp-down overlap.
 - **Unified Material Architecture:** Single `Material_16MnCr5.inp` shared by both thermal and mechanical simulations, ensuring seamless data consistency.
 - **Metallurgical Kinetics & Solidification (BTR):** Tracks liquidus/solidus melt pool kinetics and solid-state phase decomposition (Ferrite-Pearlite, Austenite, Bainite, Martensite via JMA and Koistinen-Marburger kinetics).
-- **Quadratic Unsymmetric Thermal Convergence:** Direct unsymmetric solver formulation (`UNSYMM=YES`) resolving non-symmetric metallurgical tangent matrices, localized reference flux controls (`*CONTROLS, PARAMETERS=FIELD`) eliminating cold-element dilution, and uninhibited Newton-Raphson steps without line search under-relaxation.
+- **Quadratic Unsymmetric Thermal Convergence:** Direct unsymmetric solver formulation (`UNSYMM=YES`) resolving non-symmetric metallurgical tangent matrices, localized reference flux controls (`*CONTROLS, PARAMETERS=FIELD`) eliminating cold-element dilution, and a documented criterion for when line search helps or hinders across the latent heat interval.
 - **Sequentially Coupled Structural Analysis:** Mitigates high-temperature volumetric locking via hybrid formulation elements (`C3D8H`), hydrostatic gravity stabilization, and finite-strain kinematics (`NLGEOM=YES`).
 
 <div align="justify">

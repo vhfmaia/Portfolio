@@ -44,23 +44,23 @@ $$R_0(z) = r_e + (r_i - r_e) \frac{z}{z_i}$$
 
 ### 1.2 Analytical Volume Energy Conservation (Farrokhi et al. / Wu et al. TDC Model)
 
-To guarantee that the integrated thermal power inside the conical envelope ($r \le R_0(z)$, $0 \le z \le z_i$) strictly equals the absorbed laser power ($P_{\text{abs}} = \eta \cdot Q_{\text{tot}}$), the peak flux $Q_0$ is derived analytically by integrating the Three-Dimensional Conical (TDC) Gaussian distribution:
+To guarantee that the integrated thermal power strictly equals the absorbed laser power ($P_{\text{abs}} = \eta \cdot Q_{\text{tot}}$), the peak flux $Q_0$ is derived analytically by integrating the Three-Dimensional Conical (TDC) Gaussian distribution over the depth $0 \le z \le z_i$. The subroutine does not truncate the Gaussian at the cone radius $R_0(z)$ (Section 4.3), so the radial integral is taken over the complete distribution:
 
-$$\int_V q(r, z) \, dV = \int_0^{z_i} \left[ \int_0^{R_0(z)} Q_0 \exp\left( -3 \frac{r^2}{R_0(z)^2} \right) 2\pi r \, dr \right] dz$$
+$$\int_V q(r, z) \, dV = \int_0^{z_i} \left[ \int_0^{\infty} Q_0 \exp\left( -3 \frac{r^2}{R_0(z)^2} \right) 2\pi r \, dr \right] dz$$
 
-Evaluating the radial Gaussian integral up to the cone boundary $r = R_0(z)$:
-
-$$\int_0^{R_0(z)} \exp\left( -3 \frac{r^2}{R_0(z)^2} \right) 2\pi r \, dr = \frac{\pi R_0(z)^2}{3} \left( 1 - e^{-3} \right) = \frac{\pi R_0(z)^2}{3} \cdot \frac{e^3 - 1}{e^3}$$
+$$\int_0^{\infty} \exp\left( -3 \frac{r^2}{R_0(z)^2} \right) 2\pi r \, dr = \frac{\pi R_0(z)^2}{3}$$
 
 Integrating along the conical penetration depth $z \in [0, z_i]$:
 
 $$\int_0^{z_i} R_0(z)^2 \, dz = \int_0^{z_i} \left[ r_e + (r_i - r_e) \frac{z}{z_i} \right]^2 dz = \frac{z_i}{3} \left( r_e^2 + r_e r_i + r_i^2 \right)$$
 
-Combining terms and equating to the absorbed beam power $\eta \cdot Q_{\text{tot}}$ yields the exact analytical prefactor (Farrokhi et al. 2019, Wu et al. 2006, Liu et al. 2022):
+Combining terms and equating to the absorbed beam power $\eta \cdot Q_{\text{tot}}$ yields the prefactor coded in `dflux_disk_conical_gaussian.f`:
 
-$$Q_0 = \frac{9 \, \eta Q_{\text{tot}} \, e^3}{\pi (e^3 - 1) z_i \left( r_e^2 + r_e r_i + r_i^2 \right)}$$
+$$Q_0 = \frac{9 \, \eta Q_{\text{tot}}}{\pi \, z_i \left( r_e^2 + r_e r_i + r_i^2 \right)}$$
 
-For nominal parameters ($P_l = 1800\text{ W}$, $\eta = 0.60 \implies P_{\text{abs}} = 1080\text{ W}$, $r_e = 1.0\text{ mm}$, $r_i = 0.75\text{ mm}$, and $z_i = 3.0\text{ mm}$), the analytical peak core flux is $Q_0 = 4.6935 \times 10^5\text{ mW/mm}^3$ ($469.35\text{ W/mm}^3$).
+For nominal parameters ($P_l = 1800\text{ W}$, $\eta = 0.60 \implies P_{\text{abs}} = 1080\text{ W}$, $r_e = 1.0\text{ mm}$, $r_i = 0.75\text{ mm}$, and $z_i = 3.0\text{ mm}$), the analytical peak core flux is $Q_0 = 4.4598 \times 10^5\text{ mW/mm}^3$ ($445.98\text{ W/mm}^3$). The numerical cutoff of the tail at $r_{\text{cut}} \approx 2.48 \, R_0(z)$ removes a fraction $10^{-8}$ of the power.
+
+If the distribution is instead truncated at $r = R_0(z)$, as in the original TDC formulation (Farrokhi et al. 2019, Wu et al. 2006, Liu et al. 2022), the radial integral carries the factor $(1 - e^{-3})$ and the prefactor becomes $Q_0 \, e^3 / (e^3 - 1)$, i.e. $4.6935 \times 10^5\text{ mW/mm}^3$. Using that value with the untruncated tail would deposit 5.2 % more than the absorbed power.
 
 <p align="center">
   <img src="../99_images_and_miscelania/conical_heat_source_improved_plot.svg" alt="Abaqus DFLUX 3D Conical Gaussian Heat Source Model, Cross-Section, Joint Trajectory and Power Schedule" width="100%" />
@@ -366,15 +366,24 @@ When <code>UNSYMM=YES</code> is omitted, Abaqus defaults to the symmetric direct
 ```
 
 <div align="justify">
-In standard Abaqus heat transfer, the residual equilibrium tolerance is computed as <i>R</i><sub>tol</sub> = <i>R</i><sub><i>n</i></sub><sup><i>α</i></sup> · <i>q̃</i>, where <i>q̃</i> is the time-averaged flux across the <i>entire mesh</i>. In this 225,000-element model, over 99.7% of elements are outside the laser spot (<i>q</i> = 0). Dilution drops <i>q̃</i> to ~25 mW/mm³, forcing an unphysically microscopic residual tolerance of 0.125 mW/mm³ against a peak laser source of 469,000 mW/mm³ (2.6 × 10⁻⁷ relative error). Setting an explicit characteristic weld pool flux norm <i>q̄</i> = 250.0 mW/mm³ locks the tolerance to 2.5 mW/mm³ (5 × 10⁻⁶ relative tolerance), preventing spurious solver rejections.
+In standard Abaqus heat transfer, the residual equilibrium tolerance is computed as <i>R</i><sub>tol</sub> = <i>R</i><sub><i>n</i></sub><sup><i>α</i></sup> · <i>q̃</i>, where <i>q̃</i> is the time-averaged flux across the <i>entire mesh</i>. In this 225,000-element model, over 99.7% of elements are outside the laser spot (<i>q</i> = 0). Dilution drops <i>q̃</i> to ~25 mW/mm³, forcing an unphysically microscopic residual tolerance of 0.125 mW/mm³ against a peak laser source of 446,000 mW/mm³ (2.8 × 10⁻⁷ relative error). Setting an explicit characteristic weld pool flux norm <i>q̄</i> = 250.0 mW/mm³ locks the tolerance to 2.5 mW/mm³ (5.6 × 10⁻⁶ relative tolerance), preventing spurious solver rejections.
 </div>
 
 <div align="justify">
 <ol start="3">
   <li><b>Deactivation of Line Search:</b></li>
 </ol>
-Line Search scale factors (<i>η</i> ∈ [0.35, 0.72]) artificially under-relax Newton steps across the latent heat plateau (1485 °C – 1530 °C), trapping temperatures inside the transition zone and causing iteration stalling. Removing line search enables uninhibited Newton-Raphson steps across phase fronts.
+On this model, line search with its default limits (<i>η</i> ∈ [0.35, 0.72] observed) under-relaxed Newton steps across the latent heat plateau (1485 °C – 1530 °C), trapping temperatures inside the transition zone and causing iteration stalling, so it is not used here.
 </div>
+
+<div align="justify">
+This choice is model dependent. The opposite failure also exists: when a Newton correction carries a node across the whole solidus–liquidus interval, the iteration can settle into a limit cycle between the solid and the liquid state of that node. Its signature is a residual that repeats with a period of a few iterations and whose amplitude times the time increment is constant, equal to the latent heat of the nodal volume (<i>ρ</i> <i>L</i> <i>V</i><sub>node</sub>). Cutting the time increment does not remove it, because the residual grows as 1/Δ<i>t</i>. In that situation line search is the remedy, with a lower bound on the scale factor so that the correction is not damped to a stall:
+</div>
+
+```inp
+*CONTROLS, PARAMETERS=LINE SEARCH
+5, 1.0, 0.25, 0.25, 0.10
+```
 
 ---
 
