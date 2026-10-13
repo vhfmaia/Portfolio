@@ -91,8 +91,8 @@ with $\varphi = \left(u_c - u_A \pm (z - z_{\text{mid}})\tan\beta_b\right) \bmod
 | Mesh | 508,500 nodes, 251,210 quadratic elements, 1,488,072 equations (not stored in the repository, see Section 4.1) |
 | Crown gear | Toothed rim in `C3D10` (111,490 elements) tied to a structured `C3D20` ring (24,000 elements) |
 | Differential carrier | Body in `C3D10` (106,120 elements) tied to a structured `C3D20` ring (9,600 elements) |
-| Weld interface | Cylindrical interface at $R = 55$ mm. Weld seam ($Z \in [20.8, 25]$ mm) bonded over a 260° arc (`NO SEPARATION`, `ROUGH`) |
-| Weld flaw | Remaining 100° arc left unbonded; the full interface carries frictional contact ($\mu = 0.20$, penalty) |
+| Weld interface | Cylindrical interface at $R = 55$ mm. Weld seam ($Z \in [20.8, 25]$ mm) bonded over a 252° arc, i.e. 140 of the 200 circumferential element columns (`NO SEPARATION`, `ROUGH`) |
+| Weld flaw | Remaining 108° arc left unbonded ($\theta = 36°$ to $144°$, 30 % of the circumference); the full interface carries frictional contact ($\mu = 0.20$, penalty) |
 | Bearing supports | Kinematic couplings from the bearing seats to reference node `RP_BEARING` on the axis, fully fixed |
 | Materials | `Materials_Assembly.inp`: 20MC5 (crown), GJS600-10 (carrier), elastic-plastic |
 

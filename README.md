@@ -32,14 +32,14 @@ A repository of production-grade user subroutines for <b>Abaqus/Standard</b> and
 </p>
 
 <div align="justify">
-Finite element simulation (1.49 million equations) of an automotive helical crown gear (20MC5) laser-welded with Inconel filler wire to its differential carrier (EN-GJS-600-10), with a 100° incomplete-penetration weld flaw. The tooth contact load is applied analytically by a <code>DLOAD</code> subroutine and rolled across the full 360° revolution, in drive and in coast (regeneration), without meshing the pinion.
+Finite element simulation (1.49 million equations) of an automotive helical crown gear (20MC5) laser-welded with Inconel filler wire to its differential carrier (EN-GJS-600-10), with a 108° incomplete-penetration weld flaw (30 % of the circumference). The tooth contact load is applied analytically by a <code>DLOAD</code> subroutine and rolled across the full 360° revolution, in drive and in coast (regeneration), without meshing the pinion.
 </div>
 
 #### Key Features & Verification:
 - **Drive and Coast Load Cases:** active flank and torque selected per analysis step, covering manual drivelines and hybrid / electric drivelines with torque reversal.
 - **Constant Transmitted Torque:** the pressure field integrates to $+270.03\text{ N}\cdot\text{m}$ (drive) and $-270.11\text{ N}\cdot\text{m}$ (coast) over the flank surfaces, with ripple below $0.15\%$ through the revolution.
 - **Finite Element Load Path:** reaction torque at the bearing reference node $-270.13\text{ N}\cdot\text{m}$ against $-270.0$ applied ($0.05\%$), averaged over the full revolution; transverse and axial bearing forces within $0.1\%$ of gear force theory.
-- **Welded Assembly:** bonded weld seam over 260°, frictional contact across the unbonded flaw, kinematic couplings at the bearing seats.
+- **Welded Assembly:** bonded weld seam over 252°, frictional contact across the unbonded flaw, kinematic couplings at the bearing seats.
 - **Fatigue Method:** stress-range evaluation per critical point with S-N curves and Palmgren-Miner damage summation for an OEM load spectrum.
 
 <div align="justify">
