@@ -2,7 +2,7 @@
 ** ABAQUS/STANDARD MATERIAL CARD INCLUDE DECK: 20MnCr5 (1.7147)
 ** ==============================================================================
 ** Project:      05. Elastoplastic Straightening & Springback Analysis
-** Component:    Secondary Transmission Countershaft (Husson Benchmark)
+** Component:    Secondary Transmission Countershaft
 ** Material:     20MnCr5 (DIN EN 10084 / 1.7147 / AISI 5120 Equivalent)
 ** Treatment:    Gas Carburized, Accelerated Oil Quenched & Tempered (180 deg C)
 ** Case Depth:   Effective Case Depth CHD = 0.60 mm (Eht 550 HV1)
@@ -12,30 +12,37 @@
 ** Units System: SI Metric (mm, N, tonne, MPa, mJ, s)
 ** Author:       Victor Maia (Numerical Simulation & FEA Specialist)
 ** ==============================================================================
-** DATA PROVENANCE & EMPIRICAL CALIBRATION METHODOLOGY (MEASURED vs LITERATURE)
+** DATA PROVENANCE & EMPIRICAL CALIBRATION METHODOLOGY (PUBLISHED vs ASSUMED)
 ** ==============================================================================
-** 1. DIRECT EXPERIMENTAL MEASUREMENTS (Husson et al., 2014, IJAMT, DOI: 10.1007/s00170-014-5688-8):
+** 1. PUBLISHED CONTEXT (Husson et al., 2014, IJAMT, DOI: 10.1007/s00170-014-5688-8;
+**    Husson, 2013, PhD thesis, Arts et Metiers ParisTech, NNT 2013ENAM0017):
+**    - Secondary gearbox shaft with lubrication holes, carbonitrided and quenched.
+**    - Hardness after heat treatment: about 810 HV in the martensitic skin and
+**      370 HV in the bainitic core.
+**    - These works deal with heat treatment distortion: they contain no straightening
+**      model and no hardening law.
+**
+** 2. VALUES ASSUMED BY THE AUTHOR (not measured, not calibrated):
 **    - Base Alloy: 20MnCr5 (DIN EN 10084 / WNr. 1.7147 / SAE 5120 equivalent).
-**    - Transmission Shaft CAD Geometry: secondary shaft of the benchmark
-**      (husson_shaft.step, Z = -8.6 to 285.5 mm, overall length 294.1 mm).
-**    - Carburizing & Oil Quench Heat Treatment: Lot E industrial batch (Husson et al., 2014).
-**    - Microhardness Profile across Depth: Measured Vickers HV0.1 from outer case
-**      surface (d = 0.0 mm, 60.5 HRC / ~700 HV) to ductile core (d > 2.0 mm, 30.0 HRC / ~300 HV).
-**    - Effective Case Depth (CHD / Eht 550 HV1): d_case = 0.60 mm.
+**    - Shaft CAD Geometry: husson_shaft.step, Z = -8.6 to 285.5 mm, overall length 294.1 mm.
+**    - Heat Treatment: gas carburized, oil quenched and tempered at 180 deg C.
+**    - Hardness Profile across Depth: from 60.5 HRC / ~700 HV at the surface (d = 0.0 mm)
+**      to 30.0 HRC / ~300 HV in the core (d > 2.0 mm); softer than the published hardness.
+**    - Effective Case Depth: d_case = 0.60 mm.
 **    - Elastic Properties: E = 210,000.0 MPa, nu = 0.30, rho = 7.85e-9 tonne/mm^3.
 **
-** 2. EMPIRICAL MICROSTRUCTURAL YIELD STRESS CONVERSION:
-**    - Initial yield stress sigma_y0(d) is converted from experimental Vickers microhardness
-**      mapping via Tabor's empirical relation: sigma_y0 ~= 3.0 * HV (kgf/mm^2 to MPa conversion).
+** 3. EMPIRICAL MICROSTRUCTURAL YIELD STRESS CONVERSION:
+**    - Initial yield stress sigma_y0(d) is converted from the assumed hardness profile
+**      via Tabor's empirical relation: sigma_y0 ~= 3.0 * HV (kgf/mm^2 to MPa conversion).
 **    - Continuous radial depth distribution fitted with modified Avrami/Weibull decay:
 **        sigma_y0(d) = 750.0 + (1900.0 - 750.0) * exp(-(d / 0.72)^1.6)  [MPa]
 **        HRC(d)      =  30.0 + (  60.5 -  30.0) * exp(-(d / 0.75)^1.6)  [-]
 **
-** 3. CYCLIC KINEMATIC & ISOTROPIC HARDENING IDENTIFICATION (Chaboche 2-Backstress + Voce):
+** 4. CYCLIC KINEMATIC & ISOTROPIC HARDENING (Chaboche 2-Backstress + Voce):
 **    - Constitutive framework: Armstrong-Frederick / Chaboche (Chaboche 1986, 1989; Lemaitre 1990).
 **    - Physical parameters (C1, gamma1, C2, gamma2, Q_inf, b) across radial depth:
-**        * Values estimated from cyclic tension-compression hysteresis data for
-**          carburized 20MnCr5 (Lang & Voehringer 1995; Grum 2001; Bomas et al.).
+**        * Values assumed by the author as representative of a carburized 20MnCr5;
+**          they are not taken from a specific data set.
 **        * No press straightening test data are used: the parameters have not been
 **          calibrated against stroke-force or runout measurements.
 ** ==============================================================================

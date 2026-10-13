@@ -19,7 +19,7 @@ A repository of production-grade user subroutines for <b>Abaqus/Standard</b> and
 | **02** | [`DFLUX`](02_dflux_laser_welding/README.md) | Moving Conical Flux / Thermo-Mechanical | Sequentially coupled laser welding with phase transformations and residual stress | ✅ Verified |
 | **03** | [`UINTER`](03_uinter_welding_interface/README.md) | Surface Interaction / BTR Hot Cracking | 3-State contact interface (Raw → Welded → Cracked) with BTR criteria | ⚠️ Exploratory (R&D Backlog) |
 | **04** | [`UMAT`](04_umat_cohesive_welding/README.md) | Cohesive Zone Modeling / Fracture Energy *G*<sub>c</sub> | Mesh-independent 3-state thermo-mechanical weld interface (`COH3D8`) | ⚠️ In Work (Testing Phase) |
-| **05** | [`USDFLD`](05_usdfld_shaft_straightening/README.md) | Radial Field Variable / Nonlinear Kinematic Hardening | Elastoplastic straightening & springback of case-hardened transmission shaft (DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8)) | ✅ Verified |
+| **05** | [`USDFLD`](05_usdfld_shaft_straightening/README.md) | Radial Field Variable / Nonlinear Kinematic Hardening | Elastoplastic straightening & springback of case-hardened transmission shaft (DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8)) | ⚠️ In Work (Not Validated) |
 
 ---
 
@@ -101,14 +101,14 @@ The portfolio demonstrates a complete engineering R&D cycle comparing two distin
 </p>
 
 <div align="justify">
-Three-point press straightening and springback of a case-hardened 20MnCr5 secondary transmission shaft, on the benchmark geometry of Husson et al. (<i>L</i> = 294.1 mm, DOI: <a href="https://doi.org/10.1007/s00170-014-5688-8">10.1007/s00170-014-5688-8</a>). A <code>USDFLD</code> subroutine maps the radial depth below the surface to a field variable at every integration point, so the carburized case and the core are one continuous material with depth-dependent properties, without partitioning the geometry into layers.
+Three-point press straightening and springback of a case-hardened 20MnCr5 secondary transmission shaft of the type studied by Husson et al. (<i>L</i> = 294.1 mm, DOI: <a href="https://doi.org/10.1007/s00170-014-5688-8">10.1007/s00170-014-5688-8</a>). A <code>USDFLD</code> subroutine maps the radial depth below the surface to a field variable at every integration point, so the carburized case and the core are one continuous material with depth-dependent properties, without partitioning the geometry into layers.
 </div>
 
 #### Key Modelling Features:
 - **Radial Property Gradient:** depth below the stepped outer surface computed per integration point and passed to `*PLASTIC, DEPENDENCIES=1`; initial yield stress from 1900 MPa at the surface to 750 MPa in the core, with an effective case depth of 0.60 mm.
 - **Cyclic Plasticity:** Chaboche nonlinear kinematic hardening with two backstresses combined with Voce isotropic hardening, to carry the Bauschinger effect through the reverse yielding that occurs on unloading.
 - **Three-Step Solution:** equilibrium of the quenching residual stresses, displacement-controlled punch stroke, then punch retraction and evaluation of the residual Total Indicated Runout (TIR).
-- **Data Provenance:** each material parameter is classified in the material deck as measured (hardness profile, case depth), converted from hardness or estimated from literature.
+- **Data Provenance:** the material deck separates the published context (hardness after heat treatment, Husson et al.) from the values assumed by the author (hardness profile, case depth, hardening parameters). The model is not calibrated or validated against tests.
 
 <div align="justify">
 Formulation, parameter provenance, meshing strategy and results are available in <a href="05_usdfld_shaft_straightening/README.md">05_usdfld_shaft_straightening/</a>.

@@ -1,6 +1,6 @@
 # 05. Elastoplastic Straightening & Springback Analysis of Case-Hardened Transmission Shaft (`USDFLD`)
 
-[![Status: Verified](https://img.shields.io/badge/Status-Verified-brightgreen.svg)](#)
+[![Status: In Work](https://img.shields.io/badge/Status-In%20Work-orange.svg)](#)
 [![FEA: Abaqus/Standard](https://img.shields.io/badge/FEA-Abaqus%2FStandard-blue.svg)](https://www.3ds.com/)
 [![Subroutine: USDFLD](https://img.shields.io/badge/Subroutine-USDFLD-005691.svg)](#)
 [![Language: Fortran](https://img.shields.io/badge/Language-Fortran%202008%20%2F%20F90-734f96.svg)](https://fortran-lang.org/)
@@ -22,7 +22,7 @@ To ensure coaxiality and satisfy stringent powertrain <b>Total Indicated Runout 
 </p>
 
 <div align="justify">
-This repository documents an advanced, high-fidelity three-dimensional finite element analysis (FEA) framework implemented in <b>Abaqus/Standard</b>. The pipeline models the complete non-linear mechanical response of a case-hardened secondary transmission shaft based on industrial benchmarking geometry (<code>husson_shaft.step</code>):
+This repository documents an advanced, high-fidelity three-dimensional finite element analysis (FEA) framework implemented in <b>Abaqus/Standard</b>. The pipeline models the complete non-linear mechanical response of a case-hardened secondary transmission shaft on a secondary gearbox shaft geometry (<code>husson_shaft.step</code>) of the type studied by Husson et al.:
 </div>
 
 1. **Initial Quenching Residual Stress Pre-Equilibrium:** Dissipation of self-equilibrating thermal-martensitic residual stress tensors (-350 to -500 MPa compressive case, +150 to +250 MPa tensile core);
@@ -83,46 +83,51 @@ The subroutine is linked directly to the Abaqus/Standard material card via <code
  3, SDV_RADIUS,"Current radial distance from centerline (mm)"
 ```
 
-### 2.2 Detailed Parameter Analysis & Data Provenance (Measured vs. Literature)
+### 2.2 Detailed Parameter Analysis & Data Provenance (Published vs. Assumed)
 
 <div align="justify">
-A critical requirement in high-precision finite element analysis is <b>parameter provenance traceability</b>—differentiating between directly measured physical properties, empirical conversions and literature baselines.
+A critical requirement in high-precision finite element analysis is <b>parameter provenance traceability</b>—differentiating between published data, empirical conversions and values assumed by the author. None of the material parameters of this project is measured or calibrated by the author.
 </div>
 
 #### Data Source Classification Matrix:
 
-1. **Direct Experimental Measurements (Primary Source: Husson et al., 2014):**
-   * *Benchmark Publication:* Rémi Husson, Cyrille Baudouin, Régis Bigot, Edoardo Sura, *"Consideration of residual stress and geometry during heat treatment to decrease shaft bending"*, *The International Journal of Advanced Manufacturing Technology* (2014) 72:1455–1463, DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8).
-   * *Base Steel Alloy:* 20MnCr5 (DIN EN 10084, WNr. 1.7147, SAE 5120 equivalent).
-   * *CAD Component Geometry:* Secondary transmission countershaft of the benchmark (`husson_shaft.step`, $Z = -8.6$ to $285.5\text{ mm}$, overall length $L = 294.1\text{ mm}$), featuring Ø25 mm splines, Ø38 mm central bearing journal, Ø51 mm shoulder, Ø66.9 mm helical gear, and 4 transverse lubrication cross-holes.
-   * *Heat Treatment Condition:* Gas carburized, liquid oil quenched ($860^\circ\text{C}$), and tempered ($180^\circ\text{C}$) (Industrial experimental batch **Lot E**).
-   * *Microhardness Depth Profile:* Directly measured Vickers microhardness values ($HV_{0.1}$) spanning from the outer surface ($d = 0.0\text{ mm}$, $60.5\text{ HRC}$ / $\sim 700\text{ HV}$) through the case boundary down to the ductile base core ($d > 2.0\text{ mm}$, $30.0\text{ HRC}$ / $\sim 300\text{ HV}$).
-   * *Effective Case Depth (CHD / Eht 550 HV1):* Measured at $d_{\text{case}} = 0.60\text{ mm}$.
-   * *Elastic Constants:* Standard transmission steel values ($E = 210\,000.0\text{ MPa}$, $\nu = 0.30$, $\rho = 7.85 \times 10^{-9}\text{ tonne/mm}^3$).
+1. **Published Context (Husson et al., 2014; Husson, 2013):**
+   * *Publications:* Rémi Husson, Cyrille Baudouin, Régis Bigot, Edoardo Sura, *"Consideration of residual stress and geometry during heat treatment to decrease shaft bending"*, *The International Journal of Advanced Manufacturing Technology* (2014) 72:1455–1463, DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8), and the PhD thesis of R. Husson (reference 8).
+   * *What they provide:* the industrial context of this project, i.e. a secondary gearbox shaft with axial and radial lubrication holes, carbonitrided and quenched, whose bending after heat treatment is measured (34 µm on the reference lot).
+   * *Hardness after heat treatment:* about $810\text{ HV}$ in the martensitic skin and $370\text{ HV}$ in the bainitic core.
+   * These works deal with heat treatment distortion. They contain no straightening model and no hardening law.
 
-2. **Empirical Microstructural Yield Conversion (Tabor's Relationship):**
-   * The continuous radial yield stress gradient $\sigma_{y,0}(d)$ is derived analytically from the experimental Vickers microhardness profile using **Tabor's empirical relation** for strain-hardened metallic alloys ($\sigma_{y} \approx 3.0 \times HV$ in compatible stress units):
+2. **Values Assumed by the Author (not measured, not calibrated):**
+   * *Base Steel Alloy:* 20MnCr5 (DIN EN 10084, WNr. 1.7147, SAE 5120 equivalent).
+   * *CAD Component Geometry:* `husson_shaft.step`, $Z = -8.6$ to $285.5\text{ mm}$, overall length $L = 294.1\text{ mm}$, featuring Ø25 mm splines, Ø38 mm central bearing journal, Ø51 mm shoulder, Ø66.9 mm helical gear, and 4 transverse lubrication cross-holes.
+   * *Heat Treatment Condition:* gas carburized, oil quenched ($860^\circ\text{C}$), and tempered ($180^\circ\text{C}$).
+   * *Hardness Depth Profile:* from $60.5\text{ HRC}$ / $\sim 700\text{ HV}$ at the surface to $30.0\text{ HRC}$ / $\sim 300\text{ HV}$ in the core ($d > 2.0\text{ mm}$). This profile is softer than the hardness published for the shaft of Husson et al.
+   * *Effective Case Depth:* $d_{\text{case}} = 0.60\text{ mm}$.
+   * *Elastic Constants:* standard steel values ($E = 210\,000.0\text{ MPa}$, $\nu = 0.30$, $\rho = 7.85 \times 10^{-9}\text{ tonne/mm}^3$).
+
+3. **Empirical Microstructural Yield Conversion (Tabor's Relationship):**
+   * The continuous radial yield stress gradient $\sigma_{y,0}(d)$ is derived analytically from the assumed hardness profile using **Tabor's empirical relation** for strain-hardened metallic alloys ($\sigma_{y} \approx 3.0 \times HV$ in compatible stress units):
      $$\sigma_{y,0}(d) = 750.0 + (1900.0 - 750.0) \cdot \exp\left( -\left(\frac{d}{0.72}\right)^{1.6} \right) \quad [\text{MPa}]$$
      $$\text{HRC}(d) = 30.0 + (60.5 - 30.0) \cdot \exp\left( -\left(\frac{d}{0.75}\right)^{1.6} \right) \quad [-]$$
 
-3. **Literature Baseline for Cyclic 20MnCr5 Plasticity (Chaboche 2-Backstress Formulation):**
+4. **Cyclic 20MnCr5 Plasticity (Chaboche 2-Backstress Formulation):**
    * The Armstrong-Frederick / Chaboche kinematic hardening constitutive formulation (Chaboche 1986, 1989; Lemaitre & Chaboche 1990) requires 2 backstress tensors ($\boldsymbol{\alpha} = \boldsymbol{\alpha}_1 + \boldsymbol{\alpha}_2$) to model both the sharp initial yield knee and the stabilized slope.
-   * Baseline parameters were compiled from published cyclic tension-compression push-pull fatigue literature for carburized 20MnCr5 (e.g., Lang & Vöhringer 1995; Grum 2001; Bomas et al., AWT/HTM).
+   * The parameters $(C_1, \gamma_1, C_2, \gamma_2, Q_\infty, b)$ and their variation with depth are assumed by the author as representative of a carburized 20MnCr5. They are not taken from a specific data set.
 
 <div align="justify">
-No press straightening test data are used in this project: the hardening parameters are literature-based estimates and have not been calibrated against stroke-force or runout measurements.
+No press straightening test data are used in this project: the hardening parameters are assumed values and have not been calibrated against stroke-force or runout measurements.
 </div>
 
-| Parameter | Identifier in Deck | Value Range | Physical Significance | Exact Provenance & Calibration Origin |
+| Parameter | Identifier in Deck | Value Range | Physical Significance | Provenance |
 | :--- | :--- | :---: | :--- | :--- |
 | **Field Variable 1** | `FIELD(1)` / `FV1` | 0.00–25.0 mm | Radial depth from external surface $d(r,z) = R_{\text{outer}}(z) - r$ | Computed dynamically at integration points via `GETVRM('COORD', ...)` in `usdfld_case_hardneded_shaft.f` |
-| **Initial Yield Stress** | $\sigma_{y,0}$ | 1900.0 &rarr; 750.0 MPa | Size of initial elastic yield domain | Measured microhardness profile (Husson 2014, Lot E) converted via Tabor's relation |
-| **Kinematic Modulus 1** | $C_1$ | 125.0 &rarr; 80.0 GPa | Initial kinematic hardening tangent modulus | Cyclic push-pull data (Lang & Vöhringer 1995) |
-| **Dynamic Recovery 1** | $\gamma_1$ | 180.0 &rarr; 120.0 | Backstress saturation rate for component 1 | Fitted from nonlinear transition shoulder of initial backstress $\boldsymbol{\alpha}_1$ |
-| **Kinematic Modulus 2** | $C_2$ | 45.0 &rarr; 25.0 GPa | Secondary kinematic hardening modulus | Stabilized cyclic hysteresis loop slope at large plastic strain ($\Delta\varepsilon_p / 2 = 1.0\%$) |
-| **Dynamic Recovery 2** | $\gamma_2$ | 35.0 &rarr; 20.0 | Backstress saturation rate for component 2 | Literature-based estimate for the stabilized backstress |
-| **Isotropic Expansion Max** | $Q_\infty$ | 150.0 &rarr; 250.0 MPa | Saturated isotropic yield expansion (Voce) | Monotonic tensile curve minus kinematic saturation limit; higher in ductile core |
-| **Isotropic Decay Rate** | $b$ | 12.0 &rarr; 6.0 | Rate of isotropic yield expansion with PEEQ | Exponential fit of cyclic hardening evolution across first 10 cycles |
+| **Initial Yield Stress** | $\sigma_{y,0}$ | 1900.0 &rarr; 750.0 MPa | Size of initial elastic yield domain | Assumed hardness profile converted via Tabor's relation |
+| **Kinematic Modulus 1** | $C_1$ | 125.0 &rarr; 80.0 GPa | Initial kinematic hardening tangent modulus | Assumed by the author (representative value, not calibrated) |
+| **Dynamic Recovery 1** | $\gamma_1$ | 180.0 &rarr; 120.0 | Backstress saturation rate for component 1 | Assumed by the author (representative value, not calibrated) |
+| **Kinematic Modulus 2** | $C_2$ | 45.0 &rarr; 25.0 GPa | Secondary kinematic hardening modulus | Assumed by the author (representative value, not calibrated) |
+| **Dynamic Recovery 2** | $\gamma_2$ | 35.0 &rarr; 20.0 | Backstress saturation rate for component 2 | Assumed by the author (representative value, not calibrated) |
+| **Isotropic Expansion Max** | $Q_\infty$ | 150.0 &rarr; 250.0 MPa | Saturated isotropic yield expansion (Voce) | Assumed by the author (representative value, not calibrated) |
+| **Isotropic Decay Rate** | $b$ | 12.0 &rarr; 6.0 | Rate of isotropic yield expansion with PEEQ | Assumed by the author (representative value, not calibrated) |
 
 <div align="justify">
 <b>Physical Rationale for Depth-Dependent Hardening:</b> The severe thermal and chemical gradient created during carburizing alters both carbon concentration (~0.8 wt% C at surface vs ~0.2 wt% C in core) and the martensite start temperature ($M_s$). The high surface carbon maximizes tetragonality, dislocation density, and internal lattice micro-stresses, raising initial yield strength to ~1900 MPa and driving rapid kinematic backstress saturation ($\gamma_1 = 180$). In contrast, the low-carbon ductile core undergoes extensive dislocation multiplication with higher isotropic work-hardening capacity ($Q_\infty = 250\text{ MPa}$, $b = 6.0$).
@@ -217,7 +222,7 @@ The simulation pipeline is structured into three sequential implicit steps in <b
 
 ### Step 0: Initial Quenching Residual Stress Equilibrium
 * **Input Deck:** `*INITIAL CONDITIONS, TYPE=STRESS`
-* **Mechanism:** Imports the realistic residual stress field inherited from the carburizing-quenching process (-350 to -500 MPa hoop and axial compression in the outer case, balanced by +150 to +250 MPa core tension).
+* **Mechanism:** Imports an assumed residual stress field representative of the carburizing-quenching process (-350 to -500 MPa hoop and axial compression in the outer case, balanced by +150 to +250 MPa core tension).
 * **Kinematics:** 3-2-1 isostatic boundary constraints. The solver executes a general static step (`*STATIC`) to resolve nodal force residuals and establish self-equilibrating internal stress tensors before tool contact occurs.
 
 ### Step 1: Displacement-Controlled Punch Stroke
@@ -322,7 +327,7 @@ The model is set up to evaluate the following results:
 2. **Springback Sensitivity to the Hardening Model:**  
    The material deck also holds a pure isotropic hardening card, so the residual runout predicted with the **Chaboche kinematic hardening model** can be compared with an isotropic prediction, which neglects the Bauschinger effect during the reverse yielding on unloading.
 3. **Tensile Case Cracking Risk Assessment:**  
-   During peak punch deflection, the outer convex fiber experiences severe tensile stress. Monitoring maximum principal stress (<i>σ</i><sub>I</sub>) against the case fracture toughness threshold (<i>K</i><sub>Ic</sub> &approx; 18–22 MPa&radic;m) confirms that no micro-crack initiation occurs within the allowable straightening stroke window.
+   During peak punch deflection, the outer convex fiber experiences severe tensile stress. Monitoring maximum principal stress (<i>σ</i><sub>I</sub>) against the case fracture toughness threshold (<i>K</i><sub>Ic</sub> &approx; 18–22 MPa&radic;m) is the check for micro-crack initiation within the allowable straightening stroke window.
 
 ---
 
@@ -335,6 +340,7 @@ The model is set up to evaluate the following results:
 5. **DIN EN 10084:** *Case hardening steels – Technical delivery conditions* (chemical composition and hardenability of 16MnCr5 and 20MnCr5).
 6. **ISO 1101:2017:** *Geometrical product specifications (GPS) – Geometrical tolerancing – Tolerances of form, orientation, location and run-out*.
 7. **ASTM E140-12b:** *Standard Hardness Conversion Tables for Metals Relationship Among Brinell Hardness, Vickers Hardness, Rockwell Hardness*.
+8. **Husson, R. (2013):** *Contribution à l'identification des origines des déformations révélées au traitement thermique. Application à l'analyse d'une gamme de fabrication d'arbres à dentures de boîtes de vitesses*, PhD thesis, Arts et Métiers ParisTech, NNT 2013ENAM0017. [HAL pastel-00907422](https://pastel.hal.science/pastel-00907422v1).
 
 ---
 
