@@ -1,0 +1,12 @@
+# Simulation results (too large for the repository)
+vtk_results/
+*.zip
+preview_*.png
+
+# Local working files (mesh and generated includes, see README section 4.1)
+Gear_Shaft_geometry.inp
+Gear_Shaft_bearing_sets.inp
+Gear_Shaft_coast_flank_surface.inp
+
+# Local render; the published copy is ../99_images_and_miscelania/gear_torque_simulation.gif
+gear_torque_simulation.gif
