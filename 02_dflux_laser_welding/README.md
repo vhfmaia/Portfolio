@@ -240,7 +240,7 @@ $$\Delta s_{\text{err}} = R \cdot \Delta\theta_{\text{rad}} = 15.0 \cdot (1.50 \
 
 #### Problem Statement:
 <div align="justify">
-In moving-source simulations, standard Abaqus adaptive cutback defaults (e.g. cutback factor <i>D</i><sub>f</sub> = 0.25 and increase factor <i>D</i><sub>C</sub> = 1.50) destroy kinematic phase alignment. When an irrational time step is introduced, subsequent increments place the heat source at arbitrary, non-symmetric positions across element volumes. This triggers repeated cutbacks, step stalling, and severe run-time inflation.
+In moving-source simulations, the default Abaqus time incrementation factors (e.g. cut-back factor after divergence <i>D</i><sub>f</sub> = 0.25 and increase factor <i>D</i><sub>D</sub> = 1.50) destroy kinematic phase alignment. When an irrational time step is introduced, subsequent increments place the heat source at arbitrary, non-symmetric positions across element volumes. This triggers repeated cutbacks, step stalling, and severe run-time inflation.
 </div>
 
 #### Dyadic Solution (`*CONTROLS, PARAMETERS=TIME INCREMENTATION`):
@@ -250,11 +250,12 @@ To preserve element fractional symmetry under all numerical conditions, the solv
 ```inp
 *CONTROLS, PARAMETERS=TIME INCREMENTATION
 8, 12, 9, 16, 10, 4, ,
-0.5, 2.0, 0.5, 0.5, , 2.0, ,
+0.5, 0.5, 0.5, 0.5, , , 2.0,
 ```
 
-- **Binary Cutback Factor ($D_f = 0.5$, $D_B = 0.5$):** If a local non-linearity requires a step reduction, $\Delta t$ is halved strictly ($\Delta t / 2$). The beam advances by $0.45^\circ$, aligning precisely with a $1/4$ element fraction.
-- **Binary Recovery Factor ($D_C = 2.0$, $D_S = 2.0$):** Once equilibrium stabilizes, the solver doubles the time increment back to the nominal dyadic step ($0.90^\circ$).
+- **Binary Cut-back Factors ($D_f = D_C = D_B = D_A = 0.5$):** After divergence, too slow convergence, too many equilibrium iterations or a time integration accuracy violation, $\Delta t$ is halved strictly ($\Delta t / 2$). The beam advances by $0.45^\circ$, aligning precisely with a $1/4$ element fraction.
+- **Binary Increase Factor ($D_D = 2.0$):** After two consecutive increments that converge within $I_G = 4$ iterations, the solver doubles the time increment, up to the nominal dyadic step ($0.90^\circ$) set as the maximum increment.
+- **Positions of the data line:** $D_f, D_C, D_B, D_A, D_S, D_H, D_D, W_G$. The increase factor is the seventh entry; a value above 1 in the second entry ($D_C$) would enlarge the increment after an attempt abandoned for slow convergence.
 - **Equilibrium Iteration Guard ($I_0 = 8$, $I_R = 12$, $I_C = 16$):** Calibrated to accommodate the 3–4 iterations required under the unsymmetric Newton-Raphson scheme, preventing artificial step cutbacks during rapid transient passes.
 
 ---
