@@ -92,6 +92,30 @@ The portfolio demonstrates a complete engineering R&D cycle comparing two distin
 
 ---
 
+### Project Showcase: 05. Shaft Straightening & Springback (`USDFLD`)
+
+<p align="center">
+  <a href="05_usdfld_shaft_straightening/README.md">
+    <img src="99_images_and_miscelania/shaft_straightening_schematic.svg" alt="Abaqus USDFLD Three-Point Straightening and Springback of a Case-Hardened Transmission Shaft" width="100%" />
+  </a>
+</p>
+
+<div align="justify">
+Three-point press straightening and springback of a case-hardened 20MnCr5 secondary transmission shaft, on the benchmark geometry of Husson et al. (<i>L</i> = 285.5 mm, DOI: <a href="https://doi.org/10.1007/s00170-014-5688-8">10.1007/s00170-014-5688-8</a>). A <code>USDFLD</code> subroutine maps the radial depth below the surface to a field variable at every integration point, so the carburized case and the core are one continuous material with depth-dependent properties, without partitioning the geometry into layers.
+</div>
+
+#### Key Modelling Features:
+- **Radial Property Gradient:** depth below the stepped outer surface computed per integration point and passed to `*PLASTIC, DEPENDENCIES=1`; initial yield stress from 1900 MPa at the surface to 750 MPa in the core, with an effective case depth of 0.60 mm.
+- **Cyclic Plasticity:** Chaboche nonlinear kinematic hardening with two backstresses combined with Voce isotropic hardening, to carry the Bauschinger effect through the reverse yielding that occurs on unloading.
+- **Three-Step Solution:** equilibrium of the quenching residual stresses, displacement-controlled punch stroke, then punch retraction and evaluation of the residual Total Indicated Runout (TIR).
+- **Data Provenance:** each material parameter is classified as measured (hardness profile, case depth) or identified by inverse analysis in the material deck.
+
+<div align="justify">
+Formulation, parameter provenance, meshing strategy and results are available in <a href="05_usdfld_shaft_straightening/README.md">05_usdfld_shaft_straightening/</a>.
+</div>
+
+---
+
 ## Directory Layout
 
 ```text
@@ -125,6 +149,11 @@ The portfolio demonstrates a complete engineering R&D cycle comparing two distin
 │   ├── umat_cohesive_welding_btr.f            # Prototype User Material Subroutine (Modern Fortran)
 │   ├── cohesive_weld_btr_verification.inp     # 3-Element Cohesive Zone Benchmark Deck (COH3D8)
 │   └── README.md                              # Comprehensive Technical Report & Formulation
+├── 05_usdfld_shaft_straightening/
+│   ├── usdfld_case_hardneded_shaft.f          # User Subroutine (USDFLD radial depth field variable)
+│   ├── 20MnCr5.inp                            # Depth-dependent Chaboche + Voce material deck
+│   ├── husson_shaft.step                      # CAD geometry: secondary transmission shaft
+│   └── README.md                              # Comprehensive Technical Report & Formulation
 ├── 99_images_and_miscelania/
 │   ├── gear_torque_simulation.gif             # Full 360-degree three-viewport animation (6 FPS)  
 │   ├── conical_heat_source_improved_plot.svg  # 4-Panel 3D Conical Heat Source & Trajectory Plot (SVG)
@@ -133,6 +162,9 @@ The portfolio demonstrates a complete engineering R&D cycle comparing two distin
 │   ├── uinter_3state_state_machine.svg        # UINTER 3-State Contact State Machine & Won Criteria (SVG)
 │   ├── cohesive_3state_state_machine.svg      # Cohesive Zone UMAT Architecture & Softening Law (SVG)
 │   ├── uinter_vs_czm_comparison.svg           # Interface Modeling Evolution & Bottlenecks (SVG)
+│   ├── shaft_straightening_schematic.svg      # Three-Point Straightening & Springback Schematic (SVG)
+│   ├── shaft_straightening_pipeline_architecture.svg  # Shaft Straightening 3-Step Pipeline (SVG)
+│   ├── sn_curves_20mc5_gjs600_10.svg          # Design S-N Curves for 20MC5 and GJS600-10 (SVG)
 │   └── conical_gaussian_3d.png                # Conical Heat Source Surface Elevation (PNG)
 ├── LICENSE
 └── README.md
