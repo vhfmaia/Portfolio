@@ -156,6 +156,8 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   └── README.md                              # Comprehensive Technical Report & Formulation
 ├── 99_images_and_miscelania/
 │   ├── gear_torque_simulation.gif             # Full 360-degree three-viewport animation (6 FPS)  
+│   ├── gear_shaft_cutaway.png                 # Section view of the crown gear / carrier CAD geometry (PNG)
+│   ├── stress_front_view_flaw_ends.png        # Front-view stress field with the two weld flaw ends marked (PNG)
 │   ├── conical_heat_source_improved_plot.svg  # 4-Panel 3D Conical Heat Source & Trajectory Plot (SVG)
 │   ├── conical_heat_source_schematic.svg      # Analytical Heat Source Geometry Schematic (SVG)
 │   ├── sequentially_coupled_architecture.svg  # Multi-Physics Data Flow & Pipeline Architecture (SVG)

@@ -81,6 +81,10 @@ with $\varphi = \left(u_c - u_A \pm (z - z_{\text{mid}})\tan\beta_b\right) \bmod
 
 ## 4. Finite Element Model
 
+![Section view of the crown gear and differential carrier](../99_images_and_miscelania/gear_shaft_cutaway.png)
+
+*Section view of the CAD geometry: toothed rim and crown ring (blue-grey), carrier body and carrier ring (ochre). The weld interface is the cylinder at $R = 55$ mm between the two rings.*
+
 | Item | Description |
 | :--- | :--- |
 | Master decks | `Gear_Shaft_assembly_simulation.inp` (drive) and `Gear_Shaft_assembly_drive_coast.inp` (drive + coast) |
@@ -183,6 +187,10 @@ Nodal maximum principal stress over the drive revolution at 270 N·m, from the 3
 | Weld interface, inside the flaw | $15.3\text{ MPa}$ | $39.0\text{ MPa}$ | $R = 55$ mm, $\theta = 50°$ to $130°$ |
 | Crown ring (`DIAMETER_CROWN`) | $62.1\text{ MPa}$ | $64.8\text{ MPa}$ | First node row next to the flaw end |
 | Carrier | $58.8\text{ MPa}$ | $64.3\text{ MPa}$ | First node row next to the flaw end |
+
+![Front view of the maximum principal stress with the two flaw ends marked](../99_images_and_miscelania/stress_front_view_flaw_ends.png)
+
+*Front view along $Z$ at $t = 0.96$ s (load at 273.6°), nodal maximum principal stress at 270 N·m. The two circles mark the ends of the unbonded arc of the weld interface.*
 
 - **Elastic response:** the equivalent plastic strain is zero in every frame and the largest displacement is 0.028 mm.
 - **Governing location:** the two ends of the unbonded arc, at the start of the weld seam, carry the highest stress of the assembly, above the tooth root.
