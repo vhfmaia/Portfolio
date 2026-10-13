@@ -12,7 +12,7 @@
 ** Units System: SI Metric (mm, N, tonne, MPa, mJ, s)
 ** Author:       Victor Maia (Numerical Simulation & FEA Specialist)
 ** ==============================================================================
-** DATA PROVENANCE & EMPIRICAL CALIBRATION METHODOLOGY (EXPERIMENTAL vs INVERSE FEA)
+** DATA PROVENANCE & EMPIRICAL CALIBRATION METHODOLOGY (MEASURED vs LITERATURE)
 ** ==============================================================================
 ** 1. DIRECT EXPERIMENTAL MEASUREMENTS (Husson et al., 2014, IJAMT, DOI: 10.1007/s00170-014-5688-8):
 **    - Base Alloy: 20MnCr5 (DIN EN 10084 / WNr. 1.7147 / SAE 5120 equivalent).
@@ -34,14 +34,10 @@
 ** 3. CYCLIC KINEMATIC & ISOTROPIC HARDENING IDENTIFICATION (Chaboche 2-Backstress + Voce):
 **    - Constitutive framework: Armstrong-Frederick / Chaboche (Chaboche 1986, 1989; Lemaitre 1990).
 **    - Physical parameters (C1, gamma1, C2, gamma2, Q_inf, b) across radial depth:
-**        * Initial values calibrated from cyclic tension-compression hysteresis data for
+**        * Values estimated from cyclic tension-compression hysteresis data for
 **          carburized 20MnCr5 (Lang & Voehringer 1995; Grum 2001; Bomas et al.).
-**        * Final calibration identified via inverse finite element analysis (FEA) optimization
-**          against 3-point mechanical press straightening stroke-force curves:
-**            - Forward loading stroke: Uy = 1.42 mm, peak reaction force Fy = 48.5 kN.
-**            - Punch withdrawal & springback: Residual deflection u_res = 84 um.
-**            - Post-straightening Total Indicated Runout: TIR = 22.4 um (in-spec < 30 um).
-**            - Isotropic baseline failure: Predicts u_res = 138 um, TIR = 34.8 um (+36% error).
+**        * No press straightening test data are used: the parameters have not been
+**          calibrated against stroke-force or runout measurements.
 ** ==============================================================================
 **
 ** USAGE IN MASTER ABAQUS INPUT DECK (.inp):
@@ -134,12 +130,11 @@
       750.0,   80000.0,  120.0,   25000.0,   20.0,   250.0,   6.0,          25.00
 
 ** ==============================================================================
-** 2. BENCHMARK / VALIDATION CARD: PURE ISOTROPIC HARDENING (V&V COMPARISON)
+** 2. COMPARISON CARD: PURE ISOTROPIC HARDENING
 ** ==============================================================================
-** This baseline card is provided for verification & validation (V&V) studies.
-** Running this baseline model reproduces the classical +36% overprediction error
-** in springback (Residual TIR = 34.8 um vs 22.4 um), proving that isotropic Mises
-** plasticity fails by neglecting the Bauschinger reverse plasticity effect.
+** This baseline card is provided for comparison with the combined hardening model.
+** Isotropic Mises plasticity neglects the Bauschinger effect during the reverse
+** yielding on unloading, which changes the predicted springback.
 ** ------------------------------------------------------------------------------
 *MATERIAL, NAME=20MnCr5_ISOTROPIC_BASELINE
 

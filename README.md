@@ -108,7 +108,7 @@ Three-point press straightening and springback of a case-hardened 20MnCr5 second
 - **Radial Property Gradient:** depth below the stepped outer surface computed per integration point and passed to `*PLASTIC, DEPENDENCIES=1`; initial yield stress from 1900 MPa at the surface to 750 MPa in the core, with an effective case depth of 0.60 mm.
 - **Cyclic Plasticity:** Chaboche nonlinear kinematic hardening with two backstresses combined with Voce isotropic hardening, to carry the Bauschinger effect through the reverse yielding that occurs on unloading.
 - **Three-Step Solution:** equilibrium of the quenching residual stresses, displacement-controlled punch stroke, then punch retraction and evaluation of the residual Total Indicated Runout (TIR).
-- **Data Provenance:** each material parameter is classified as measured (hardness profile, case depth) or identified by inverse analysis in the material deck.
+- **Data Provenance:** each material parameter is classified in the material deck as measured (hardness profile, case depth), converted from hardness or estimated from literature.
 
 <div align="justify">
 Formulation, parameter provenance, meshing strategy and results are available in <a href="05_usdfld_shaft_straightening/README.md">05_usdfld_shaft_straightening/</a>.

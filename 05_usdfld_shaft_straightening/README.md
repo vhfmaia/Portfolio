@@ -29,7 +29,7 @@ This repository documents an advanced, high-fidelity three-dimensional finite el
 2. **Radial Hardness & Yield Gradient Interpolation (`USDFLD`):** Continuous integration-point mapping of depth-dependent constitutive properties across the 0.6 mm case layer into the ductile core;
 3. **Nonlinear Reverse Plasticity & Bauschinger Effect:** Accurate prediction of plastic overbend and reverse yielding during punch unloading using a two-backstress **Chaboche nonlinear kinematic hardening model**;
 4. **Full 3D Conformal Quadratic Tetrahedral Discretization (`C3D10` / `C3D10M`):** Pragmatic meshing architecture accommodating internal lubrication cross-holes, splines, and helical gear teeth;
-5. **Post-Straightening Total Indicated Runout (TIR):** Quantitative springback calculation and verification against physical punch stroke curves.
+5. **Post-Straightening Total Indicated Runout (TIR):** Quantitative springback calculation from the centerline displacement after unloading.
 
 ---
 
@@ -83,16 +83,16 @@ The subroutine is linked directly to the Abaqus/Standard material card via <code
  3, SDV_RADIUS,"Current radial distance from centerline (mm)"
 ```
 
-### 2.2 Detailed Parameter Analysis & Data Provenance (Experimental vs. Inverse FEA)
+### 2.2 Detailed Parameter Analysis & Data Provenance (Measured vs. Literature)
 
 <div align="justify">
-A critical requirement in high-precision finite element analysis is <b>parameter provenance traceability</b>—differentiating between directly measured physical properties, empirical conversions, literature baselines, and parameters identified through inverse FEA optimization.
+A critical requirement in high-precision finite element analysis is <b>parameter provenance traceability</b>—differentiating between directly measured physical properties, empirical conversions and literature baselines.
 </div>
 
 #### Data Source Classification Matrix:
 
 1. **Direct Experimental Measurements (Primary Source: Husson et al., 2014):**
-   * *Benchmark Publication:* Rémi Husson, Cyrille Baudouin, Régis Bigot, Edoardo Sura, *"Consideration of residual stress and geometry during heat treatment to decrease shaft bending"*, *The International Journal of Advanced Manufacturing Technology* (2014) 72:1455–1463, DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8) (Arts et Métiers ParisTech / Renault SAS Powertrain).
+   * *Benchmark Publication:* Rémi Husson, Cyrille Baudouin, Régis Bigot, Edoardo Sura, *"Consideration of residual stress and geometry during heat treatment to decrease shaft bending"*, *The International Journal of Advanced Manufacturing Technology* (2014) 72:1455–1463, DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8).
    * *Base Steel Alloy:* 20MnCr5 (DIN EN 10084, WNr. 1.7147, SAE 5120 equivalent).
    * *CAD Component Geometry:* Secondary transmission countershaft of the benchmark (`husson_shaft.step`, $Z = -8.6$ to $285.5\text{ mm}$, overall length $L = 294.1\text{ mm}$), featuring Ø25 mm splines, Ø38 mm central bearing journal, Ø51 mm shoulder, Ø66.9 mm helical gear, and 4 transverse lubrication cross-holes.
    * *Heat Treatment Condition:* Gas carburized, liquid oil quenched ($860^\circ\text{C}$), and tempered ($180^\circ\text{C}$) (Industrial experimental batch **Lot E**).
@@ -109,20 +109,18 @@ A critical requirement in high-precision finite element analysis is <b>parameter
    * The Armstrong-Frederick / Chaboche kinematic hardening constitutive formulation (Chaboche 1986, 1989; Lemaitre & Chaboche 1990) requires 2 backstress tensors ($\boldsymbol{\alpha} = \boldsymbol{\alpha}_1 + \boldsymbol{\alpha}_2$) to model both the sharp initial yield knee and the stabilized slope.
    * Baseline parameters were compiled from published cyclic tension-compression push-pull fatigue literature for carburized 20MnCr5 (e.g., Lang & Vöhringer 1995; Grum 2001; Bomas et al., AWT/HTM).
 
-4. **Inverse FEA Identification against Press Straightening Stroke Curves:**
-   * Final numerical calibration of $(C_1, \gamma_1, C_2, \gamma_2, Q_\infty, b)$ across depth $d(r, z)$ was performed via **inverse finite element optimization** matching physical 3-point press straightening stroke curves:
-     * *Forward Loading Stroke:* Punch vertical deflection $U_y = 1.42\text{ mm}$ achieving peak reaction force $F_y = 48.5\text{ kN}$ on central journal Ø38 mm.
-     * *Punch Withdrawal (Springback):* Residual shaft deflection of $u_{\text{res}} = 84\ \mu\text{m}$, successfully yielding a **post-straightening Total Indicated Runout of $\text{TIR} = 22.4\ \mu\text{m}$** (well within ISO 1101 powertrain tolerance of $< 30\ \mu\text{m}$).
-     * *Validation Proof:* Running the baseline pure isotropic hardening model yields $u_{\text{res}} = 138\ \mu\text{m}$ and $\text{TIR} = 34.8\ \mu\text{m}$ (+36% overprediction error, failing tolerance), proving that capturing the Bauschinger reverse plasticity gap is indispensable.
+<div align="justify">
+No press straightening test data are used in this project: the hardening parameters are literature-based estimates and have not been calibrated against stroke-force or runout measurements.
+</div>
 
 | Parameter | Identifier in Deck | Value Range | Physical Significance | Exact Provenance & Calibration Origin |
 | :--- | :--- | :---: | :--- | :--- |
 | **Field Variable 1** | `FIELD(1)` / `FV1` | 0.00–25.0 mm | Radial depth from external surface $d(r,z) = R_{\text{outer}}(z) - r$ | Computed dynamically at integration points via `GETVRM('COORD', ...)` in `usdfld_case_hardneded_shaft.f` |
 | **Initial Yield Stress** | $\sigma_{y,0}$ | 1900.0 &rarr; 750.0 MPa | Size of initial elastic yield domain | Measured microhardness profile (Husson 2014, Lot E) converted via Tabor's relation |
-| **Kinematic Modulus 1** | $C_1$ | 125.0 &rarr; 80.0 GPa | Initial kinematic hardening tangent modulus | Cyclic push-pull data (Lang & Vöhringer 1995) + inverse FEA optimization |
+| **Kinematic Modulus 1** | $C_1$ | 125.0 &rarr; 80.0 GPa | Initial kinematic hardening tangent modulus | Cyclic push-pull data (Lang & Vöhringer 1995) |
 | **Dynamic Recovery 1** | $\gamma_1$ | 180.0 &rarr; 120.0 | Backstress saturation rate for component 1 | Fitted from nonlinear transition shoulder of initial backstress $\boldsymbol{\alpha}_1$ |
 | **Kinematic Modulus 2** | $C_2$ | 45.0 &rarr; 25.0 GPa | Secondary kinematic hardening modulus | Stabilized cyclic hysteresis loop slope at large plastic strain ($\Delta\varepsilon_p / 2 = 1.0\%$) |
-| **Dynamic Recovery 2** | $\gamma_2$ | 35.0 &rarr; 20.0 | Backstress saturation rate for component 2 | Inverse calibration against punch unloading compliance |
+| **Dynamic Recovery 2** | $\gamma_2$ | 35.0 &rarr; 20.0 | Backstress saturation rate for component 2 | Literature-based estimate for the stabilized backstress |
 | **Isotropic Expansion Max** | $Q_\infty$ | 150.0 &rarr; 250.0 MPa | Saturated isotropic yield expansion (Voce) | Monotonic tensile curve minus kinematic saturation limit; higher in ductile core |
 | **Isotropic Decay Rate** | $b$ | 12.0 &rarr; 6.0 | Rate of isotropic yield expansion with PEEQ | Exponential fit of cyclic hardening evolution across first 10 cycles |
 
@@ -316,13 +314,13 @@ The residual runout is evaluated from the displacement $U_y$ of the centerline n
 ## 10. Key Results & Engineering Evaluation
 
 <div align="justify">
-The simulation results demonstrate excellent correlation with physical press straightening trials:
+The model is set up to evaluate the following results:
 </div>
 
 1. **Punch Force vs. Stroke Hysteresis:**  
    Captures the steep initial elastic slope, the onset of case yield at high load (~1900 MPa), progressive core yield propagation, and the non-linear unloading path driven by reverse plastic deformation.
-2. **Springback Prediction Accuracy:**  
-   Comparative benchmarking shows that the **Chaboche kinematic hardening model** predicts a residual runout of TIR = 22.4 µm. In contrast, an isotropic hardening model predicted TIR = 34.8 µm (an overestimation of +36%), demonstrating the indispensability of capturing the Bauschinger effect.
+2. **Springback Sensitivity to the Hardening Model:**  
+   The material deck also holds a pure isotropic hardening card, so the residual runout predicted with the **Chaboche kinematic hardening model** can be compared with an isotropic prediction, which neglects the Bauschinger effect during the reverse yielding on unloading.
 3. **Tensile Case Cracking Risk Assessment:**  
    During peak punch deflection, the outer convex fiber experiences severe tensile stress. Monitoring maximum principal stress (<i>σ</i><sub>I</sub>) against the case fracture toughness threshold (<i>K</i><sub>Ic</sub> &approx; 18–22 MPa&radic;m) confirms that no micro-crack initiation occurs within the allowable straightening stroke window.
 
