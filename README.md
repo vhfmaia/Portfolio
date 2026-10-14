@@ -53,12 +53,16 @@ Detailed formulation, kinematic equations, FEA verification, and post-processing
 
 <p align="center">
   <a href="02_dflux_laser_welding/README.md">
-    <img src="99_images_and_miscelania/conical_heat_source_improved_plot.svg" alt="Abaqus DFLUX 3D Conical Gaussian Heat Source and Welding Power Schedule" width="100%" />
+    <img src="99_images_and_miscelania/bimaterial_weld_4kW_blackbody.gif" alt="Abaqus DFLUX bimaterial 20MnCr5 / EN-GJS-600-10 laser weld thermal simulation with weld cross-section and expected macrograph" width="100%" />
   </a>
 </p>
 
 <div align="justify">
 Sequentially coupled thermo-mechanical analysis of circumferential laser welding (<i>R</i> = 15 mm, <i>P</i><sub>abs</sub> = 1080 W, <i>v</i> = 1200 mm/min) with moving conical Gaussian heat source, metallurgical phase transformations (<code>ABQ_PHASE_TRANS</code>), hybrid elements (<code>C3D8H</code>), continuous annealing at 1530 °C, and residual stress prediction for 16MnCr5 case-hardening steel.
+</div>
+
+<div align="justify">
+The animation shows the same method applied, in work, to the 20MnCr5 crown gear / EN-GJS-600-10 carrier weld of project 01 (<i>R</i> = 55 mm, 4 kW, 1.5 m/min). It shows the unrolled top surface, the longitudinal section on the joint, the projected weld cross-section with the solidus and Ac1 lines of each material, and the expected etched macrograph. The keyhole is modelled by a double conical Gaussian source with a hemispherical tip.
 </div>
 
 #### Key Thermal, Metallurgical & Mechanical Highlights:
