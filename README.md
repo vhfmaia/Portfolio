@@ -20,6 +20,7 @@ A repository of production-grade user subroutines for <b>Abaqus/Standard</b> and
 | **03** | [`UINTER`](03_uinter_welding_interface/README.md) | Surface Interaction / BTR Hot Cracking | 3-State contact interface (Raw → Welded → Cracked) with BTR criteria | ⚠️ Exploratory (R&D Backlog) |
 | **04** | [`UMAT`](04_umat_cohesive_welding/README.md) | Cohesive Zone Modeling / Fracture Energy *G*<sub>c</sub> | Mesh-independent 3-state thermo-mechanical weld interface (`COH3D8`) | ⚠️ In Work (Testing Phase) |
 | **05** | [`USDFLD`](05_usdfld_shaft_straightening/README.md) | Radial Field Variable / Nonlinear Kinematic Hardening | Elastoplastic straightening & springback of case-hardened transmission shaft (DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8)) | ⚠️ In Work (Not Validated) |
+| **06** | [`UMATHT`](06_umatht_hydrogen_diffusion/README.md) | Hydrogen Transport / Heat Transfer Analogy | Oriani trapping and stress-driven diffusion for delayed (cold) cracking of welds | ⚠️ In Work (Abaqus Run Pending) |
 
 ---
 
@@ -154,6 +155,10 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── 20MnCr5.inp                            # Depth-dependent Chaboche + Voce material deck
 │   ├── husson_shaft.step                      # CAD geometry: secondary transmission shaft
 │   └── README.md                              # Comprehensive Technical Report & Formulation
+├── 06_umatht_hydrogen_diffusion/
+│   ├── umatht_hydrogen_transport.f            # User Subroutine (UMATHT hydrogen transport, heat transfer analogy)
+│   ├── hydrogen_transport_verification.inp    # 3-Bar 1D Verification Deck (permeation, traps, stress drift)
+│   └── README.md                              # Technical Report, Formulation & Expected Results
 ├── 99_images_and_miscelania/
 │   ├── gear_torque_simulation.gif             # Drive + coast three-viewport animation (6 FPS)  
 │   ├── gear_shaft_cutaway.png                 # Section view of the crown gear / carrier CAD geometry (PNG)
