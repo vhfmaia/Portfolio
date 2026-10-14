@@ -165,6 +165,8 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── stress_front_view_flaw_ends.png        # Front-view stress field, drive against coast, weld flaw ends marked (PNG)
 │   ├── conical_heat_source_improved_plot.svg  # 4-Panel 3D Conical Heat Source & Trajectory Plot (SVG)
 │   ├── conical_heat_source_schematic.svg      # Analytical Heat Source Geometry Schematic (SVG)
+│   ├── double_cone_heat_source_plot.svg       # 4-Panel Double Conical Keyhole Source, Crown Gear / Carrier Weld (SVG)
+│   ├── bimaterial_weld_4kW_blackbody.gif      # Bimaterial weld thermal animation with expected macrograph (GIF)
 │   ├── sequentially_coupled_architecture.svg  # Multi-Physics Data Flow & Pipeline Architecture (SVG)
 │   ├── uinter_3state_state_machine.svg        # UINTER 3-State Contact State Machine & Won Criteria (SVG)
 │   ├── cohesive_3state_state_machine.svg      # Cohesive Zone UMAT Architecture & Softening Law (SVG)

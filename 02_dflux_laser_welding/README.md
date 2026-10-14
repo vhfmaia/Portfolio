@@ -477,6 +477,8 @@ At temperatures near melting (<i>T</i> > 1200 °C) and in the plastic regime, st
 ├── compile_vtk_to_gif.py                  # Multi-viewport 3DEXPERIENCE simulation report compiler
 ├── odb_to_vtk.py                          # Abaqus Python ODB to VTK ASCII exporter & ZIP packager
 ├── run_pipeline.sh                        # HPC / batch automated execution pipeline
+├── bimaterial/
+│   └── dflux_gear_shaft_keyhole.f         # In work: double conical keyhole source, crown gear / carrier weld
 └── README.md                              # Technical report & documentation
 ```
 
@@ -531,17 +533,34 @@ python compile_vtk_to_gif.py laser_mech_vtk.zip --fps 15 -o laser_welding_report
 ## 7. Key Results to Evaluate
 
 <p align="center">
-  <img src="disk_heatsource_th_simulation.gif" alt="Abaqus DFLUX Circumferential Laser Welding Simulation - Thermal Analysis Animation" width="100%" />
+  <img src="../99_images_and_miscelania/bimaterial_weld_4kW_blackbody.gif" alt="Abaqus DFLUX bimaterial 20MnCr5 / EN-GJS-600-10 laser weld thermal simulation, black-body colour map" width="100%" />
 </p>
 
 <div align="justify">
+Thermal run of the bimaterial crown gear / differential carrier weld of section 7.1 (previous Goldak-head source), with the ParaView black-body colour map and the legend banded up to the 20MnCr5 liquidus:
 <ul>
-  <li><b>Melt Pool Geometry:</b> Isotherm <i>T</i> ≥ <i>T</i><sub>liquidus</sub> = 1530 °C identifies the molten weld bead width and penetration depth (<i>z</i><sub>i</sub> ≈ 3.0 mm), visible dynamically in the local tracking viewport.</li>
-  <li><b>Heat Affected Zone (HAZ):</b> Region bounded between <i>Ac</i><sub>1</sub> ≈ 720 °C and <i>T</i><sub>solidus</sub> = 1485 °C.</li>
-  <li><b>Phase Distributions (<code>SDV4</code>–<code>SDV7</code>):</b> Martensite formation in the rapidly cooled HAZ and bainite/ferrite in adjacent parent material.</li>
-  <li><b>Residual Stress State:</b> Peak hoop (<i>σ</i><sub>θθ</sub>) and axial (<i>σ</i><sub>zz</sub>) tensile stresses locked along the weld fusion line, balanced by compressive stress in the surrounding shaft and hub body.</li>
+  <li><b>Top surface (unrolled along the joint):</b> the moving pool and its trail, with the solidus and Ac1 lines evaluated per material.</li>
+  <li><b>Longitudinal section on the joint:</b> pool shape along the travel direction and the solidus / Ac1 penetrations (6.51 / 6.83 mm).</li>
+  <li><b>Weld cross-section:</b> projection of the pool, i.e. the maximum temperature along the travel at each point. In steady state this is the peak temperature that a fixed section experiences. The fusion line uses the solidus of each side (20MnCr5 1470 °C, EN-GJS-600-10 1150 °C) and the HAZ boundary the Ac1 of each side (731 / 850 °C).</li>
+  <li><b>Expected macrograph:</b> schematic of the etched section built from the same peak temperatures: fusion zone, partially melted ledeburite rim and martensitic HAZ on the cast iron side, thin HAZ line on the steel side. Martensite is the transformation product computed by the phase model (bainite ≈ 0).</li>
 </ul>
 </div>
+
+---
+
+## 7.1 In Work: Bimaterial Crown Gear / Differential Carrier Weld
+
+<div align="justify">
+The same method is being applied to the welded assembly of <a href="../01_dload_gear_fatigue/README.md">project 01</a>: a 20MnCr5 crown gear laser-welded to an EN-GJS-600-10 differential carrier along the joint radius <i>R</i> = 55 mm (4 kW, 1.5 m/min, <i>η</i> = 0.75, 3000 W absorbed). The heavy thermal mesh is not published; the heat source is in <code>bimaterial/dflux_gear_shaft_keyhole.f</code>.
+</div>
+
+<div align="justify">
+A thick keyhole weld has a "nail head" section: a wide, shallow head at the surface, driven by the Marangoni flow, over a narrow and nearly parallel body. The run above used a Goldak half-ellipsoid head over a conical body. It gave the right fused area but the wrong distribution: the Gaussian tail of the head spread its power down to ~2.5 mm, which turned the head into a funnel and left the body too narrow. The source is therefore now a <b>double conical Gaussian</b>, a head cone over a body cone with a hemispherical bottom. Each part is uniform along its depth and normalised over its own volume, so the head power stays inside the head depth. Numerical integration gives 3000.07 W against 3000 W absorbed. The double-cone parameters are first estimates, to be calibrated on a short run before the full 360° weld.
+</div>
+
+<p align="center">
+  <img src="../99_images_and_miscelania/double_cone_heat_source_plot.svg" alt="Abaqus DFLUX double conical Gaussian keyhole heat source with hemispherical bottom, cross-section, joint trajectory and power schedule" width="100%" />
+</p>
 
 ---
 
