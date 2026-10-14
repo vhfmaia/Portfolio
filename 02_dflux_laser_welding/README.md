@@ -555,11 +555,21 @@ The same method is being applied to the welded assembly of <a href="../01_dload_
 </div>
 
 <div align="justify">
-A thick keyhole weld has a "nail head" section: a wide, shallow head at the surface, driven by the Marangoni flow, over a narrow and nearly parallel body. The run above used a Goldak half-ellipsoid head over a conical body. It gave the right fused area but the wrong distribution: the Gaussian tail of the head spread its power down to ~2.5 mm, which turned the head into a funnel and left the body too narrow. The source is therefore now a <b>double conical Gaussian</b>, a head cone over a body cone with a hemispherical bottom. Each part is uniform along its depth and normalised over its own volume, so the head power stays inside the head depth. Numerical integration gives 3000.07 W against 3000 W absorbed. The double-cone parameters were set with a conduction surrogate calibrated on that run (cylindrical body, head cone 1.05 mm deep with 32 % of the power) and are to be confirmed on a short run before the full 360° weld.
+A thick keyhole weld has a "nail head" section: a wide, shallow head at the surface, driven by the Marangoni flow, over a narrow and nearly parallel body. The run above used a Goldak half-ellipsoid head over a conical body. It gave the right fused area but the wrong distribution: the Gaussian tail of the head spread its power down to ~2.5 mm, which turned the head into a funnel and left the body too narrow. The source is therefore now a <b>double conical Gaussian</b>, a head cone over a body cone with a hemispherical bottom. Each part is uniform along its depth and normalised over its own volume, so the head power stays inside the head depth. Numerical integration gives 3000.02 W against 3000 W absorbed. The double-cone parameters were set with a conduction surrogate calibrated on that run (cylindrical body, head cone 1.05 mm deep with 32 % of the power) and are to be confirmed on a short run before the full 360° weld.
 </div>
 
 <p align="center">
   <img src="../99_images_and_miscelania/double_cone_heat_source_plot.svg" alt="Abaqus DFLUX double conical Gaussian keyhole heat source with hemispherical bottom, cross-section, joint trajectory and power schedule" width="100%" />
+</p>
+
+<div align="justify">
+For reference, the macrograph below shows the nail-head shape in a published case of the same family. It is a laser-welded steel crown / ductile iron differential case at 4 kW and 1.5 m/min, with Ni-Cr filler wire and full penetration into a gas escape chamber [8]. It is not a validation of this model: the steel grade, the filler wire and the joint geometry are different.
+</div>
+
+<p align="center">
+  <img src="../99_images_and_miscelania/macrograph_nogueira_2021_fig6_13a.jpg" alt="Macrograph of a laser-welded steel / ductile iron joint with Ni-Cr filler wire, Nogueira (2021), Fig. 6.13(a), CC BY 4.0" width="55%" />
+  <br>
+  <sub>Macrograph of a laser-welded steel (left) / ductile iron (right) joint, trial 5, section at 0°. Reproduced unchanged from L. F. J. Nogueira, <i>Rotura diferida em soldadura laser de materiais dissimilares</i>, MSc thesis, University of Coimbra, 2021, Fig. 6.13(a), <a href="https://hdl.handle.net/10316/97996">hdl.handle.net/10316/97996</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</sub>
 </p>
 
 ---
@@ -573,6 +583,7 @@ A thick keyhole weld has a "nail head" section: a wide, shallow head at the surf
 5. **EN 10084:** *Case hardening steels — Technical delivery conditions* (chemical composition of 16MnCr5).
 6. **Andrews, K. W. (1965):** *Empirical formulae for the calculation of critical temperatures in steels*, Journal of the Iron and Steel Institute (JISI), 203, 721–727.
 7. **Koistinen, D. P., & Marburger, R. E. (1959):** *A general equation prescribing the extent of the austenite-martensite transformation in pure iron-carbon alloys and plain carbon steels*, Acta Metallurgica, 7(1), 59–60.
+8. **Nogueira, L. F. J. (2021):** *Rotura diferida em soldadura laser de materiais dissimilares* (Delayed cracking in dissimilar metal laser welding), MSc thesis in Mechanical Engineering, University of Coimbra, [hdl.handle.net/10316/97996](https://hdl.handle.net/10316/97996), CC BY 4.0.
 
 ---
 
