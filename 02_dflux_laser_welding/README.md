@@ -478,7 +478,12 @@ At temperatures near melting (<i>T</i> > 1200 °C) and in the plastic regime, st
 ├── odb_to_vtk.py                          # Abaqus Python ODB to VTK ASCII exporter & ZIP packager
 ├── run_pipeline.sh                        # HPC / batch automated execution pipeline
 ├── bimaterial/
-│   └── dflux_gear_shaft_keyhole.f         # In work: double conical keyhole source, crown gear / carrier weld
+│   ├── dflux_gear_shaft_keyhole.f         # In work: double conical keyhole source, crown gear / carrier weld
+│   ├── bimaterial_crown.step              # In work: helical crown gear with weld land, gas escape groove, press fit
+│   ├── bimaterial_carrier.step            # In work: differential carrier (bowl, flange, cup, hubs)
+│   ├── bimaterial_filler.step             # In work: 0.3 mm filler gap of the weld land (progressive activation)
+│   ├── bimaterial_assembly.step           # In work: the three solids together
+│   └── bimaterial_geometry_*.png          # Section and quarter-cut previews
 └── README.md                              # Technical report & documentation
 ```
 
@@ -572,6 +577,27 @@ For reference, the macrograph below shows the nail-head shape in a published cas
   <sub>Macrograph of a laser-welded steel (left) / ductile iron (right) joint, trial 5, section at 0°. Reproduced unchanged from L. F. J. Nogueira, <i>Rotura diferida em soldadura laser de materiais dissimilares</i>, MSc thesis, University of Coimbra, 2021, Fig. 6.13(a), <a href="https://hdl.handle.net/10316/97996">hdl.handle.net/10316/97996</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</sub>
 </p>
 
+### New joint geometry (in work)
+
+<div align="justify">
+To compare with that macrograph on the same kind of joint, the crown gear and the carrier are being redrawn with the joint layout of laser-welded differentials. From the irradiated face down, the joint has:
+<ul>
+  <li>a 5 mm weld land with a 0.15 + 0.15 mm radial gap for the Inconel-82 filler wire, exported as its own solid for progressive element activation;</li>
+  <li>a gas escape groove machined in both parts, into which the root of the full-penetration keyhole vents;</li>
+  <li>a press-fit zone with a 15° entry chamfer on the crown bore.</li>
+</ul>
+The carrier has a hollow bowl, a flange carrying the crown, an open annular cup and two hubs; the crown has its own helical teeth (<i>z</i> = 52, <i>m</i><sub>n</sub> = 3 mm, <i>β</i> = 25°). The models are in <code>bimaterial/</code>: <code>bimaterial_crown.step</code>, <code>bimaterial_carrier.step</code>, <code>bimaterial_filler.step</code> and <code>bimaterial_assembly.step</code>.
+</div>
+
+<p align="center">
+  <img src="bimaterial/bimaterial_geometry_3d.png" alt="Crown gear and differential carrier with a quarter cut away" width="42%" />
+  <img src="bimaterial/bimaterial_geometry_section.png" alt="Section of the crown gear / carrier joint: weld land with filler gap, gas escape groove, press-fit zone" width="56%" />
+</p>
+
+<div align="justify">
+<i>Provenance:</i> the general arrangement follows published descriptions of laser-welded crown / carrier joints [8, 9]. All dimensions, the tooth data and the carrier shape are the author's own choices, and no proprietary drawings were used.
+</div>
+
 ---
 
 ## 8. Standards & References
@@ -584,6 +610,7 @@ For reference, the macrograph below shows the nail-head shape in a published cas
 6. **Andrews, K. W. (1965):** *Empirical formulae for the calculation of critical temperatures in steels*, Journal of the Iron and Steel Institute (JISI), 203, 721–727.
 7. **Koistinen, D. P., & Marburger, R. E. (1959):** *A general equation prescribing the extent of the austenite-martensite transformation in pure iron-carbon alloys and plain carbon steels*, Acta Metallurgica, 7(1), 59–60.
 8. **Nogueira, L. F. J. (2021):** *Rotura diferida em soldadura laser de materiais dissimilares* (Delayed cracking in dissimilar metal laser welding), MSc thesis in Mechanical Engineering, University of Coimbra, [hdl.handle.net/10316/97996](https://hdl.handle.net/10316/97996), CC BY 4.0.
+9. **Maia, V. H. F. (2023):** *Estudo e projeto de ferramentas porta-peças para tratamento termoquímico-carbonitruração* (Study and design of tool-piece carriers for carbonitriding thermochemical treatment), MSc report in Mechanical Engineering, University of Aveiro, [hdl.handle.net/10773/39345](https://hdl.handle.net/10773/39345), CC BY 4.0.
 
 ---
 
