@@ -63,12 +63,12 @@ module laser_dflux_mod
     ! 2. SOURCE GEOMETRY AND POWER SPLIT
     ! ------------------------------------------------------------------
     real(real64), parameter :: depth_total  = 7.00d0        ! Penetration of the source, depth_cone + r_cap [mm]
-    real(real64), parameter :: d_up         = 1.20d0        ! Depth of the head cone [mm]
-    real(real64), parameter :: r_top        = 1.20d0        ! Head Gaussian radius at the surface [mm]
-    real(real64), parameter :: r_mid        = 0.62d0        ! Gaussian radius at the head / body junction [mm]
-    real(real64), parameter :: r_bottom     = 0.55d0        ! Body Gaussian radius at the bottom of the cone [mm]
-    real(real64), parameter :: r_cap        = 0.55d0        ! Depth radius of the bottom (= r_bottom: hemisphere) [mm]
-    real(real64), parameter :: f_up         = 0.30d0        ! Fraction of the absorbed power in the head cone [-]
+    real(real64), parameter :: d_up         = 1.05d0        ! Depth of the head cone [mm]
+    real(real64), parameter :: r_top        = 1.22d0        ! Head Gaussian radius at the surface [mm]
+    real(real64), parameter :: r_mid        = 0.53d0        ! Gaussian radius at the head / body junction [mm]
+    real(real64), parameter :: r_bottom     = 0.53d0        ! Body Gaussian radius at the bottom of the cone [mm] (= r_mid: cylindrical body)
+    real(real64), parameter :: r_cap        = 0.53d0        ! Depth radius of the bottom (= r_bottom: hemisphere) [mm]
+    real(real64), parameter :: f_up         = 0.32d0        ! Fraction of the absorbed power in the head cone [-]
 
     ! ------------------------------------------------------------------
     ! 3. ANGULAR POWER SCHEDULE PARAMETERS
