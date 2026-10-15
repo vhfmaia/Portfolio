@@ -479,10 +479,8 @@ At temperatures near melting (<i>T</i> > 1200 °C) and in the plastic regime, st
 ├── run_pipeline.sh                        # HPC / batch automated execution pipeline
 ├── bimaterial/
 │   ├── dflux_gear_shaft_keyhole.f         # In work: double conical keyhole source, crown gear / carrier weld
-│   ├── bimaterial_crown.step              # In work: helical crown gear with weld land, gas escape groove, press fit
-│   ├── bimaterial_carrier.step            # In work: differential carrier (bowl, flange, cup, hubs)
-│   ├── bimaterial_filler.step             # In work: 0.3 mm filler gap of the weld land (progressive activation)
-│   ├── bimaterial_assembly.step           # In work: the three solids together
+│   ├── bimaterial_assembly.step           # In work: crown gear, carrier and 0.3 mm filler, partitioned for the hex weld zone
+│   ├── Material_Inconel82.inp             # In work: Ni 6082 filler wire card (estimated, public producer data)
 │   └── bimaterial_geometry_*.png          # Section and quarter-cut previews
 └── README.md                              # Technical report & documentation
 ```
@@ -560,7 +558,7 @@ The same method is being applied to the welded assembly of <a href="../01_dload_
 </div>
 
 <div align="justify">
-A thick keyhole weld has a "nail head" section: a wide, shallow head at the surface, driven by the Marangoni flow, over a narrow and nearly parallel body. The run above used a Goldak half-ellipsoid head over a conical body. It gave the right fused area but the wrong distribution: the Gaussian tail of the head spread its power down to ~2.5 mm, which turned the head into a funnel and left the body too narrow. The source is therefore now a <b>double conical Gaussian</b>, a head cone over a body cone with a hemispherical bottom. Each part is uniform along its depth and normalised over its own volume, so the head power stays inside the head depth. Numerical integration gives 3000.02 W against 3000 W absorbed. The double-cone parameters were set with a conduction surrogate calibrated on that run (cylindrical body, head cone 1.05 mm deep with 32 % of the power) and are to be confirmed on a short run before the full 360° weld.
+A thick keyhole weld has a "nail head" section: a wide, shallow head at the surface, driven by the Marangoni flow, over a narrow and nearly parallel body. The run above used a Goldak half-ellipsoid head over a conical body. It gave the right fused area but the wrong distribution: the Gaussian tail of the head spread its power down to ~2.5 mm, which turned the head into a funnel and left the body too narrow. The source is therefore now a <b>double conical Gaussian</b>, a head cone over a body cone with a hemispherical bottom. Each part is uniform along its depth and normalised over its own volume, so the head power stays inside the head depth. Numerical integration gives 3000.02 W against 3000 W absorbed. The double-cone parameters are fitted with a conduction surrogate to the fusion zone of the macrograph below (2.42 mm wide at the surface, full penetration into the gas escape chamber 5.2 mm down): cylindrical body of 0.43 mm Gaussian radius, head cone 1.05 mm deep with 26 % of the power, source 7.1 mm deep. The power of the source below the 5 mm weld land falls in the chamber and is lost, in the fit as on the mesh: it is the power transmitted through the root of the open keyhole, and with it about 2.3 kW of the 3 kW absorbed stay in the weld. A small correction factor brings the source integrated on the 0.6° hex mesh to the same value. The first full 360° run of the new joint is in progress.
 </div>
 
 <p align="center">
@@ -586,7 +584,7 @@ To compare with that macrograph on the same kind of joint, the crown gear and th
   <li>a gas escape groove machined in both parts, into which the root of the full-penetration keyhole vents;</li>
   <li>a press-fit zone with a 15° entry chamfer on the crown bore.</li>
 </ul>
-The carrier has a hollow bowl, a flange carrying the crown, an open annular cup and two hubs; the crown has its own helical teeth (<i>z</i> = 52, <i>m</i><sub>n</sub> = 3 mm, <i>β</i> = 25°). The models are in <code>bimaterial/</code>: <code>bimaterial_crown.step</code>, <code>bimaterial_carrier.step</code>, <code>bimaterial_filler.step</code> and <code>bimaterial_assembly.step</code>.
+The carrier has a hollow bowl, a flange carrying the crown, an open annular cup and two hubs; the crown has its own helical teeth (<i>z</i> = 52, <i>m</i><sub>n</sub> = 3 mm, <i>β</i> = 25°). The models are in <code>bimaterial/</code>: <code>bimaterial_assembly.step</code> (crown gear, carrier and filler as separate named solids).
 </div>
 
 <p align="center">

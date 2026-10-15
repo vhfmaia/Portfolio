@@ -1,0 +1,190 @@
+** ==============================================================================
+** ABAQUS/STANDARD THERMO-MECHANICAL MATERIAL CARD: INCONEL FILLER METAL 82
+** Nickel filler wire ERNiCr-3 (AWS A5.14, ISO 18274 S Ni 6082), weld deposit
+** Nominal composition 72 Ni - 20 Cr - 3 Mn - 2.5 Nb - 1.5 Fe (wt%)
+** Units: mm, s, tonne, mJ, MPa, C
+** Author: Victor Maia (vhfm08@gmail.com)
+**
+** ESTIMATED DATA, FIRST APPROXIMATION. No measurement of this wire is behind this
+** card. Values come from public producer data for INCONEL Filler Metal 82 and for
+** the base alloy of the same family (INCONEL alloy 600, which has close Ni-Cr
+** contents), read to two or three figures.
+**
+** Plain material, no phase transformation framework: the deposit is austenitic
+** (fcc) from the solidus to room temperature, with no solid-state transformation.
+** Dilution with the steel and the cast iron is not modelled in this card; the
+** fusion zone composition is a post-processing step (Schaeffler diagram).
+** Consequences in the deck:
+**  - no *DEPVAR: *INITIAL CONDITIONS, TYPE=SOLUTION must not include FILLER
+**    (use an element set of the two phase transformation materials only);
+**  - the filler elements are switched on by *MODEL CHANGE, ADD.
+**
+** Values and their origin:
+**  - Melting range 1300-1350 C (producer data for the filler metal); latent heat
+**    of fusion 300 kJ/kg (nickel alloy handbook range 290-310 kJ/kg).
+**  - Density 8.30 g/cm3 at 20 C, falling with the thermal expansion, 7.60 in the
+**    liquid.
+**  - Conductivity, specific heat, elastic modulus and mean expansion: alloy 600
+**    curves. Liquid conductivity: 3 x the solid value above the liquidus, as in
+**    the steel and cast iron cards (stirring of the weld pool).
+**  - Strength of the as-welded deposit at 20 C: Rp0.2 = 380 MPa, Rm = 640 MPa,
+**    elongation 40 % (producer typical values). Yield stress versus temperature:
+**    1.00 / 0.92 / 0.87 / 0.80 / 0.60 / 0.30 / 0.10 of the 20 C value at 20 / 300
+**    / 500 / 700 / 800 / 1000 / 1200 C, from the elevated temperature data of
+**    alloy 600; liquid floor of 5 MPa above the solidus.
+**  - Annealing at the liquidus: the plastic strain is reset when the deposit
+**    melts, like in the steel and cast iron cards.
+**
+** References:
+**  - Special Metals, INCONEL Filler Metal 82, product data sheet
+**  - Special Metals, INCONEL alloy 600, publication SMC-027
+**  - AWS A5.14/A5.14M, Specification for Nickel and Nickel-Alloy Bare Welding
+**    Electrodes and Rods
+** ==============================================================================
+*MATERIAL, NAME=INCONEL82
+*DENSITY
+**
+** Format: Density (tonne/mm^3), Temp (C)
+**
+ 8.300E-09,    20.0
+ 8.150E-09,   600.0
+ 7.980E-09,  1000.0
+ 7.850E-09,  1300.0
+ 7.600E-09,  1350.0
+ 7.600E-09,  2800.0
+*ELASTIC, TYPE=ISOTROPIC
+**
+** Format: E (MPa), nu, Temp (C)
+**
+  214000., 0.29,    20.0
+  210000., 0.29,   100.0
+  205000., 0.29,   200.0
+  199000., 0.29,   300.0
+  193000., 0.30,   400.0
+  187000., 0.30,   500.0
+  180000., 0.30,   600.0
+  172000., 0.31,   700.0
+  164000., 0.31,   800.0
+  154000., 0.31,   900.0
+  145000., 0.32,  1000.0
+  110000., 0.32,  1200.0
+   20000., 0.33,  1300.0
+    2000., 0.33,  1350.0
+    2000., 0.33,  2800.0
+*PLASTIC, HARDENING=ISOTROPIC, EXTRAPOLATION=LINEAR
+**
+** Format: Stress (MPa), Plastic strain, Temp (C)
+** Hardening from Rp0.2 = 380 to Rm = 640 MPa (true stress about 750 MPa at
+** the uniform strain), scaled with the yield stress at each temperature.
+**
+   380.0, 0.000,    20.0
+   430.0, 0.010,    20.0
+   500.0, 0.050,    20.0
+   600.0, 0.150,    20.0
+   700.0, 0.300,    20.0
+   750.0, 0.400,    20.0
+**
+   350.0, 0.000,   300.0
+   396.0, 0.010,   300.0
+   460.0, 0.050,   300.0
+   552.0, 0.150,   300.0
+   644.0, 0.300,   300.0
+   690.0, 0.400,   300.0
+**
+   331.0, 0.000,   500.0
+   374.0, 0.010,   500.0
+   435.0, 0.050,   500.0
+   522.0, 0.150,   500.0
+   609.0, 0.300,   500.0
+   653.0, 0.400,   500.0
+**
+   304.0, 0.000,   700.0
+   344.0, 0.010,   700.0
+   400.0, 0.050,   700.0
+   480.0, 0.150,   700.0
+   560.0, 0.300,   700.0
+   600.0, 0.400,   700.0
+**
+   228.0, 0.000,   800.0
+   250.0, 0.010,   800.0
+   275.0, 0.050,   800.0
+   300.0, 0.150,   800.0
+   315.0, 0.300,   800.0
+   320.0, 0.400,   800.0
+**
+   114.0, 0.000,  1000.0
+   120.0, 0.010,  1000.0
+   125.0, 0.050,  1000.0
+   130.0, 0.150,  1000.0
+   132.0, 0.300,  1000.0
+   133.0, 0.400,  1000.0
+**
+    38.0, 0.000,  1200.0
+    39.0, 0.050,  1200.0
+    40.0, 0.400,  1200.0
+**
+** Liquid State Degradation
+**
+     5.0, 0.000,  1300.0
+     5.0, 0.400,  1300.0
+     5.0, 0.000,  2800.0
+     5.0, 0.400,  2800.0
+*EXPANSION, TYPE=ISOTROPIC, ZERO=20.
+**
+** Format: mean (secant) Alpha from 20 C (1/C), Temp (C)
+**
+ 13.0E-06,    20.0
+ 13.3E-06,   100.0
+ 13.8E-06,   200.0
+ 14.2E-06,   300.0
+ 14.5E-06,   400.0
+ 14.9E-06,   500.0
+ 15.3E-06,   600.0
+ 15.8E-06,   700.0
+ 16.1E-06,   800.0
+ 16.4E-06,   900.0
+ 16.7E-06,  1000.0
+ 17.3E-06,  1200.0
+ 17.6E-06,  1350.0
+ 17.6E-06,  2800.0
+*CONDUCTIVITY, TYPE=ISOTROPIC
+**
+** Format: Thermal conductivity (mJ/s*mm*K), Temp (C)
+**
+  14.9,    20.0
+  15.9,   100.0
+  17.3,   200.0
+  19.0,   300.0
+  20.5,   400.0
+  22.1,   500.0
+  23.9,   600.0
+  25.7,   700.0
+  27.5,   800.0
+  29.6,   900.0
+  31.7,  1000.0
+  35.0,  1200.0
+  37.0,  1300.0
+ 111.0,  1350.0
+ 111.0,  2800.0
+*SPECIFIC HEAT
+**
+** Format: Cp (mJ/tonne*K), Temp (C)
+**
+ 4.440E+08,    20.0
+ 4.650E+08,   100.0
+ 4.860E+08,   200.0
+ 5.020E+08,   300.0
+ 5.190E+08,   400.0
+ 5.360E+08,   500.0
+ 5.780E+08,   600.0
+ 5.950E+08,   700.0
+ 6.110E+08,   800.0
+ 6.280E+08,   900.0
+ 6.450E+08,  1000.0
+ 6.750E+08,  1200.0
+ 6.900E+08,  1300.0
+ 6.900E+08,  2800.0
+*LATENT HEAT
+300e9, 1300, 1350
+*ANNEAL TEMPERATURE
+1350,

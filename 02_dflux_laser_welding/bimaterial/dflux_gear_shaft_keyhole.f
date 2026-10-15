@@ -4,7 +4,8 @@
 !  Model: Circumferential Laser Welding - Moving Keyhole Heat Source:
 !         double conical Gaussian (head cone over body cone) with a
 !         hemispherical bottom
-!         Crown Gear & Differential Carrier Assembly (Gear_Shaft_geometry_TH.inp)
+!         Crown Gear & Differential Carrier Assembly with Ni 6082 filler
+!         (bimaterial weld model, run/ folder: bimaterial_TH.inp)
 !  Author: Victor Maia (vhfm08@gmail.com)
 !
 !  Target shape: "nail head" keyhole weld, a wide and shallow head at the
@@ -43,6 +44,23 @@
 !    - Shape parameters: values assumed by the author for a nail-head weld,
 !      set with a conduction surrogate calibrated on the previous run; to be
 !      checked against the computed fusion line.
+!    - Calibration (2026-10-15): heat_source_calibrator.py (conduction
+!      surrogate, k = 0.0349 W/mm.K, alpha = 8.0 mm2/s) fitted to the
+!      fusion zone of Nogueira (2021), Fig. 6.13(a), CC BY 4.0: 2.42 mm wide
+!      at the surface, 5.21 mm deep (full penetration of the weld land into
+!      the gas escape chamber). The source power below the 5 mm weld land
+!      falls in the chamber and is lost, in the fit and on the mesh: it is
+!      the power transmitted through the root of the open keyhole. The
+!      shape stays close to the previous one (depth_total 7.1 mm).
+!      Widths fitted / measured [mm] at depth 0.15 / 1.12 / 2.24 / 3.51 /
+!      4.79: 2.22/2.38, 1.67/1.68, 1.16/0.83, 1.05/0.93, 0.62/1.29; the
+!      widening of the root at the chamber is not reproduced.
+!    - mesh_factor = 0.961: in the fit, 2286 W of the 3000 W absorbed stay in
+!      the weld land; integrated on the DC3D8 mesh (2x2x2 Gauss points), beam
+!      on a node of the joint line as at every increment end, the source
+!      gives 2379 W. Between two nodes it would give 2153 W (-10 %): the
+!      body radius (0.43 mm) is smaller than the circumferential element
+!      (0.58 mm), keep the increments aligned.
 !=======================================================================
 
 module laser_dflux_mod
@@ -58,17 +76,18 @@ module laser_dflux_mod
     real(real64), parameter :: travel_speed = 1500.0d0      ! Travel speed [mm/min] (25 mm/s)
     real(real64), parameter :: z_surface    = 25.00d0       ! Top irradiated surface Z coordinate [mm]
     real(real64), parameter :: cutoff_tol   = 1.0d-8        ! Gaussian tail cut-off, fraction of the peak [-]
+    real(real64), parameter :: mesh_factor  = 0.961d0       ! Correction of the power integrated on the mesh [-]
 
     ! ------------------------------------------------------------------
     ! 2. SOURCE GEOMETRY AND POWER SPLIT
     ! ------------------------------------------------------------------
-    real(real64), parameter :: depth_total  = 7.00d0        ! Penetration of the source, depth_cone + r_cap [mm]
-    real(real64), parameter :: d_up         = 1.05d0        ! Depth of the head cone [mm]
-    real(real64), parameter :: r_top        = 1.22d0        ! Head Gaussian radius at the surface [mm]
-    real(real64), parameter :: r_mid        = 0.53d0        ! Gaussian radius at the head / body junction [mm]
-    real(real64), parameter :: r_bottom     = 0.53d0        ! Body Gaussian radius at the bottom of the cone [mm] (= r_mid: cylindrical body)
-    real(real64), parameter :: r_cap        = 0.53d0        ! Depth radius of the bottom (= r_bottom: hemisphere) [mm]
-    real(real64), parameter :: f_up         = 0.32d0        ! Fraction of the absorbed power in the head cone [-]
+    real(real64), parameter :: depth_total  = 7.105d0        ! Penetration of the source, depth_cone + r_cap [mm]
+    real(real64), parameter :: d_up         = 1.048d0        ! Depth of the head cone [mm]
+    real(real64), parameter :: r_top        = 1.213d0        ! Head Gaussian radius at the surface [mm]
+    real(real64), parameter :: r_mid        = 0.434d0        ! Gaussian radius at the head / body junction [mm]
+    real(real64), parameter :: r_bottom     = 0.434d0        ! Body Gaussian radius at the bottom of the cone [mm] (= r_mid: cylindrical body)
+    real(real64), parameter :: r_cap        = 0.434d0        ! Depth radius of the bottom (= r_bottom: hemisphere) [mm]
+    real(real64), parameter :: f_up         = 0.261d0        ! Fraction of the absorbed power in the head cone [-]
 
     ! ------------------------------------------------------------------
     ! 3. ANGULAR POWER SCHEDULE PARAMETERS
@@ -79,7 +98,7 @@ module laser_dflux_mod
 
     ! Derived constants
     real(real64), parameter :: pi_const   = 3.14159265358979323846d0
-    real(real64), parameter :: q_abs      = eta_absorb * qtot_nominal
+    real(real64), parameter :: q_abs      = mesh_factor * eta_absorb * qtot_nominal
     real(real64), parameter :: depth_cone = depth_total - r_cap
     ! Volume integrals of exp(-3 r2 / r0(z)2) * g(z), divided by pi / 3:
     !   truncated cone of height h, radii a -> b:  h (a2 + a b + b2) / 3
@@ -183,7 +202,8 @@ subroutine dflux(flux, sol, kstep, kinc, time, noel, npt, coords, &
 
     real(real64) :: q_val
 
-    ! time(2) is the total time; the welding step is the first one, so it equals the step time
+    ! time(2) is the total time; the welding steps start at total time 0 and follow
+    ! each other (filler sector steps), so it is the time since the start of the weld
     call compute_flux(time(2), coords, q_val)
 
     flux(1) = q_val
