@@ -16,7 +16,7 @@ A repository of production-grade user subroutines for <b>Abaqus/Standard</b> and
 | ID | Subroutine | Physics / Type | Engineering Application | Status |
 | :---: | :--- | :--- | :--- | :---: |
 | **01** | [`DLOAD`](01_dload_gear_fatigue/README.md) | Moving Surface Load / Quasi-Static | Drive + coast rolling load and fatigue framework for a welded helical crown gear and differential carrier | ✅ Verified |
-| **02** | [`DFLUX`](02_dflux_laser_welding/README.md) | Moving Conical Flux / Thermo-Mechanical | Sequentially coupled laser welding with phase transformations and residual stress | ✅ Verified |
+| **02** | [`DFLUX`](02_dflux_laser_welding/README.md) | Moving Keyhole Flux / Thermo-Metallurgical-Mechanical | Laser welding of a steel crown gear to a cast-iron carrier: phase transformations, raw-wire (RLS) filler vs element activation, residual stress | ✅ Thermal verified, stress in work |
 | **03** | [`UINTER`](03_uinter_welding_interface/README.md) | Surface Interaction / BTR Hot Cracking | 3-State contact interface (Raw → Welded → Cracked) with BTR criteria | ⚠️ Exploratory (R&D Backlog) |
 | **04** | [`UMAT`](04_umat_cohesive_welding/README.md) | Cohesive Zone Modeling / Fracture Energy *G*<sub>c</sub> | Mesh-independent 3-state thermo-mechanical weld interface (`COH3D8`) | ⚠️ In Work (Testing Phase) |
 | **05** | [`USDFLD`](05_usdfld_shaft_straightening/README.md) | Radial Field Variable / Nonlinear Kinematic Hardening | Elastoplastic straightening & springback of case-hardened transmission shaft (DOI: [10.1007/s00170-014-5688-8](https://doi.org/10.1007/s00170-014-5688-8)) | ⚠️ In Work (Not Validated) |
@@ -49,31 +49,27 @@ Detailed formulation, kinematic equations, FEA verification, and post-processing
 
 ---
 
-### Project Showcase: 02. Circumferential Laser Welding (`DFLUX`)
+### Project Showcase: 02. Laser Welding of a Crown Gear to a Cast-Iron Carrier (`DFLUX`)
 
 <p align="center">
   <a href="02_dflux_laser_welding/README.md">
-    <img src="99_images_and_miscelania/bimaterial_weld_4kW_blackbody.gif" alt="Abaqus DFLUX bimaterial 20MnCr5 / EN-GJS-600-10 laser weld thermal simulation with weld cross-section and expected macrograph" width="100%" />
+    <img src="99_images_and_miscelania/bimaterial_weld_rls_blackbody.gif" alt="Abaqus DFLUX bimaterial 20MnCr5 / EN-GJS-600-10 laser weld thermal simulation with weld cross-section and expected macrograph" width="100%" />
   </a>
 </p>
 
 <div align="justify">
-Sequentially coupled thermo-mechanical analysis of circumferential laser welding (<i>R</i> = 15 mm, <i>P</i><sub>abs</sub> = 1080 W, <i>v</i> = 1200 mm/min) with moving conical Gaussian heat source, metallurgical phase transformations (<code>ABQ_PHASE_TRANS</code>), hybrid elements (<code>C3D8H</code>), continuous annealing at 1530 °C, and residual stress prediction for 16MnCr5 case-hardening steel.
+A 20MnCr5 crown gear laser welded to an EN-GJS-600-10 differential carrier with a Ni 6082 filler wire (<i>R</i> = 55 mm, 4 kW, 1.5 m/min, full penetration of a 5 mm weld land into a gas escape chamber, press fit below). The animation shows the unrolled top surface, the longitudinal section on the joint, the projected weld cross-section with the solidus and Ac1 lines of each material, and the expected etched macrograph.
 </div>
 
-<div align="justify">
-The animation shows the same method applied, in work, to the 20MnCr5 crown gear / EN-GJS-600-10 carrier weld of project 01 (<i>R</i> = 55 mm, 4 kW, 1.5 m/min). It shows the unrolled top surface, the longitudinal section on the joint, the projected weld cross-section with the solidus and Ac1 lines of each material, and the expected etched macrograph. The keyhole is modelled by a double conical Gaussian source with a hemispherical tip.
-</div>
-
-#### Key Thermal, Metallurgical & Mechanical Highlights:
-- **3D Conical Gaussian Heat Source:** Analytically normalized peak flux *Q*<sub>0</sub> = 4.4598 × 10⁵ mW/mm³ with 10° linear power ramp-up, 360° steady weld, and 10° crater-filling ramp-down overlap.
-- **Unified Material Architecture:** Single `Material_16MnCr5.inp` shared by both thermal and mechanical simulations, ensuring seamless data consistency.
-- **Metallurgical Kinetics & Solidification (BTR):** Tracks liquidus/solidus melt pool kinetics and solid-state phase decomposition (Ferrite-Pearlite, Austenite, Bainite, Martensite via JMA and Koistinen-Marburger kinetics).
-- **Quadratic Unsymmetric Thermal Convergence:** Direct unsymmetric solver formulation (`UNSYMM=YES`) resolving non-symmetric metallurgical tangent matrices, localized reference flux controls (`*CONTROLS, PARAMETERS=FIELD`) eliminating cold-element dilution, and a documented criterion for when line search helps or hinders across the latent heat interval.
-- **Sequentially Coupled Structural Analysis:** Mitigates high-temperature volumetric locking via hybrid formulation elements (`C3D8H`), hydrostatic gravity stabilization, and finite-strain kinematics (`NLGEOM=YES`).
+#### Key Highlights:
+- **Double conical keyhole source (`DFLUX`):** nail-head weld (wide head, narrow body, hemispherical tip), calibrated on a published macrograph, with the power through the keyhole root lost into the chamber.
+- **Mesh built for a moving source:** a quad section revolved in 600 steps of 0.6 deg, one element per increment so the beam sits on a node at every increment end; tetrahedra away from the weld, tied, on plain cards.
+- **Metallurgy in all three materials:** the Abaqus phase transformation framework (`ABQ_PHASE_TRANS`) with phase-dependent properties, JMA / Koistinen-Marburger kinetics and secant transformation strains.
+- **Filler as a raw wire (RLS state):** the wire is in the model from the start and becomes weld metal where the computed temperature melts it, in one weld step, compared with classic element activation (`*MODEL CHANGE`) on the same mesh.
+- **Stress run (in work):** press fit by interference saved once by restart, weld and cooling read the thermal history increment by increment.
 
 <div align="justify">
-Detailed formulation, verification routines, simulation input decks, and automated post-processing pipeline are available in <a href="02_dflux_laser_welding/README.md">02_dflux_laser_welding/</a>.
+Formulation, mesh, materials, input decks and results are in <a href="02_dflux_laser_welding/README.md">02_dflux_laser_welding/</a>.
 </div>
 
 ---
@@ -136,16 +132,12 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── run_pipeline.sh                        # Headless Linux / HPC batch execution script
 │   └── README.md                              # Comprehensive Technical Report
 ├── 02_dflux_laser_welding/
-│   ├── Disk_heatsource_TH.inp                 # Master Thermal Analysis Deck (DC3D8)
-│   ├── Disk_heatsource_ME.inp                 # Master Mechanical Analysis Deck (C3D8H, Sequentially Coupled)
-│   ├── Geometry_TH.inp                        # Thermal Mesh Deck (DC3D8 Solid Bricks)
-│   ├── Geometry_ME.inp                        # Mechanical Hybrid Mesh Deck (C3D8H, NSET_BASE)
-│   ├── Material_16MnCr5.inp                   # Unified Thermo-Elasto-Plastic & Phase Transformation Deck
-│   ├── dflux_disk_conical_gaussian.f          # User Subroutine (Modern Fortran TDC Conical Model)
-│   ├── compile_vtk_to_gif.py                  # Multi-Viewport Animated Report Compiler
-│   ├── odb_to_vtk.py                          # Abaqus Python ODB to VTK Extractor & ZIP Packager
-│   ├── run_pipeline.sh                        # Headless Linux / HPC Batch Execution Pipeline
-│   └── README.md                              # Comprehensive Technical Report
+│   ├── bimaterial_RLS_TH.inp / _ME.inp       # Thermal and stress decks, raw-wire (RLS) filler
+│   ├── bimaterial_EA_TH.inp / _ME.inp        # Thermal and stress decks, element activation
+│   ├── dflux_bimaterial_keyhole.f            # User Subroutine (double conical keyhole source)
+│   ├── Material_*.inp                        # 20MnCr5, EN-GJS-600-10, Ni 6082 cards (phase framework) + plain tet cards
+│   ├── bimaterial_assembly.step              # Geometry, five named solids (hex / tet split, filler)
+│   └── README.md                             # Technical Report
 ├── 03_uinter_welding_interface/
 │   ├── uinter_btr_hot_cracking.f              # User Subroutine (UINTER State Machine in Fortran)
 │   ├── dummy_btr_contact_patch.inp            # 2-Element Contact Patch Benchmark Deck
@@ -167,19 +159,21 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── gear_torque_simulation.gif             # Drive + coast three-viewport animation (6 FPS)  
 │   ├── gear_shaft_cutaway.png                 # Section view of the crown gear / carrier CAD geometry (PNG)
 │   ├── stress_front_view_flaw_ends.png        # Front-view stress field, drive against coast, weld flaw ends marked (PNG)
-│   ├── conical_heat_source_improved_plot.svg  # 4-Panel 3D Conical Heat Source & Trajectory Plot (SVG)
-│   ├── conical_heat_source_schematic.svg      # Analytical Heat Source Geometry Schematic (SVG)
 │   ├── double_cone_heat_source_plot.svg       # 4-Panel Double Conical Keyhole Source, Crown Gear / Carrier Weld (SVG)
-│   ├── bimaterial_weld_4kW_blackbody.gif      # Bimaterial weld thermal animation with expected macrograph (GIF)
+│   ├── bimaterial_weld_rls_blackbody.gif      # Bimaterial weld thermal animation with expected macrograph (GIF)
+│   ├── bimaterial_section.svg / _mesh_section.svg  # Joint section and swept hex mesh (SVG)
+│   ├── bimaterial_geometry_3d.png             # Quarter cut of the crown gear / carrier (PNG)
+│   ├── bimaterial_filler_ea_vs_rls.svg        # Filler: element activation vs raw wire (SVG)
+│   ├── bimaterial_rls_phase_map.svg           # RLS state and phase transformations (SVG)
+│   ├── bimaterial_weld_workflow.svg           # Analysis chain of the weld model (SVG)
+│   ├── bimaterial_macrograph_vs_neto.png      # Measured vs simulated macrograph, Neto (2023), CC BY 4.0 (PNG)
 │   ├── macrograph_nogueira_2021_fig6_13a.jpg  # Published nail-head weld macrograph, Nogueira (2021), CC BY 4.0 (JPG)
-│   ├── sequentially_coupled_architecture.svg  # Multi-Physics Data Flow & Pipeline Architecture (SVG)
 │   ├── uinter_3state_state_machine.svg        # UINTER 3-State Contact State Machine & Won Criteria (SVG)
 │   ├── cohesive_3state_state_machine.svg      # Cohesive Zone UMAT Architecture & Softening Law (SVG)
 │   ├── uinter_vs_czm_comparison.svg           # Interface Modeling Evolution & Bottlenecks (SVG)
 │   ├── shaft_straightening_schematic.svg      # Three-Point Straightening & Springback Schematic (SVG)
 │   ├── shaft_straightening_pipeline_architecture.svg  # Shaft Straightening 3-Step Pipeline (SVG)
-│   ├── sn_curves_20mc5_gjs600_10.svg          # Design S-N Curves for 20MC5 and GJS600-10 (SVG)
-│   └── conical_gaussian_3d.png                # Conical Heat Source Surface Elevation (PNG)
+│   └── sn_curves_20mc5_gjs600_10.svg          # Design S-N Curves for 20MC5 and GJS600-10 (SVG)
 ├── LICENSE
 └── README.md
 ```
