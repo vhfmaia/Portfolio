@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <pattern id="raw" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" fill="#f6e3e1"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#d9534f" stroke-width="2"/>
+    </pattern>
+    <linearGradient id="pool" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8e3b2e"/>
+      <stop offset="0.45" stop-color="#f39c12"/>
+      <stop offset="0.7" stop-color="#fff3c4"/>
+      <stop offset="1" stop-color="#f39c12"/>
+    </linearGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#222"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="600" fill="#ffffff"/>
+  <text x="30" y="36" font-size="20" font-weight="600" fill="#222">Two ways to put the filler wire in the model</text>
+  <text x="30" y="58" font-size="13" fill="#666">The 0.3 mm gap of the weld land unrolled along the joint (travel to the right); beam position as in the middle of a weld step</text>
+
+  <!-- ===================== A. element activation ===================== -->
+  <text x="30" y="90" font-size="15" font-weight="600" fill="#0369a1">A. Element activation (*MODEL CHANGE): 24 weld steps of 15 deg + 1 run-out step</text>
+  <!-- sectors: 8 shown, 110 px each, from x=60 -->
+  <g stroke="#222" stroke-width="1.2">
+    <rect x="60"  y="115" width="110" height="44" fill="#8e5a4f"/>
+    <rect x="170" y="115" width="110" height="44" fill="#8e5a4f"/>
+    <rect x="280" y="115" width="110" height="44" fill="#8e5a4f"/>
+    <rect x="390" y="115" width="110" height="44" fill="url(#pool)"/>
+    <rect x="500" y="115" width="110" height="44" fill="#e8a39d"/>
+  </g>
+  <g stroke="#999" stroke-width="1.2" stroke-dasharray="6 4" fill="none">
+    <rect x="610" y="115" width="110" height="44"/>
+    <rect x="720" y="115" width="110" height="44"/>
+    <rect x="830" y="115" width="110" height="44"/>
+  </g>
+  <g font-size="12" fill="#fff" text-anchor="middle">
+    <text x="115" y="142">S(k-3)</text><text x="225" y="142">S(k-2)</text><text x="335" y="142">S(k-1)</text>
+  </g>
+  <g font-size="12" fill="#222" text-anchor="middle">
+    <text x="445" y="142">S(k)</text><text x="555" y="142">S(k+1)</text>
+    <text x="665" y="142" fill="#999">S(k+2)</text><text x="775" y="142" fill="#999">S(k+3)</text><text x="885" y="142" fill="#999">...</text>
+  </g>
+  <!-- beam -->
+  <line x1="470" y1="96" x2="470" y2="113" stroke="#c2410c" stroke-width="3" marker-end="url(#arr)"/>
+  <text x="478" y="108" font-size="12" fill="#c2410c">beam</text>
+  <line x1="520" y1="104" x2="600" y2="104" stroke="#222" stroke-width="1.4" marker-end="url(#arr)"/>
+  <text x="606" y="108" font-size="11" fill="#222">travel</text>
+  <!-- labels -->
+  <g font-size="12" fill="#222">
+    <text x="60" y="180">deposit: solid weld metal</text>
+    <text x="390" y="180">melting under the beam</text>
+    <text x="500" y="196">sector ahead: added at the start of step k</text>
+    <text x="500" y="211">(full deposit properties, cold; stress run: strain free)</text>
+    <text x="640" y="180" fill="#777">removed: not in the heat equation nor in the stiffness</text>
+  </g>
+  <g font-size="12.5" fill="#333">
+    <text x="60" y="242">+ standard, no special material; the gap ahead of the beam is open, as in the real joint</text>
+    <text x="60" y="261">-  a step boundary every 15 deg (25 weld steps), with new contact / activation bookkeeping at each</text>
+    <text x="60" y="280">-  the added sector is cold and fully conductive one sector ahead: heat leaks forward into it</text>
+    <text x="60" y="299">-  stress run: the activated wire joins strain free, but its thermal strain stays referred to 25 C</text>
+  </g>
+
+  <!-- ===================== B. RLS ===================== -->
+  <line x1="30" y1="322" x2="970" y2="322" stroke="#ddd" stroke-width="1.5"/>
+  <text x="30" y="344" font-size="15" font-weight="600" fill="#0369a1">B. RLS state of the phase transformation framework: one weld step, the wire is there from the start</text>
+  <g stroke="#222" stroke-width="1.2">
+    <rect x="60"  y="369" width="330" height="44" fill="#8e5a4f"/>
+    <rect x="390" y="369" width="110" height="44" fill="url(#pool)"/>
+    <rect x="500" y="369" width="440" height="44" fill="url(#raw)"/>
+  </g>
+  <text x="225" y="396" font-size="13" fill="#fff" text-anchor="middle">RLS = 1  solid deposit</text>
+  <text x="445" y="396" font-size="13" fill="#222" text-anchor="middle">RLS = 0</text>
+  <text x="720" y="396" font-size="13" fill="#7a1f1a" text-anchor="middle" font-weight="600">RLS = -1  raw wire</text>
+  <line x1="470" y1="351" x2="470" y2="367" stroke="#c2410c" stroke-width="3" marker-end="url(#arr)"/>
+  <text x="478" y="362" font-size="12" fill="#c2410c">beam</text>
+  <g font-size="12" fill="#222">
+    <text x="60" y="434">deposit properties, stress history</text>
+    <text x="60" y="449">erased at melting (*ANNEAL TEMPERATURE)</text>
+    <text x="390" y="434">liquid</text>
+    <text x="500" y="434">raw wire: conductivity 1 % of the deposit (the gap stays thermally open),</text>
+    <text x="500" y="449">E = 214 MPa and yield 1 MPa (no stiffness, no stress); real density,</text>
+    <text x="500" y="464">specific heat and latent heat, so the beam melts it with its real energy</text>
+  </g>
+  <g font-size="12.5" fill="#333">
+    <text x="60" y="500">+ one weld step for the whole ring: no activation, no step boundaries, the same mesh and sets in the stress run</text>
+    <text x="60" y="519">+ the wire becomes deposit exactly where and when the computed temperature melts it, not one sector at a time</text>
+    <text x="60" y="538">+ the same framework (RLS, phases, annealing) already runs in the steel and the cast iron: one formulation</text>
+    <text x="60" y="557">-  the raw wire costs its elements from the start, and needs the framework card (field variable = RLS)</text>
+  </g>
+  <text x="970" y="588" font-size="11" fill="#999" text-anchor="end">Ni 6082 filler, gap 0.15 + 0.15 mm, weld land 5 mm deep</text>
+</svg>

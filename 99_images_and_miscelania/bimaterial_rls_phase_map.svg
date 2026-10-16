@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="640" viewBox="0 0 1000 640" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+    </marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c2410c"/>
+    </marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0369a1"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="640" fill="#ffffff"/>
+  <text x="30" y="36" font-size="20" font-weight="600" fill="#222">Metallurgical state carried by every integration point (ABQ_PHASE_TRANS)</text>
+  <text x="30" y="58" font-size="13" fill="#666">Abaqus/Standard phase transformation framework: state variables updated from the temperature history, no user subroutine</text>
+
+  <!-- ============ RLS state ============ -->
+  <text x="40" y="100" font-size="15" font-weight="600" fill="#222">1. RLS state, SDV1 (Raw / Liquid / Solid)</text>
+  <rect x="40" y="120" width="250" height="62" rx="8" fill="#f6e3e1" stroke="#d9534f" stroke-width="1.5"/>
+  <text x="165" y="146" font-size="15" text-anchor="middle" font-weight="600" fill="#7a1f1a">Raw, RLS = -1</text>
+  <text x="165" y="168" font-size="12" text-anchor="middle" fill="#333">filler wire only, at the start</text>
+  <rect x="40" y="250" width="250" height="62" rx="8" fill="#fff3c4" stroke="#e08e0b" stroke-width="1.5"/>
+  <text x="165" y="276" font-size="15" text-anchor="middle" font-weight="600" fill="#8a5300">Liquid, RLS = 0</text>
+  <text x="165" y="298" font-size="12" text-anchor="middle" fill="#333">above the melting range</text>
+  <rect x="40" y="380" width="250" height="62" rx="8" fill="#e6ecf2" stroke="#556677" stroke-width="1.5"/>
+  <text x="165" y="406" font-size="15" text-anchor="middle" font-weight="600" fill="#223344">Solid, RLS = 1</text>
+  <text x="165" y="428" font-size="12" text-anchor="middle" fill="#333">steel and cast iron at the start</text>
+  <line x1="165" y1="184" x2="165" y2="246" stroke="#c2410c" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="175" y="214" font-size="12" fill="#c2410c">melts: heated through</text>
+  <text x="175" y="229" font-size="12" fill="#c2410c">solidus - liquidus</text>
+  <line x1="140" y1="314" x2="140" y2="376" stroke="#0369a1" stroke-width="2" marker-end="url(#ab)"/>
+  <text x="20" y="338" font-size="12" fill="#0369a1">solidifies,</text>
+  <text x="20" y="353" font-size="12" fill="#0369a1">as austenite</text>
+  <line x1="200" y1="376" x2="200" y2="316" stroke="#c2410c" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="208" y="352" font-size="12" fill="#c2410c">re-melted</text>
+  <g font-size="12" fill="#333">
+    <text x="40" y="470">Melting range (solidus - liquidus) and latent heat:</text>
+    <text x="40" y="488">20MnCr5  1470 - 1530 C, 280 kJ/kg</text>
+    <text x="40" y="506">EN-GJS-600-10  1150 - 1220 C, 230 kJ/kg</text>
+    <text x="40" y="524">Ni 6082 filler  1300 - 1350 C, 300 kJ/kg</text>
+    <text x="40" y="548">At melting the plastic strain is reset</text>
+    <text x="40" y="566">(*ANNEAL TEMPERATURE = liquidus).</text>
+  </g>
+
+  <!-- ============ solid phases ============ -->
+  <line x1="330" y1="88" x2="330" y2="600" stroke="#ddd" stroke-width="1.5"/>
+  <text x="360" y="100" font-size="15" font-weight="600" fill="#222">2. Solid phases, SDV4 - SDV7 (fractions, sum 1)</text>
+  <!-- austenite centre -->
+  <rect x="560" y="250" width="200" height="66" rx="8" fill="#fde7d5" stroke="#c2410c" stroke-width="1.8"/>
+  <text x="660" y="278" font-size="15" text-anchor="middle" font-weight="600" fill="#8a3a0c">Austenite</text>
+  <text x="660" y="299" font-size="12" text-anchor="middle" fill="#333">fcc, first solid phase</text>
+  <!-- ferrite -->
+  <rect x="360" y="120" width="200" height="66" rx="8" fill="#e6ecf2" stroke="#556677" stroke-width="1.5"/>
+  <text x="460" y="147" font-size="15" text-anchor="middle" font-weight="600" fill="#223344">Ferrite</text>
+  <text x="460" y="168" font-size="12" text-anchor="middle" fill="#333">initial state (base metal)</text>
+  <!-- bainite -->
+  <rect x="760" y="120" width="200" height="66" rx="8" fill="#e6ecf2" stroke="#556677" stroke-width="1.5"/>
+  <text x="860" y="147" font-size="15" text-anchor="middle" font-weight="600" fill="#223344">Bainite</text>
+  <text x="860" y="168" font-size="12" text-anchor="middle" fill="#333">ausferrite in the cast iron</text>
+  <!-- martensite -->
+  <rect x="560" y="420" width="200" height="66" rx="8" fill="#e6ecf2" stroke="#556677" stroke-width="1.5"/>
+  <text x="660" y="447" font-size="15" text-anchor="middle" font-weight="600" fill="#223344">Martensite</text>
+  <text x="660" y="468" font-size="12" text-anchor="middle" fill="#333">hard HAZ / fusion zone</text>
+  <!-- heating arrows (red) -->
+  <path d="M500,188 Q520,240 556,262" fill="none" stroke="#c2410c" stroke-width="2" marker-end="url(#ar)"/>
+  <path d="M820,188 Q800,240 764,262" fill="none" stroke="#c2410c" stroke-width="2" marker-end="url(#ar)"/>
+  <path d="M700,418 Q720,370 700,320" fill="none" stroke="#c2410c" stroke-width="2" marker-end="url(#ar)"/>
+  <!-- cooling arrows (blue) -->
+  <path d="M556,280 Q490,260 470,190" fill="none" stroke="#0369a1" stroke-width="2" marker-end="url(#ab)"/>
+  <path d="M764,280 Q830,260 850,190" fill="none" stroke="#0369a1" stroke-width="2" marker-end="url(#ab)"/>
+  <path d="M620,318 Q600,370 620,416" fill="none" stroke="#0369a1" stroke-width="2" marker-end="url(#ab)"/>
+  <g font-size="11.5">
+    <text x="342" y="214" fill="#c2410c">F -> A on heating (TTT),</text>
+    <text x="342" y="229" fill="#c2410c">from Ac1 (731 / 850 C)</text>
+    <text x="342" y="300" fill="#0369a1">A -> F, JMA (diffusional)</text>
+    <text x="342" y="315" fill="#0369a1">550 - 800 / 600 - 930 C</text>
+    <text x="852" y="214" fill="#c2410c">B -> A on heating</text>
+    <text x="852" y="229" fill="#c2410c">(TTT), from Ac1</text>
+    <text x="800" y="300" fill="#0369a1">A -> B, JMA (diffusional)</text>
+    <text x="800" y="315" fill="#0369a1">385 - 545 / 290 - 600 C</text>
+    <text x="342" y="380" fill="#0369a1">A -> M, Koistinen-Marburger,</text>
+    <text x="342" y="395" fill="#0369a1">below Ms (385 / 290 C),</text>
+    <text x="342" y="410" fill="#0369a1">gamma = 0.01 1/K</text>
+    <text x="728" y="380" fill="#c2410c">M -> A on heating (tempering</text>
+    <text x="728" y="395" fill="#c2410c">and re-austenitisation), from 650 / 700 C</text>
+  </g>
+  <g font-size="12" fill="#333">
+    <text x="342" y="512">Values 20MnCr5 / EN-GJS-600-10 (Ac3 831 / 970 C). Filler Ni 6082: one solid phase</text>
+    <text x="342" y="530">(austenite), no solid-state transformation. Heating uses rate-dependent TTT tables (fast</text>
+    <text x="342" y="548">laser heating shifts them up); cooling uses JMA / KM with Scheil additivity. Density,</text>
+    <text x="342" y="566">elasticity, expansion, conductivity, specific heat and flow curves depend on the phase</text>
+    <text x="342" y="584">fractions (DEPENDENCIES): the stress run sees transformation strains and the hardening</text>
+    <text x="342" y="602">of the new phases. Other state variables: SDV2 columnar fraction, SDV3 grain size.</text>
+  </g>
+</svg>
