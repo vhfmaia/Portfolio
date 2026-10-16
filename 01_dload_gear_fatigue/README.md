@@ -12,9 +12,7 @@
 
 ## 1. Executive Summary
 
-<div align="justify">
 This project applies the tooth contact load of a helical gear pair <b>analytically</b>, through an Abaqus/Standard user subroutine <code>DLOAD</code>, onto the flanks of an automotive crown gear (<i>z</i> = 60, <i>m</i><sub>t</sub> = 2.903 mm, <i>β</i> = 25°) laser-welded to its differential carrier. The pinion is not meshed: the subroutine reproduces its line of action, contact ratio and rolling kinematics, so a full 360° revolution runs as a quasi-static analysis without gear-to-gear contact pairs and their convergence cost. The carrier, the weld, an incomplete-penetration weld flaw and the bearing supports are modelled explicitly.
-</div>
 
 ### Key Features
 - **Drive and coast (regeneration) load cases:** the active flank and the torque are selected per analysis step, so one model covers manual drivelines (drive only) and hybrid / electric drivelines with torque reversal.
@@ -259,9 +257,7 @@ The weld metal is not modelled as a separate material: the joint is represented 
 
 ### 7.3 Fatigue Life Estimation From an OEM Load Spectrum
 
-<div align="justify">
 A service life can be estimated from the simulated stress history and the manufacturer's duty cycle. The governing quantity is the <b>stress range at each critical point over the cycle</b>, not the isolated peak of each load case:
-</div>
 
 1. **Stress history per point:** extract $\sigma(t)$ over the drive and coast revolutions at the tooth-root fillet, the weld root and the flaw tips.
 2. **Load spectrum:** torque levels, number of revolutions per level and number of drive-to-coast reversals, as specified by the OEM.

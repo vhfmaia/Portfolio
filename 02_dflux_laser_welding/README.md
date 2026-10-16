@@ -9,11 +9,7 @@
 [![Language: Fortran](https://img.shields.io/badge/Language-Fortran%202008-734f96.svg)](https://fortran-lang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
 
-<div align="justify">
-
 A 20MnCr5 crown gear is laser welded to an EN-GJS-600-10 spheroidal graphite cast-iron differential carrier, with a nickel filler wire (Ni 6082) fed into a 0.3 mm gap. The weld runs once around the joint (R = 55 mm, 4 kW, 1.5 m/min), penetrates the whole 5 mm weld land and vents through its root into a gas escape chamber; below the weld, the crown is press fitted on the carrier. The model is a sequentially coupled thermal / stress analysis in Abaqus/Standard: a double conical keyhole heat source in a <code>DFLUX</code> subroutine, the built-in metallurgical phase transformation framework in all three materials, and the filler wire carried as a <b>raw wire</b> in the RLS state of that framework, compared with the classic <b>element activation</b>.
-
-</div>
 
 <p align="center">
   <img src="../99_images_and_miscelania/bimaterial_weld_rls_blackbody.gif" alt="Bimaterial laser weld, thermal run: unrolled top surface, longitudinal section, weld cross-section and expected macrograph" width="100%">
@@ -61,13 +57,9 @@ A 20MnCr5 crown gear is laser welded to an EN-GJS-600-10 spheroidal graphite cas
   <img src="../99_images_and_miscelania/bimaterial_section.svg" alt="Axisymmetric section of the crown gear and carrier with the joint detail" width="100%">
 </p>
 
-<div align="justify">
-
 The crown gear and the carrier are axisymmetric sections revolved about the z axis, with helical teeth cut into the crown (52 teeth, normal module 3, helix 25 deg). The joint is at R = 55 mm and the irradiated face at z = 25, the frame of the <code>DFLUX</code>. From the irradiated face down: the 5 mm weld land with the 0.3 mm filler gap, the gas escape chamber (one rounded groove machined in each part, so the root of the full-penetration keyhole vents into it), the press fit with a 2 mm x 15 deg lead-in chamfer, and the crown base resting on the carrier flange.
 
 The general arrangement (crown bore welded to a carrier seat wall, gas escape chamber, press fit under the weld) follows published joints of this type [1, 7]; <b>every dimension is the author's own</b>, chosen for this model. The geometry is built by a parametric FreeCAD script (not included) and exported as <a href="bimaterial_assembly.step"><code>bimaterial_assembly.step</code></a> with five named solids, already split for the mesh of section 3: <code>CROWN_HEX</code>, <code>CROWN_TET</code>, <code>CARRIER_HEX</code>, <code>CARRIER_TET</code> and <code>FILLER</code>.
-
-</div>
 
 | Part | Main dimensions [mm] |
 | :--- | :--- |
@@ -85,11 +77,7 @@ The general arrangement (crown bore welded to a carrier seat wall, gas escape ch
   <img src="../99_images_and_miscelania/bimaterial_mesh_section.svg" alt="Quad mesh of the swept hex region read from the run mesh, with the three mesh zones and the tie planes" width="100%">
 </p>
 
-<div align="justify">
-
 The mesh follows what the weld needs, and nothing more:
-
-</div>
 
 - **A swept hex region where the heat source passes** (r 49 to 64.3 mm, z 13.5 to 25, the dashed box of section 2). Its 2D section is meshed with quadrilaterals in ANSA and revolved about the axis in **600 steps of 0.6 deg**. The section is split into three zones before meshing (outlined in blue above):
   - **Z1, fine zone**, +-2.5 mm about the joint, from the irradiated face to 1 mm below the top of the chamber: elements of 0.20 to 0.47 mm, so the 1 mm wide body of the weld spans several elements;
@@ -111,11 +99,7 @@ The mesh follows what the weld needs, and nothing more:
 | Tetrahedra | DC3D10: crown 266 169, carrier 315 351 | C3D10M (modified, for the press-fit contact) |
 | Nodes | 1 717 061 | same nodes |
 
-<div align="justify">
-
 The mesh files (<code>mesh_nodes.inp</code>, <code>mesh_elements_TH.inp</code> / <code>_ME.inp</code>, <code>mesh_sets_EA.inp</code> / <code>_RLS.inp</code>, about 290 MB) are not in the repository; the decks include them by name. They are written from the ANSA export, with the element sets, the 24 filler sectors of the element activation, the hex / tet tie surfaces and the contact surfaces of the press fit.
-
-</div>
 
 ---
 
@@ -125,11 +109,7 @@ The mesh files (<code>mesh_nodes.inp</code>, <code>mesh_elements_TH.inp</code> /
   <img src="../99_images_and_miscelania/double_cone_heat_source_plot.svg" alt="Double conical Gaussian keyhole source: 3D cutaway, meridional section, weld path and power schedule" width="100%">
 </p>
 
-<div align="justify">
-
 A laser keyhole weld has a "nail head" shape: a wide, shallow head at the surface over a narrow, nearly parallel body. <a href="dflux_bimaterial_keyhole.f"><code>dflux_bimaterial_keyhole.f</code></a> builds it from two truncated Gaussian cones of the TDC type [3, 4], each normalised over its own volume, with a hemispherical tip. At depth <i>&zeta;</i> below the surface and distance <i>r</i> from the beam axis:
-
-</div>
 
 $$q(r,\zeta) = q_{0,i}\,\exp\left(-\frac{3\,r^2}{r_0(\zeta)^2}\right) g(\zeta)$$
 
@@ -141,13 +121,9 @@ $$q(r,\zeta) = q_{0,i}\,\exp\left(-\frac{3\,r^2}{r_0(\zeta)^2}\right) g(\zeta)$$
 
 $$q_{0,\mathrm{up}} = \frac{3 f_\mathrm{up} Q}{\pi V_\mathrm{up}}, \qquad V_\mathrm{up} = \frac{d_\mathrm{up}\left(r_\mathrm{top}^2 + r_\mathrm{top} r_\mathrm{mid} + r_\mathrm{mid}^2\right)}{3}, \qquad q_{0,\mathrm{low}} = \frac{3\,(1 - f_\mathrm{up})\,Q}{\pi\,(V_\mathrm{low} + V_\mathrm{tip})}$$
 
-<div align="justify">
-
 with <i>Q</i> = 3 000 W absorbed, so that the source integrates to <i>Q</i> for any split. The beam moves on the circle R = 55 mm at the travel speed, with the power schedule of section 1.
 
 <b>Calibration.</b> The shape parameters were fitted with a conduction surrogate to the fusion zone of a published macrograph of this type of joint, Nogueira (2021), Fig. 6.13(a) [1]: 2.45 mm wide at the surface and full penetration of the 5 mm land. The source reaches below the land; that part of the power falls into the gas escape chamber, where there are no elements, and is lost, as the power transmitted through the root of an open keyhole is in reality (about 2 290 W of the 3 000 W stay in the weld land). A factor of 0.961 corrects the power integrated on the actual mesh, with the beam on a node.
-
-</div>
 
 ---
 
@@ -157,11 +133,7 @@ with <i>Q</i> = 3 000 W absorbed, so that the source integrates to <i>Q</i> for 
   <img src="../99_images_and_miscelania/bimaterial_filler_ea_vs_rls.svg" alt="Element activation against the raw-wire RLS state for the filler" width="100%">
 </p>
 
-<div align="justify">
-
 The filler wire fills a 0.3 mm gap that is open ahead of the beam and becomes weld metal behind it. Two models of that are built on the same mesh, sets and heat source, and both run:
-
-</div>
 
 **A. Element activation (EA)**, `bimaterial_EA_TH.inp` / `_ME.inp`. The filler is cut into 24 sectors of 15 deg (sets `FILLER_S01` to `FILLER_S24`). All but the first two are removed at the start (`*MODEL CHANGE, REMOVE`), and each weld step adds the next sector one step ahead of the beam (`*MODEL CHANGE, ADD`; in the stress run `ADD=STRAIN FREE`). It needs no special material, but it cuts the weld into 25 steps, adds a cold, fully conductive sector one step ahead of the pool, and in the stress run the activated wire joins strain free with its thermal strain still referred to 25 C.
 
@@ -190,11 +162,7 @@ The filler wire fills a 0.3 mm gap that is open ahead of the beam and becomes we
   <img src="../99_images_and_miscelania/bimaterial_rls_phase_map.svg" alt="RLS state and solid-phase transformations of the phase transformation framework" width="100%">
 </p>
 
-<div align="justify">
-
 The crown, the carrier and the filler use the built-in metallurgical phase transformation framework of Abaqus/Standard (<code>ABQ_PHASE_TRANS</code>), with no user subroutine: material names starting with <code>ABQ_PHASE_TRANS_</code>, the table types of <a href="Material_phase_trans_table_types.inp"><code>Material_phase_trans_table_types.inp</code></a> (included once per model) and <code>*PARAMETER TABLE</code> / <code>*PROPERTY TABLE</code> data in each card. The same card is used by the thermal and the stress decks.
-
-</div>
 
 | State variable | Meaning |
 | :--- | :--- |
@@ -211,8 +179,6 @@ The crown, the carrier and the filler use the built-in metallurgical phase trans
 | Cooling | A -> F 550 to 800 C and A -> B 385 to 545 C (JMA); A -> M below Ms = 385 C (Koistinen-Marburger, gamma = 0.01 1/K) | A -> F 600 to 930 C, A -> B 290 to 600 C (ausferrite), A -> M below 290 C | none |
 | Card | `Material_20MnCr5.inp` | `Material_GJS600_10.inp` | `Material_Inconel82_RLS.inp` (`_EA.inp` without the framework) |
 
-<div align="justify">
-
 <b>Properties depend on the phases.</b> Density, elastic constants, thermal expansion, conductivity, specific heat and the flow curves are given per phase (<code>DEPENDENCIES</code> on the phase fractions), so the thermal run sees the heat capacity of each phase and the stress run sees the transformation strains and the hardening of bainite and martensite. The specific heat carries the magnetic (Curie) peak on the ferrite only; the ferrite and austenite curves meet at Ac3, so the switch causes no jump in heat capacity.
 
 <b>Thermal expansion is secant.</b> Abaqus integrates <code>*EXPANSION</code> as a secant coefficient from the reference temperature, so each phase carries the mean coefficient of its own strain curve: the phase strains are tied to each other by the specific volumes of ferrite, austenite and martensite, which gives transformation strains of the right sign and size (contraction on austenitisation, expansion at Ms), and the strain is frozen above the liquidus (no strain collapse in the liquid). <code>*ANNEAL TEMPERATURE</code> at the liquidus resets the plastic strain of molten metal.
@@ -220,8 +186,6 @@ The crown, the carrier and the filler use the built-in metallurgical phase trans
 <b>Tetrahedra.</b> <code>Material_20MnCr5_TET.inp</code> and <code>Material_GJS600_10_TET.inp</code> are the same materials with one phase (the as-delivered one) and temperature-dependent properties only, for the tets away from the weld, which stay below Ac1 (at most 344 C on the tie faces).
 
 <b>Data.</b> The cards are estimated, not measured: the 20MnCr5 card is a 16MnCr5 card shifted with published composition relations (transformation kinetics after Li et al. [5], Ac1 / Ac3 / Ms from a steel producer datasheet), the cast-iron card is a first approximation from EN 1563 and the literature, and the filler card follows public data for ERNiCr-3. Each card lists its sources in its header. Not modelled: the enthalpy of the solid-state transformations, ledeburite in the partially melted cast iron, and transformation plasticity.
-
-</div>
 
 ---
 
@@ -237,47 +201,27 @@ The crown, the carrier and the filler use the built-in metallurgical phase trans
 | Press fit | gap conductance 10 kW/m2.K on the bore / seat and base / flange faces, falling to zero at 0.05 mm clearance |
 | Output | `*NODE FILE` NT at every increment (read by the stress run); field output every 3 deg (section 7.6) |
 
-<div align="justify">
-
 A moving, concentrated source over latent heat and phase-dependent properties is the classic recipe for cut-backs, chattering and stalled increments. The thermal runs have gone through every increment so far with <b>no cut-back</b>; these are the choices behind that.
-
-</div>
 
 ### 7.1 One element per increment: Courant number 1
 
-<div align="justify">
-
 The beam moves at <i>v</i> = 25 mm/s on <i>R</i> = 55 mm, so its angular speed is &omega; = <i>v</i>/<i>R</i> = 5/11 rad/s. The mesh has 600 elements around the joint (&Delta;&theta; = 0.6 deg = &pi;/300 rad, circumferential element size &Delta;<i>h</i> = 2&pi;<i>R</i>/600 = 0.576 mm); in the cross-section of the source region the elements are much finer, 0.22 mm radially and 0.20 mm in depth, so the travel direction is the coarsest one. The increment is the time the beam takes to cross one element:
-
-</div>
 
 $$\Delta t = \frac{\Delta\theta}{\omega} = \frac{\pi/300}{5/11} = \frac{11\pi}{1500}\ \mathrm{s} = 0.023038346126\ldots\ \mathrm{s}, \qquad C = \frac{v\,\Delta t}{\Delta h} = 1$$
 
-<div align="justify">
-
 With a Courant number of exactly 1, the beam axis sits on a node at the end of every increment, so every node of the joint line is heated at its peak once, and the source is integrated by the mesh in the same position every time. This matters here more than in a coarse model: the body of the keyhole has a Gaussian radius of 0.43 mm, smaller than the 0.58 mm circumferential element, and with the beam between two nodes the mesh would integrate 10 % less power (the factor 0.961 of section 4 is calibrated for the beam on a node).
-
-</div>
 
 <p align="center">
   <img src="../99_images_and_miscelania/bimaterial_courant_number.gif" alt="Courant number below 1, equal to 1 and above 1: where the solver sees the source, which nodes are heated at their peak, and the power integrated by the mesh at every increment" width="100%">
 </p>
 
-<div align="justify">
-
 <b>Why the source has to land on a node.</b> A node is heated by the source sampled at the integration points of the elements around it. With the beam axis on a node at the end of every increment, those points sit symmetrically about the beam, the mesh integrates the same power at every increment, and each node of the joint line is once in the centre of the source, so its peak temperature is reached at an increment end and written to the results. The animation shows the body of the keyhole (Gaussian radius 0.43 mm) on the 0.58 mm circumferential elements, with the two integration points of each element along the travel. The bottom row follows the heat received by the two integration points of element 4 as the source passes: the solver deposits, at each increment, the flux at the end of that increment times &Delta;<i>t</i> (implicit time integration), compared with the continuous passage of the source:
-
-</div>
 
 - **C &lt; 1, not a unit fraction** (0.7 shown): 43 % more increments than C = 1, and still the source is centred on a node only once every 10 increments (every 7 elements). The other six nodes in seven never have the source centred on them, so their peak temperature is not sampled, and the integrated power wanders between 7 % above and 8 % below the exact value from one increment to the next (10 % between the two extreme positions for the whole source on the actual mesh). The heat received differs from point to point: 0.96 of the analytical total at both points of element 4, between 0.96 and 1.04 over the neighbouring elements. A unit fraction such as C = 0.5 is less harmful: the source returns to a node every second increment and every node is sampled at its peak, but the power still alternates between the two extremes and the run costs twice the increments for no gain, since the element, not the increment, limits the resolution.
 - **C = 1**: one increment per element, the same integrated power at every increment, and every node of the joint line heated at its peak: the fewest increments that skip no node. Every integration point receives the same heat, 1.07 times the analytical total along the travel: a uniform bias, the same at every point of the joint, of the kind the calibration factor of section 4 absorbs (0.961 for the whole three-dimensional source).
 - **C &gt; 1** (1.6 shown): fewer increments, but the beam jumps over nodes. The red nodes never have the source centred on them: their peak temperature, and with it melting, austenitisation and the phases formed on cooling, is underestimated there, the power arrives in irregular chunks (the two points of element 4 receive 2.07 and 0.34 times the analytical heat), and the stress run, which reads the temperatures at the increment ends, never sees those peaks either.
 
-<div align="justify">
-
 <b>Rounding.</b> The deck writes <code>0.023038346126</code> s (12 decimals): 3.3 &times; 10<sup>-13</sup> s short of the exact value per increment, 2.4 &times; 10<sup>-10</sup> s after the 750 increments of the weld, so the beam drifts by 6 &times; 10<sup>-9</sup> mm along the joint. The number of decimals is not cosmetic: every step time and every time point is written as an exact decimal multiple of that increment. With 7 decimals, Abaqus inserted 2 &times; 10<sup>-7</sup> s increments to land on the time points (rounding of the multiples), and the increments after them were shifted off the nodes.
-
-</div>
 
 ### 7.2 Cut-backs that return to the aligned increment
 
@@ -287,35 +231,19 @@ With a Courant number of exactly 1, the beam axis sits on a node at the end of e
 0.5, 0.5, 0.5, 0.5, , , 2.0,
 ```
 
-<div align="justify">
-
 The default factors (0.25 after a divergence, 1.5 to grow) would put the beam at an arbitrary fraction of an element after any cut-back, and it would never come back to the nodes. Here every cut-back halves the increment and every increase doubles it, so the increment stays a binary fraction of &Delta;<i>t</i> (0.3 deg, 0.15 deg, ...) and returns exactly to &Delta;<i>t</i>, which is also the maximum allowed. The first line relaxes the iteration limits for the increments where the pool first forms: divergence check from iteration 14 (default 4), convergence-rate check from 16, at most 25 iterations, a cut-back of the next increment only after 18, and the increment grows back after two increments of at most 7 iterations.
-
-</div>
 
 ### 7.3 Smooth tail of the source
 
-<div align="justify">
-
 A Gaussian cut at its nominal radius <i>r</i><sub>0</sub> drops from 5 % of the peak to zero, a step that integration points move across from one increment to the next: the residual chatters. The <code>DFLUX</code> cuts each Gaussian only where it has fallen to 10<sup>-8</sup> of its peak:
-
-</div>
 
 $$r_\mathrm{cut} = \sqrt{\frac{-\ln 10^{-8}}{3}}\; r_0(\zeta) = 2.478\, r_0(\zeta)$$
 
-<div align="justify">
-
 radially, and the same along the depth of the hemispherical tip. The depth is clamped, &zeta; = max(<i>z</i><sub>surface</sub> - <i>z</i>, 0), so the nodes of the irradiated face get the full surface flux.
-
-</div>
 
 ### 7.4 Specific heat without artificial peaks
 
-<div align="justify">
-
 Fire-design curves (EN 1993-1-2) put the heat of the &alpha;/&gamma; transformation of steel in a narrow spike of specific heat near 735 C. In a model where the phase framework already switches the properties between ferrite and austenite, that spike doubles the effect and makes the tangent jump by an order of magnitude across a few degrees: Newton oscillates at every node crossing Ac1. The cards here keep smooth curves for every phase: the magnetic (Curie) peak is carried by the ferrite only, its curve meets the austenite curve at Ac3, and the only latent heat is the one of fusion, in <code>*LATENT HEAT</code> between the solidus and the liquidus. The enthalpy of the solid-state transformations (about 16 J/g against 280 J/g for fusion) is not modelled.
-
-</div>
 
 ### 7.5 Unsymmetric solver, reference flux and line search
 
@@ -333,11 +261,7 @@ Fire-design curves (EN 1993-1-2) put the heat of the &alpha;/&gamma; transformat
 
 ### 7.6 Output that does not cut the increments
 
-<div align="justify">
-
 Output requests by <code>NUMBER INTERVAL</code> with <code>TIME MARKS=YES</code>, or time points that are not exact multiples of &Delta;<i>t</i>, make Abaqus shorten increments to reach them, and the beam leaves the nodes. Here:
-
-</div>
 
 - field output at `TIME POINTS` every 5 increments (3 deg), written as exact multiples of &Delta;<i>t</i>;
 - a history request on one node (`SYNC_NODE`) at time points at **every** increment end: if a cut-back ever happens, the following increments are brought back exactly onto the aligned times;
@@ -347,42 +271,26 @@ Output requests by <code>NUMBER INTERVAL</code> with <code>TIME MARKS=YES</code>
 
 ## 8. Stress analysis (in work)
 
-<div align="justify">
-
 The stress decks (C3D8 / C3D10M) read the temperatures of the thermal run from its results file (<code>*TEMPERATURE, FILE=bimaterial_RLS_TH</code>) at the thermal increment, so every node is read at its peak temperature; the phases are recomputed from the same temperature history. The first step is the press fit at 25 C:
-
-</div>
 
 - **Interference.** 0.035 mm radial (0.07 mm on the diameter, mean of D = 110 H7/s6) on the bore / seat pair, by `*CLEARANCE` with a negative value and `*CONTACT INTERFERENCE, SHRINK`, resolved in a single increment; friction 0.15, hard contact.
 - **Small sliding.** `*CLEARANCE` is accepted on small-sliding pairs only, and a small-sliding main surface must be of one element order: the bore and the seat are split into their hex (C3D8) and tet (C3D10M) parts, two pairs with their own clearance.
 - **Base on the flange.** The crown base is wider than the flange; the contact uses only the part of the base above the flange (`CROWN_BASE_IN`), the rest is a free face.
 - **Restart.** The press fit is computed once with `*RESTART, WRITE`; the weld and cooling restart from it, so the solver, the increment and NLGEOM can be changed without repeating it.
 
-<div align="justify">
-
 Status: the thermal run is verified; the stress run is being set up (press-fit convergence, then the choice of solver, NLGEOM and increment on short weld runs). The stress model has 5.1 million equations, so its cost is the next thing to work on.
-
-</div>
 
 ---
 
 ## 9. Results: thermal run
 
-<div align="justify">
-
 Raw-wire (RLS) thermal run, symmetric and unsymmetric solvers compared node by node (same temperatures within 0.14 K). The pool is steady from about 33 deg: the number of nodes above Ac1 stops changing, and the fusion section (the projection of the pool along the travel, which is the cross-section of the finished weld) is the same at 45, 90 and 129 deg.
-
-</div>
 
 <p align="center">
   <img src="../99_images_and_miscelania/bimaterial_macrograph_vs_nogueira.png" alt="Published macrograph of a 4 kW, 1.5 m/min weld of this joint type next to the simulated macrograph at the same scale" width="100%">
 </p>
 
-<div align="justify">
-
 The comparison is made against the macrograph used to calibrate the heat source, Nogueira (2021), Fig. 6.13(a) [1]: same process (4 kW, 1.5 m/min), steel on the left, cast iron on the right, both pictures on the same scale in mm (the 1 mm bar of the photograph and the bar drawn from the calibration coincide). The measured widths are read on that photograph at the depths of the source calibration.
-
-</div>
 
 | Depth below the surface | Model, solidus width | Nogueira (2021), Fig. 6.13(a) | Difference |
 | :--- | :--- | :--- | :--- |
@@ -395,21 +303,13 @@ The comparison is made against the macrograph used to calibrate the heat source,
 | Penetration | full, 5 mm, into the chamber | full, 5.10 mm | |
 | Cap | 0.08 mm (metal balance of the wire) | 0.82 mm | |
 
-<div align="justify">
-
 The model reproduces the full penetration, the nail head and the width of the root at the chamber. It misses the neck: the measured weld narrows to 0.8-0.9 mm between 2 and 3.5 mm, while the model body stays at about 1.3 mm, and the head is 13 % narrower at the surface. The split of the source power between head and body is the next calibration. The cap is the wire metal standing proud of the surface, which a conduction model with a fixed surface does not form (estimated here from the metal balance only). Peak temperature in the keyhole: 2 326 C (a conduction model; the physics of the vapour capillary is not represented).
 
-</div>
-
 ### Hardness from the phase fractions (first estimate)
-
-<div align="justify">
 
 <b>Which measurements.</b> The macrograph of Nogueira (2021) has no hardness traverses, so the hardness is compared with the HV1 traverses of Neto (2023) [2], measured on welds of the same process at 0.5, 2 and 4 mm below the surface: five parts cut at 180 deg, indents every 0.15 mm.
 
 <b>Which steel.</b> The crown of the model is 20MnCr5 because that grade has far more published data (CCT diagrams, transformation kinetics, thermophysical properties) than the crown steel of the theses, a 27MnCr5 (Nogueira, Tab. 3.1: C 0.23-0.31, Mn 1.10-1.40, Cr 1.00-1.40). The thermal run and the phase fractions are therefore those of 20MnCr5. The hardness is computed with the chemistry of the theses (middle of the ranges: C 0.27, Mn 1.25, Cr 1.20; Si 0.25 assumed), because the traverses were measured on that steel. The mix carries an error that is accepted: with more carbon the real steel has a lower Ms and a higher hardenability, so its phase fractions would not be exactly those of the 20MnCr5 run. The carbon content alone moves the martensite hardness by about 10 % (Maynier gives about 490 HV with C 0.195, 557 HV with C 0.27).
-
-</div>
 
 <b>How it is computed</b> (a post-processing script on the exported VTK frames, not part of this folder):
 
@@ -433,11 +333,7 @@ $$HV_B = -323 + 185\,C + 330\,Si + 153\,Mn + 65\,Ni + 144\,Cr + 191\,Mo + \log V
 | 2 mm | 1.23 / 0.90 mm | 0.83 / 0.60 mm | 557 / 525 HV | 689 / 496 HV |
 | 4 mm | 1.23 / 0.90 mm | 0.56 / 0.60 mm | 560 / 543 HV | 544 / 578 HV |
 
-<div align="justify">
-
 Neto values: medians of the five parts. The peak hardness of the steel HAZ is within 2-6 %. The widths repeat the section comparison above: the fusion zone of the body is too wide and the steel HAZ under the head too narrow, both from the split of the power between head and body.
-
-</div>
 
 <b>Limits of the estimate</b>
 

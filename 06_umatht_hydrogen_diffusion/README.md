@@ -14,13 +14,9 @@
 > **DEVELOPMENT STATUS: IN WORK**  
 > The subroutine and its 1D verification deck are written; the formulation has been checked against the analytical solutions with an independent 1D finite element replica of the same constitutive update (section 4). The Abaqus run of the deck is pending, and the coupling to the welding model of project 02 is the next stage (section 5).
 
-<div align="justify">
 Hydrogen-assisted cold cracking, also called delayed cracking, is a typical failure of laser welds between case-hardening steels and cast irons. During cooling, the austenite of the heat-affected zone (HAZ) transforms to martensite. Hydrogen is far more soluble in austenite but diffuses there several orders of magnitude more slowly, so it is left supersaturated in a hard, highly stressed microstructure. It then diffuses towards the hydrostatic tension and gathers in traps, and a crack can appear hours to days after welding.
-</div>
 
-<div align="justify">
 This project models the transport part of that chain with a <b>User Material for Heat Transfer (<code>UMATHT</code>)</b>. The nodal temperature degree of freedom carries the lattice hydrogen concentration. This is the heat transfer analogy of Díaz <i>et al.</i> (2016), and it keeps the same <code>DC3D8</code> meshes, solver and post-processing as the welding thermal analysis of project 02.
-</div>
 
 ---
 
@@ -52,9 +48,7 @@ Where:
 | `DFDG` | $-D_L\,\mathbf{I}$ | Exact |
 | `DFDT` | $D_L \bar{V}_H \nabla\sigma_h / (R T)$ | Exact |
 
-<div align="justify">
 Because the increment of <code>U</code> comes from the exact Oriani equilibrium rather than from <code>DUDT·ΔC</code>, the hydrogen balance holds at any trap occupancy. Traps created by plastic strain, or emptied by heating ($K_T$ falls with $T$), act as sinks and sources of lattice hydrogen without any extra term.
-</div>
 
 ### Inputs
 
@@ -84,17 +78,13 @@ State variables (`*DEPVAR 4`): $C_L$, $C_T$, $D_L$, $N_T$. Concentrations can be
 | $W_B$ (dislocations) | 60 kJ/mol | Sofronis & McMeeking (1989) |
 | $D_{0,\gamma}$, $Q_\gamma$ (austenite) | 1.0 mm²/s, 50 kJ/mol | **Order-of-magnitude estimate by the author** ($D_\gamma \approx 10^{-9}$ mm²/s at 20 °C), to be replaced by data for the grade |
 
-<div align="justify">
 Martensite has a lower effective diffusivity than bcc iron because of its lath boundaries and dislocation density; in this model that enters through the trap terms, not through $D_L$.
-</div>
 
 ---
 
 ## 4. Verification Deck and Expected Results
 
-<div align="justify">
 <code>hydrogen_transport_verification.inp</code> holds three independent bars of 40 <code>DC3D8</code> elements with a 1 × 1 mm section, run in one transient step of 1000 s with fixed increments of 0.1 s. The expected values below are the analytical solutions; the "1D replica" column is an independent finite element implementation of the same <code>UMATHT</code> update (lumped capacity, 2-point Gauss flux, backward Euler) and shows the discretisation error that the Abaqus run should reproduce.
-</div>
 
 ### 4.1 Bar A: Permeation Transient (Lattice Only)
 
@@ -109,9 +99,7 @@ $$\frac{J(t)}{J_{ss}} = 1 + 2\sum_{n=1}^{\infty} (-1)^n \exp\left(-\frac{n^2 \pi
 
 ### 4.2 Bar B: Permeation with Oriani Traps
 
-<div align="justify">
 $W_B$ = 10 kJ/mol ($K_T$ = 60.507 at 20 °C) and $N_T$ = 125 967 mol/m³, so that $N_T K_T / N_L = 9$. At low occupancy ($\theta_L K_T < 10^{-4}$) the effective diffusivity is $D_{\text{eff}} = D_L / (1 + N_T K_T / N_L) = D_L / 10$: same steady flux as bar A, ten times slower transient.
-</div>
 
 | *t* [s] | 50 | 100 | 166.7 | 250 | 500 |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -120,9 +108,7 @@ $W_B$ = 10 kJ/mol ($K_T$ = 60.507 at 20 °C) and $N_T$ = 125 967 mol/m³, so tha
 
 ### 4.3 Bar C: Stress-Driven Equilibrium
 
-<div align="justify">
 Closed bar ($\mathbf{J} \cdot \mathbf{n} = 0$ at both ends), $L = 2$ mm, initial $C = 1$, uniform $\nabla\sigma_h$ = 500 MPa/mm (field variable 3). At equilibrium the flux vanishes everywhere and the hydrogen redistributes towards the tensile end, conserving its total amount:
-</div>
 
 $$C(x) = \bar{C}\, \frac{k L\, e^{k x}}{e^{k L} - 1}, \qquad k = \frac{\bar{V}_H\, \partial\sigma_h/\partial x}{R T} = 0.41028\text{ mm}^{-1}$$
 
@@ -137,9 +123,7 @@ The total amount stays at 2.000000 (the integral of *C* over the length).
 
 ## 5. Coupling to the Welding Simulation (Roadmap)
 
-<div align="justify">
 The intended analysis chain reuses the thermal and metallurgical results of the welded crown gear and differential carrier of projects 01 and 02:
-</div>
 
 1. **Thermal + metallurgical** (project 02, `DFLUX`): temperature history and austenite / martensite fractions.
 2. **Mechanical** (sequential): residual stresses with transformation strains → $\sigma_h$ and the equivalent plastic strain.
@@ -167,9 +151,7 @@ Open points before step 3 can run on the weld model:
 abaqus job=hydrogen_transport_verification user=umatht_hydrogen_transport.f interactive
 ```
 
-<div align="justify">
 Check against section 4: the summed <code>RFL11</code> of <code>A_OUT</code> and <code>B_OUT</code> in the <code>.dat</code> file (exit flux; its magnitude is <i>J</i> for the 1 mm² section, steady value 0.01), and <code>NT11</code> of <code>C_PROFILE</code> at the end of the step.
-</div>
 
 ---
 

@@ -9,21 +9,15 @@
 
 ## Executive Summary & Industrial Scope
 
-<div align="justify">
 In automotive transmission manufacturing, critical driveline components—such as secondary countershafts and stepped pinion shafts—undergo severe thermochemical case hardening (gas carburizing or carbonitriding followed by accelerated oil quenching) to achieve exceptional surface wear resistance, high contact fatigue strength, and bending endurance. However, the severe, non-uniform thermal gradients and differential martensitic phase transformation kinetics inherent to liquid quenching inevitably induce significant axial warping and geometric distortion (runout).
-</div>
 
-<div align="justify">
 To ensure coaxiality and satisfy stringent powertrain <b>Total Indicated Runout (TIR)</b> manufacturing tolerances (typically under 20–30 µm) prior to hard-finish gear grinding and final assembly, serial production lines deploy automated <b>three-point mechanical press straightening</b> machines.
-</div>
 
 <p align="center">
   <img src="../99_images_and_miscelania/shaft_straightening_schematic.svg" alt="Abaqus USDFLD Secondary Shaft Three-Point Straightening and Springback Architecture" width="100%" />
 </p>
 
-<div align="justify">
 This repository documents an advanced, high-fidelity three-dimensional finite element analysis (FEA) framework implemented in <b>Abaqus/Standard</b>. The pipeline models the complete non-linear mechanical response of a case-hardened secondary transmission shaft on a secondary gearbox shaft geometry (<code>husson_shaft.step</code>) of the type studied by Husson et al.:
-</div>
 
 1. **Initial Quenching Residual Stress Pre-Equilibrium:** Dissipation of self-equilibrating thermal-martensitic residual stress tensors (-350 to -500 MPa compressive case, +150 to +250 MPa tensile core);
 2. **Radial Hardness & Yield Gradient Interpolation (`USDFLD`):** Continuous integration-point mapping of depth-dependent constitutive properties across the 0.6 mm case layer into the ductile core;
@@ -35,34 +29,24 @@ This repository documents an advanced, high-fidelity three-dimensional finite el
 
 ## 1. Physical Motivation: The Straightening & Springback Dilemma
 
-<div align="justify">
 A case-hardened transmission shaft is inherently a bimaterial continuum with an extreme mechanical property gradient:
-</div>
 
 * **Brittle Case Layer (0.0–0.6 mm):** High surface carbon content (~0.8 wt% C), tempered martensite microstructure, ~60 HRC (<i>σ</i><sub>y,0</sub> &approx; 1900 MPa), high notch sensitivity, and low plastic fracture strain (<i>ε</i><sub>f</sub> &lt; 2%).
 * **Ductile Core (&gt; 0.6 mm):** Low carbon base steel (~0.16–0.20 wt% C), bainite/martensite core, ~30 HRC (<i>σ</i><sub>y,0</sub> &approx; 750 MPa), and high plastic ductility (<i>ε</i><sub>f</sub> &gt; 12%).
 
-<div align="justify">
 During three-point press straightening, the punch imposes a localized bending moment on the central bearing journal exceeding the section yield strength. When the outer fibers yield in tension and compression, the ductile core undergoes substantial plastic deformation while the high-strength case layer undergoes extreme elastic-plastic strain.
-</div>
 
-<div align="justify">
 Upon punch retraction, the elastically stored strain energy in the shaft drives <b>springback recovery</b>. Crucially, the internal redistribution of residual stresses forces the plastified zones into <b>reverse plastic loading</b>. If an engineer uses a standard isotropic hardening rule, the solver completely ignores the <b>Bauschinger effect</b>, dramatically underestimating reverse plastic strain and predicting an erroneous springback angle (typically off by 30–45%).
-</div>
 
 ---
 
 ## 2. Anatomy of the `USDFLD` Subroutine & Parameter Breakdown
 
-<div align="justify">
 Rather than slicing the CAD geometry into artificial geometric shells with discontinuous material boundaries—which creates numerical stress concentrations and meshing bottlenecks—this architecture utilizes an advanced <b>Fortran 2008 User Defined Field subroutine (<code>USDFLD</code>)</b>.
-</div>
 
 ### 2.1 Keyword Deck Integration
 
-<div align="justify">
 The subroutine is linked directly to the Abaqus/Standard material card via <code>*USER DEFINED FIELD</code> and <code>*PLASTIC, DEPENDENCIES=1</code>:
-</div>
 
 ```abaqus
 *USER DEFINED FIELD
@@ -85,9 +69,7 @@ The subroutine is linked directly to the Abaqus/Standard material card via <code
 
 ### 2.2 Detailed Parameter Analysis & Data Provenance (Published vs. Assumed)
 
-<div align="justify">
 A critical requirement in high-precision finite element analysis is <b>parameter provenance traceability</b>—differentiating between published data, empirical conversions and values assumed by the author. None of the material parameters of this project is measured or calibrated by the author.
-</div>
 
 #### Data Source Classification Matrix:
 
@@ -114,9 +96,7 @@ A critical requirement in high-precision finite element analysis is <b>parameter
    * The Armstrong-Frederick / Chaboche kinematic hardening constitutive formulation (Chaboche 1986, 1989; Lemaitre & Chaboche 1990) requires 2 backstress tensors ($\boldsymbol{\alpha} = \boldsymbol{\alpha}_1 + \boldsymbol{\alpha}_2$) to model both the sharp initial yield knee and the stabilized slope.
    * The parameters $(C_1, \gamma_1, C_2, \gamma_2, Q_\infty, b)$ and their variation with depth are assumed by the author as representative of a carburized 20MnCr5. They are not taken from a specific data set.
 
-<div align="justify">
 No press straightening test data are used in this project: the hardening parameters are assumed values and have not been calibrated against stroke-force or runout measurements.
-</div>
 
 | Parameter | Identifier in Deck | Value Range | Physical Significance | Provenance |
 | :--- | :--- | :---: | :--- | :--- |
@@ -129,17 +109,13 @@ No press straightening test data are used in this project: the hardening paramet
 | **Isotropic Expansion Max** | $Q_\infty$ | 150.0 &rarr; 250.0 MPa | Saturated isotropic yield expansion (Voce) | Assumed by the author (representative value, not calibrated) |
 | **Isotropic Decay Rate** | $b$ | 12.0 &rarr; 6.0 | Rate of isotropic yield expansion with PEEQ | Assumed by the author (representative value, not calibrated) |
 
-<div align="justify">
 <b>Physical Rationale for Depth-Dependent Hardening:</b> The severe thermal and chemical gradient created during carburizing alters both carbon concentration (~0.8 wt% C at surface vs ~0.2 wt% C in core) and the martensite start temperature ($M_s$). The high surface carbon maximizes tetragonality, dislocation density, and internal lattice micro-stresses, raising initial yield strength to ~1900 MPa and driving rapid kinematic backstress saturation ($\gamma_1 = 180$). In contrast, the low-carbon ductile core undergoes extensive dislocation multiplication with higher isotropic work-hardening capacity ($Q_\infty = 250\text{ MPa}$, $b = 6.0$).
-</div>
 
 ---
 
 ## 3. Mathematical Formulation: Chaboche Nonlinear Kinematic Hardening
 
-<div align="justify">
 The non-linear Bauschinger effect and cyclic ratchetting/springback under reverse bending are governed by the classical Armstrong-Frederick / Chaboche kinematic hardening constitutive framework:
-</div>
 
 ### 3.1 Yield Surface Definition
 
@@ -153,9 +129,7 @@ where:
 
 ### 3.2 Two-Term Kinematic Backstress Evolution
 
-<div align="justify">
 To accurately capture both the sharp non-linear knee at yielding onset and the linear hardening slope at larger strain ranges, a superposed two-backstress decomposition is employed:
-</div>
 
 $$\boldsymbol{\alpha} = \sum_{k=1}^{2} \boldsymbol{\alpha}_k$$
 
@@ -174,36 +148,26 @@ $$\sigma_y(p) = \sigma_{y,0}(FV_1) + Q_\infty(FV_1) \left( 1 - e^{-b(FV_1) \, p}
 
 ## 4. Finite Element Discretization Strategy: The Industrial Tetrahedral Approach
 
-<div align="justify">
 In academic textbooks, cylindrical shafts are frequently discretized using idealized structured hexahedral meshes (such as <code>C3D8I</code> with O-grid blocking). However, in realistic automotive transmission shafts—such as the actual secondary shaft analyzed here (<code>husson_shaft.step</code>)—the geometry features:
-</div>
 
 1. **Cross-Drilled Lubrication Holes:** Transverse internal channels (Ø3.5 mm and Ø8.0 mm) drilled through the shaft core to supply oil to bearing journals;
 2. **Torque Transmission Splines:** Longitudinal drive flutes and keyways that disrupt rotational symmetry;
 3. **Integral Helical Pinion Teeth:** Complex 3D involute surfaces directly adjacent to the main shaft bearing shoulder;
 4. **Multiple Diameter Steps & Transition Fillets:** Stepped transitions from Ø25 mm to Ø38 mm, Ø51 mm, and Ø68.2 mm.
 
-<div align="justify">
 Attempting to create structured hexahedral partitions (<code>C3D8I</code>) across intersecting lubrication channels and helical teeth requires dozens of non-physical geometric cuts, introduces severe mesh skewness, and produces prohibitive pre-processing bottlenecks in CAE. Consequently, an industrial-grade, fully conformal <b>quadratic tetrahedral meshing strategy (<code>C3D10</code> / <code>C3D10M</code>)</b> is deployed.
-</div>
 
 ### 4.1 Modified 10-Node Quadratic Tetrahedrals (`C3D10M`)
-<div align="justify">
 Standard quadratic tetrahedral elements (<code>C3D10</code>) can exhibit volumetric locking during unconstrained, large-scale plastic flow because their volumetric strain is over-constrained. Furthermore, standard <code>C3D10</code> elements can produce oscillating, non-uniform contact nodal forces on curved surfaces.
-</div>
 
-<div align="justify">
 To overcome both limitations, the entire shaft is discretized using <b>Abaqus modified quadratic tetrahedrals (<code>C3D10M</code>)</b>:
-</div>
 
 * **Volumetric Locking Elimination:** Incorporates an internal hydrostatic pressure degree of freedom and specialized hourglass/volume control that maintains volume constancy (<i>ν</i><sub>eff</sub> &rarr; 0.5) without artificial stiffening;
 * **Consistent Contact Formulation:** Features lumped mass and contact-consistent force distributions, eliminating contact chattering between the punch rigid surface and the shaft convex boundary;
 * **Conformal Geometry:** Captures cross-drilled lubrication holes, spline roots, and tooth fillets without artificial tie interfaces or interface stiffness jumps.
 
 ### 4.2 Radial Case Layer Refinement Strategy
-<div align="justify">
 To accurately capture the steep hardness, yield stress, and residual stress gradient within the 0.6 mm carburized case layer:
-</div>
 
 * **Surface Inflation / Boundary Layer Seeding:** Surface element sizing is maintained at &Delta;<i>h</i><sub>surf</sub> &approx; 0.15–0.20 mm along the central contact journal, providing 3 to 4 quadratic tetrahedral elements through the 0.6 mm case depth;
 * **Core Transition:** Element size transitions smoothly to 1.2–1.5 mm in the ductile core, balancing computational efficiency with high through-thickness bending resolution.
@@ -216,9 +180,7 @@ To accurately capture the steep hardness, yield stress, and residual stress grad
   <img src="../99_images_and_miscelania/shaft_straightening_pipeline_architecture.svg" alt="Abaqus USDFLD Sequentially Coupled FEA Data Pipeline Architecture" width="100%" />
 </p>
 
-<div align="justify">
 The simulation pipeline is structured into three sequential implicit steps in <b>Abaqus/Standard</b>:
-</div>
 
 ### Step 0: Initial Quenching Residual Stress Equilibrium
 * **Input Deck:** `*INITIAL CONDITIONS, TYPE=STRESS`
@@ -240,40 +202,28 @@ $$\text{TIR}_{\text{residual}} = \max\left(U_y(z)\right) - \min\left(U_y(z)\righ
 
 ## 6. Industrial Numerical Engineering: Convergence Stabilization & Best Practices
 
-<div align="justify">
 Elastoplastic contact simulations involving localized plastic yielding, reverse unloading, and high-strength surface layers are highly prone to severe discontinuity iterations (SDI) and convergence stalls. The following stabilization guidelines are strictly embedded:
-</div>
 
 ### 6.1 Displacement Control vs. Force Control Stability
-<div align="justify">
 During 3-point bending of a solid stepped shaft, the tangent stiffness matrix <b>K</b><sub>T</sub> degrades rapidly once the outer case and core yield simultaneously. Force-controlled Newton-Raphson iterations diverge instantly due to an ill-conditioned tangent matrix (det(<b>K</b><sub>T</sub>) &approx; 0). Imposing displacement boundary conditions on the punch Reference Point preserves diagonal dominance in <b>K</b><sub>T</sub>, ensuring monotonic quadratic convergence across the entire loading branch.
-</div>
 
 ### 6.2 Asymmetric Solver Activation (`UNSYMM=YES`)
-<div align="justify">
 Because frictional penalty contact generates a non-symmetric contribution to the global stiffness matrix when sliding occurs (<i>τ</i><sub>crit</sub> = <i>μ</i> <i>p</i>), setting:
-</div>
 
 ```abaqus
 *STEP, NAME=PUNCH_LOADING, NLGEOM=YES, UNSYMM=YES
 ```
 
-<div align="justify">
 is mandatory. While each iteration incurs a ~30% higher computational cost, it eliminates severe Newton-Raphson residual cycling and prevents solver cutbacks.
-</div>
 
 ### 6.3 Contact Chattering Mitigation with `C3D10M`
-<div align="justify">
 Traditional <code>C3D10</code> elements distribute equivalent nodal forces unequally between corner and mid-side nodes (corner nodes can receive negative equivalent forces under uniform pressure), causing severe contact status oscillations (open/close chatter). The modified <code>C3D10M</code> element formulation uses a consistent weighting scheme that guarantees positive nodal forces across all contact faces, eliminating contact chattering and drastically accelerating convergence.
-</div>
 
 ---
 
 ## 7. Subroutine Architecture & Integration (`USDFLD`)
 
-<div align="justify">
 The user subroutine is packaged as a standalone modern Fortran 2008 file (<code>usdfld_case_hardneded_shaft.f</code>). At every material integration point:
-</div>
 
 1. `CALL GETVRM('COORD', ...)` extracts the current 3D coordinates (<i>x</i>, <i>y</i>, <i>z</i>);
 2. The outer radius profile <i>R</i><sub>outer</sub>(<i>z</i>) is evaluated piecewise based on the shaft stepped CAD geometry (`husson_shaft.step`):
@@ -318,9 +268,7 @@ The residual runout is evaluated from the displacement $U_y$ of the centerline n
 
 ## 10. Key Results & Engineering Evaluation
 
-<div align="justify">
 The model is set up to evaluate the following results:
-</div>
 
 1. **Punch Force vs. Stroke Hysteresis:**  
    Captures the steep initial elastic slope, the onset of case yield at high load (~1900 MPa), progressive core yield propagation, and the non-linear unloading path driven by reverse plastic deformation.

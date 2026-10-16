@@ -5,9 +5,7 @@
 [![Language](https://img.shields.io/badge/Language-Fortran%202008%20%2F%20F90-734f96.svg)](https://fortran-lang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-<div align="justify">
 A repository of production-grade user subroutines for <b>Abaqus/Standard</b> and <b>3DEXPERIENCE SIMULIA</b>, written in <b>Fortran</b> for high-performance structural, fatigue, and manufacturing simulations.
-</div>
 
 ---
 
@@ -32,9 +30,7 @@ A repository of production-grade user subroutines for <b>Abaqus/Standard</b> and
   </a>
 </p>
 
-<div align="justify">
 Finite element simulation (1.49 million equations) of an automotive helical crown gear (20MC5) laser-welded with Inconel filler wire to its differential carrier (EN-GJS-600-10), with a 108° incomplete-penetration weld flaw (30 % of the circumference). The tooth contact load is applied analytically by a <code>DLOAD</code> subroutine and rolled across the full 360° revolution, in drive and in coast (regeneration), without meshing the pinion.
-</div>
 
 #### Key Features & Verification:
 - **Drive and Coast Load Cases:** active flank and torque selected per analysis step, covering manual drivelines and hybrid / electric drivelines with torque reversal.
@@ -43,9 +39,7 @@ Finite element simulation (1.49 million equations) of an automotive helical crow
 - **Welded Assembly:** bonded weld seam over 252°, frictional contact across the unbonded flaw, kinematic couplings at the bearing seats.
 - **Fatigue Method:** stress-range evaluation per critical point with S-N curves and Palmgren-Miner damage summation for an OEM load spectrum.
 
-<div align="justify">
 Detailed formulation, kinematic equations, FEA verification, and post-processing scripts are available in <a href="01_dload_gear_fatigue/README.md">01_dload_gear_fatigue/</a>.
-</div>
 
 ---
 
@@ -57,9 +51,7 @@ Detailed formulation, kinematic equations, FEA verification, and post-processing
   </a>
 </p>
 
-<div align="justify">
 A 20MnCr5 crown gear laser welded to an EN-GJS-600-10 differential carrier with a Ni 6082 filler wire (<i>R</i> = 55 mm, 4 kW, 1.5 m/min, full penetration of a 5 mm weld land into a gas escape chamber, press fit below). The animation shows the unrolled top surface, the longitudinal section on the joint, the projected weld cross-section with the solidus and Ac1 lines of each material, and the expected etched macrograph.
-</div>
 
 #### Key Highlights:
 - **Double conical keyhole source (`DFLUX`):** nail-head weld (wide head, narrow body, hemispherical tip), calibrated on a published macrograph, with the power through the keyhole root lost into the chamber.
@@ -68,28 +60,22 @@ A 20MnCr5 crown gear laser welded to an EN-GJS-600-10 differential carrier with 
 - **Filler as a raw wire (RLS state):** the wire is in the model from the start and becomes weld metal where the computed temperature melts it, in one weld step, compared with classic element activation (`*MODEL CHANGE`) on the same mesh.
 - **Stress run (in work):** press fit by interference saved once by restart, weld and cooling read the thermal history increment by increment.
 
-<div align="justify">
 Formulation, mesh, materials, input decks and results are in <a href="02_dflux_laser_welding/README.md">02_dflux_laser_welding/</a>.
-</div>
 
 ---
 
 ### Project Showcase: 03 & 04. Advanced Interface Modeling Evolution
 
-<div align="justify">
 The portfolio demonstrates a complete engineering R&D cycle comparing two distinct methodologies to capture the 3 physical states of a welded interface (<b>Raw → Welded → Cracked</b>):
-</div>
 
 <p align="center">
   <img src="99_images_and_miscelania/uinter_vs_czm_comparison.svg" alt="Architectural Evolution from Contact Interaction UINTER to Cohesive Zone Modeling UMAT" width="100%" />
 </p>
 
-<div align="justify">
 <ul>
   <li><b><a href="03_uinter_welding_interface/README.md">03. Exploratory Interface (UINTER)</a>:</b> Formulates the 3-state state machine on contact surfaces. Benchmarking identified critical mesh-dependency due to displacement jumps vs strain rates, prompting its classification as an exploratory R&D backlog module.</li>
   <li><b><a href="04_umat_cohesive_welding/README.md">04. Cohesive Zone Interface (UMAT)</a>:</b> Under active development and testing to evaluate mesh-independent fracture energy <i>G</i><sub>c</sub> regularization. Uses an exact 3 × 3 analytical <code>DDSDDE</code> Jacobian to investigate convergence without contact chattering or SDI cutbacks (strictly a research prototype under evaluation, not for production use).</li>
 </ul>
-</div>
 
 ---
 
@@ -101,9 +87,7 @@ The portfolio demonstrates a complete engineering R&D cycle comparing two distin
   </a>
 </p>
 
-<div align="justify">
 Three-point press straightening and springback of a case-hardened 20MnCr5 secondary transmission shaft of the type studied by Husson et al. (<i>L</i> = 294.1 mm, DOI: <a href="https://doi.org/10.1007/s00170-014-5688-8">10.1007/s00170-014-5688-8</a>). A <code>USDFLD</code> subroutine maps the radial depth below the surface to a field variable at every integration point, so the carburized case and the core are one continuous material with depth-dependent properties, without partitioning the geometry into layers.
-</div>
 
 #### Key Modelling Features:
 - **Radial Property Gradient:** depth below the stepped outer surface computed per integration point and passed to `*PLASTIC, DEPENDENCIES=1`; initial yield stress from 1900 MPa at the surface to 750 MPa in the core, with an effective case depth of 0.60 mm.
@@ -111,9 +95,7 @@ Three-point press straightening and springback of a case-hardened 20MnCr5 second
 - **Three-Step Solution:** equilibrium of the quenching residual stresses, displacement-controlled punch stroke, then punch retraction and evaluation of the residual Total Indicated Runout (TIR).
 - **Data Provenance:** the material deck separates the published context (hardness after heat treatment, Husson et al.) from the values assumed by the author (hardness profile, case depth, hardening parameters). The model is not calibrated or validated against tests.
 
-<div align="justify">
 Formulation, parameter provenance, meshing strategy and results are available in <a href="05_usdfld_shaft_straightening/README.md">05_usdfld_shaft_straightening/</a>.
-</div>
 
 ---
 
@@ -183,17 +165,13 @@ Formulation, parameter provenance, meshing strategy and results are available in
 
 ## Disclaimer
 
-<div align="justify">
 This repository is published for professional portfolio and academic demonstration purposes. All CAD dimensions, process parameters, and metallurgical kinetics presented herein are synthetic, open-literature benchmarks designed to illustrate advanced FEA and Fortran programming methodologies, and do not represent any confidential data.
-</div>
 
 ---
 
 ## Development Approach & Use of AI
 
-<div align="justify">
 The engineering content of this portfolio is the author's own: the choice of problems, the physical and numerical modelling strategy, the finite element models (geometry, meshes, materials, contact, welds and boundary conditions), the simulation campaigns on Abaqus / 3DEXPERIENCE and the judgement of whether a result is physically right. AI coding assistants were used as a productivity tool, under the author's direction, to speed up the writing and adaptation of Fortran subroutines, pre- and post-processing scripts, numerical cross-checks and documentation. Generated code is not taken on trust: projects marked as verified are checked against an analytical solution, an independent numerical integration or the solver's own reaction output, as documented in each project, and work still in progress is labelled as such in the table above.
-</div>
 
 ---
 

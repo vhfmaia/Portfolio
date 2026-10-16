@@ -20,17 +20,13 @@
 
 ## 1. Physical Motivation: The 3-State Contact Interface
 
-<div align="justify">
 In conventional finite element welding analyses, joint interfaces are typically simplified via static <code>*TIE</code> constraints (as in baseline sequential thermal-mechanical pipelines). However, a <code>*TIE</code> constraint glues the entire 360° circumference from time <i>t</i> = 0, completely ignoring:
-</div>
 
 1. **Pre-weld joint gaps and press-fit mechanics** ahead of the advancing beam;
 2. **Semi-solid mushy zone tearing** during cooling through the **Brittleness Temperature Range (BTR)**;
 3. **Permanent weld seam rupture or hot cracking**.
 
-<div align="justify">
 To bridge this gap, an interaction model was formulated to dynamically transition between three discrete constitutive states:
-</div>
 
 <p align="center">
   <img src="../99_images_and_miscelania/uinter_3state_state_machine.svg" alt="Abaqus UINTER 3-State Contact Interface and Won BTR Hot Tearing Engine" width="100%" />
@@ -40,9 +36,7 @@ To bridge this gap, an interaction model was formulated to dynamically transitio
 
 ## 2. Anatomy of the `UINTER` Subroutine & Parameter Breakdown
 
-<div align="justify">
 The subroutine is invoked by Abaqus/Standard at every contact slave node / integration point where a user interaction is assigned (<code>*SURFACE INTERACTION, USER</code>).
-</div>
 
 ### 2.1 Interface Definition & Keyword Deck
 
@@ -56,9 +50,7 @@ SURF_SLAVE, SURF_MASTER
 
 ### 2.2 Detailed Parameter Analysis & Empirical Origin
 
-<div align="justify">
 All material and process constants in <code>PROPS</code> were obtained through <b>empirical high-temperature characterization</b>:
-</div>
 
 | Parameter | Identifier in Code | Value | Physical Significance | Experimental / Empirical Origin |
 | :--- | :--- | :---: | :--- | :--- |
@@ -70,17 +62,13 @@ All material and process constants in <code>PROPS</code> were obtained through <
 | **`PROPS(5)`** | `M_STAR` ($m^{\ast}$) | $0.40$ | Strain-rate sensitivity exponent | Fit from strain-rate jump tests in the mushy zone ($10^{-4} - 10^{-1}\,\text{s}^{-1}$) |
 | **`PROPS(6)`** | `N_STAR` ($n^{\ast}$) | $1.20$ | Cooling rate sensitivity exponent | Solidification morphology / secondary dendrite arm spacing (SDAS) fit |
 
-<div align="justify">
 <b>Why are these parameters empirical?</b> Direct physical measurement of tensile ductility during solidification is virtually impossible using classical static testing machines because the material is a fragile dendritic slurry (<i>f</i><sub>s</sub> ∈ [0.90, 0.99]) surrounded by liquid segregation films. Parameters <i>ϕ</i>, <i>m</i>*, and <i>n</i>* must be calibrated on specialized <b>Gleeble thermo-mechanical physical simulators</b> or <b>Transvarestraint testing rigs</b> by pulling the specimen at controlled stroke rates during rapid cooling.
-</div>
 
 ---
 
 ### 2.3 Internal State Variables (`STATEV 1..16`)
 
-<div align="justify">
 Abaqus allocates 16 solution-dependent state variables (<code>DEPVAR=16</code>) to track the local metallurgical and mechanical history at each contact node:
-</div>
 
 | Variable | Description | Physical Unit |
 | :--- | :--- | :---: |
@@ -104,24 +92,18 @@ Abaqus allocates 16 solution-dependent state variables (<code>DEPVAR=16</code>) 
 
 ### 3.1 Mathematical Theory
 
-<div align="justify">
 The classical hot tearing criterion of <b>Won, Yeo, Seol, and Yim (2000)</b> posits that solidification cracking occurs when the accumulated tensile strain within the critical solid fraction range (<i>f</i><sub>s</sub> = 0.90 – 0.99, corresponding to the BTR) exceeds a threshold <i>ε</i><sub>crit</sub> that depends on both the strain rate <i>ε̇</i> and the thermal cooling rate <i>Ṫ</i>:
-</div>
 
 $$\varepsilon_{\text{crit}} = \frac{\phi}{\dot{\varepsilon}^{m^{\ast}} \cdot \dot{T}^{n^{\ast}}}$$
 
-<div align="justify">
 <ul>
   <li>At <b>higher strain rates</b> (<i>ε̇</i> ↑), liquid feeding cannot replenish opening voids, reducing the critical strain (<i>ε</i><sub>crit</sub> ↓).</li>
   <li>At <b>higher cooling rates</b> (<i>Ṫ</i> ↑), finer dendritic spacing shortens the time available for stress relaxation, lowering crack resistance.</li>
 </ul>
-</div>
 
 ### 3.2 Evaluation in `UINTER`
 
-<div align="justify">
 Inside the BTR interval (<i>T</i><sub>solidus</sub> ≤ <i>T</i> ≤ <i>T</i><sub>liquidus</sub>), the subroutine computes:
-</div>
 
 $$\varepsilon_{\text{eval}} = \frac{\Delta u_{n,\text{accum}}}{L_0}, \quad I_{\text{Won}} = \frac{\varepsilon_{\text{eval}}}{\varepsilon_{\text{crit}}}$$
 
@@ -131,9 +113,7 @@ $$\text{If } I_{\text{Won}} \ge 1.0 \implies \text{State} \rightarrow \mathbf{CR
 
 ## 4. Empirical Temporal Discretization Benchmark (2, 3, 4, 5 Points in BTR)
 
-<div align="justify">
 To evaluate the numerical sensitivity and temporal dependency of <code>UINTER</code>, four systematic simulations were executed using the identical 2-element patch model (<code>dummy_btr_coarse_*points_normalized.inp</code>). The cooling rate was kept strictly constant at <i>Ṫ</i> = 2812.5 °C/s across the 45 °C BTR span (Δ<i>t</i><sub>BTR</sub> = 0.0160 s), while Step 5 was discretized to place exactly 2, 3, 4, and 5 temporal sampling points within the BTR:
-</div>
 
 | Numerical Metric | 2 Points in BTR | 3 Points in BTR | 4 Points in BTR | 5 Points in BTR | Asymptotic Behavior |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -147,34 +127,28 @@ To evaluate the numerical sensitivity and temporal dependency of <code>UINTER</c
 | **Final Pressure `CPRESS`** | $-970.2\text{ MPa}$ | $-971.5\text{ MPa}$ | $-972.3\text{ MPa}$ | $-972.5\text{ MPa}$ | **Monotonic ($< 0.24\%$ error)** |
 
 ### Key Engineering Findings:
-<div align="justify">
 <ol>
   <li><b>Asymptotic Structural Convergence:</b> Once ruptured, the final room-temperature crack opening <code>COPEN</code> converges monotonically with an error below 0.23% (2.0636 μm → 2.0684 μm), demonstrating that the post-rupture contact release mechanics are structurally sound.</li>
   <li><b>Thermal Sampling Overshoot:</b> Coarse time stepping (≤ 3 points in BTR) skips past the solidus temperature (1485 °C), registering fracture with a numerical lag at 1469.67 °C. A minimum of <b>4 to 5 increments inside the BTR</b> (Δ<i>t</i> ≤ 0.005 s) is strictly necessary to resolve the true physical onset of hot tearing.</li>
   <li><b>Severe Discontinuity Overhead:</b> In all cases, the sudden loss of cohesion across interface nodes triggers <b>3 Severe Discontinuity Iterations (SDI)</b> before standard Newton-Raphson equilibrium can be re-established.</li>
 </ol>
-</div>
 
 ---
 
 ## 5. Critical Bottlenecks of the Contact Formulation
 
-<div align="justify">
 Despite its conceptual elegance, three fundamental limitations prevent practical deployment:
 <ol>
   <li><b>Pathological Mesh Dependency:</b> Operating on discrete displacement jumps Δ<i>u</i><sub>n</sub> forces the use of a virtual length scale <i>L</i><sub>0</sub>. If the mesh is refined from 0.35 mm to 0.10 mm, apparent strain concentrates into fewer nodes, triggering false-positive tears everywhere.</li>
   <li><b>Contact Chattering &amp; SDI Cutbacks:</b> Instantaneous stiffness switching (0 → <i>K</i><sub>bond</sub>) triggers severe solver cutbacks (<code>1U</code>, <code>2U</code>, <code>3U</code>), increasing CPU cost by 5× – 8×.</li>
   <li><b>MPI Domain Conflicts:</b> Master/slave surfaces partitioned across multiple CPU cores introduce communication locks.</li>
 </ol>
-</div>
 
 ---
 
 ## 6. Architectural Comparison: UINTER vs. Cohesive UMAT
 
-<div align="justify">
 To evaluate solutions for these limitations, research expanded to investigate a <b>Cohesive Zone Modeling (CZM)</b> approach via a thermo-mechanical <code>UMAT</code>:
-</div>
 
 | Performance Metric | Surface Interaction (`UINTER`) | Cohesive Zone (`UMAT` + `COH3D8`) |
 | :--- | :--- | :--- |
@@ -227,6 +201,4 @@ To evaluate solutions for these limitations, research expanded to investigate a 
 └── README.md                        # Technical report & research documentation
 ```
 
-<div align="justify">
 > <b>Next Step:</b> See <a href="../04_umat_cohesive_welding/README.md"><b>04_umat_cohesive_welding</b></a> for the mesh-independent cohesive UMAT prototype currently under evaluation.
-</div>
