@@ -69,10 +69,6 @@ The general arrangement (crown bore welded to a carrier seat wall, gas escape ch
 
 </div>
 
-<p align="center">
-  <img src="../99_images_and_miscelania/bimaterial_geometry_3d.png" alt="Quarter cut of the crown gear, carrier and filler" width="60%">
-</p>
-
 | Part | Main dimensions [mm] |
 | :--- | :--- |
 | Crown gear | bore r = 55, tooth tips r = 89.06, face width 25 (z 0 to 25); hub r <= 63, rim r >= 77, web z 8 to 17 |

@@ -162,7 +162,6 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── double_cone_heat_source_plot.svg       # 4-Panel Double Conical Keyhole Source, Crown Gear / Carrier Weld (SVG)
 │   ├── bimaterial_weld_rls_blackbody.gif      # Bimaterial weld thermal animation with expected macrograph (GIF)
 │   ├── bimaterial_section.svg / _mesh_section.svg  # Joint section and swept hex mesh (SVG)
-│   ├── bimaterial_geometry_3d.png             # Quarter cut of the crown gear / carrier (PNG)
 │   ├── bimaterial_filler_ea_vs_rls.svg        # Filler: element activation vs raw wire (SVG)
 │   ├── bimaterial_rls_phase_map.svg           # RLS state and phase transformations (SVG)
 │   ├── bimaterial_weld_workflow.svg           # Analysis chain of the weld model (SVG)
