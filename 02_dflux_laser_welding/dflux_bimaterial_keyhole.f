@@ -5,7 +5,7 @@
 !         double conical Gaussian (head cone over body cone) with a
 !         hemispherical bottom
 !         Crown Gear & Differential Carrier Assembly with Ni 6082 filler
-!         (bimaterial weld model, run/ folder: bimaterial_TH.inp)
+!         (bimaterial weld model: EA/bimaterial_EA_TH.inp, RLS/bimaterial_RLS_TH.inp)
 !  Author: Victor Maia (vhfm08@gmail.com)
 !
 !  Target shape: "nail head" keyhole weld, a wide and shallow head at the

@@ -1,0 +1,167 @@
+*HEADING
+Crown gear / carrier laser weld with Ni 6082 filler - sequentially coupled stress analysis
+**
+*PHYSICAL CONSTANTS, ABSOLUTE ZERO=-273.15, STEFAN BOLTZMANN=5.67E-11
+**
+** Units: mm, s, tonne, N, MPa, mJ, C
+** Crown gear 20MnCr5 (Material_20MnCr5.inp), carrier EN-GJS-600-10
+** (Material_GJS600_10.inp), filler wire Ni 6082 / Inconel 82 (Material_Inconel82_RLS.inp)
+** Mesh: mesh_nodes.inp, mesh_elements_ME.inp, mesh_sets_RLS.inp (build_run_mesh.py from
+** bimaterial_assembly.inp, ANSA export fixed by fix_assembly.py)
+**
+** Table types of the phase transformation framework: once, before the materials
+*INCLUDE, INPUT=Material_phase_trans_table_types.inp
+*INCLUDE, INPUT=Material_20MnCr5.inp
+*INCLUDE, INPUT=Material_GJS600_10.inp
+** Tets away from the weld: plain cards, no SDV (below Ac1, no transformation)
+*INCLUDE, INPUT=Material_20MnCr5_TET.inp
+*INCLUDE, INPUT=Material_GJS600_10_TET.inp
+*INCLUDE, INPUT=Material_Inconel82_RLS.inp
+*INCLUDE, INPUT=mesh_nodes.inp
+*INCLUDE, INPUT=mesh_elements_ME.inp
+*INCLUDE, INPUT=mesh_sets_RLS.inp
+**
+** ------------------------------------------------------------------
+** INITIAL CONDITIONS
+** - RLS (SDV1) = 1.0 (solid), initial phase 100 % ferrite (SDV4 = 1.0), only on the
+**   phase transformation materials (the filler card has no SDV)
+** - Initial temperature: 25.0 C uniform
+** ------------------------------------------------------------------
+*INITIAL CONDITIONS, TYPE=SOLUTION
+ELSET_PHASE_TRANS, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+0.0, 0.0
+** Filler: raw wire (RLS = -1), austenite (Material_Inconel82_RLS.inp, 4 SDV). Abaqus
+** wants the maximum number of SDV of the model (25) on every set: the last 21 are padding
+*INITIAL CONDITIONS, TYPE=SOLUTION
+FILLER, -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+0.0, 0.0
+**
+*INITIAL CONDITIONS, TYPE=FIELD, VARIABLE=3
+NSET_ALL, 0., 0., 0.,
+**
+*INITIAL CONDITIONS, TYPE=TEMPERATURE
+NSET_ALL, 25.0
+**
+** ------------------------------------------------------------------
+** TIES: tetrahedral volumes (slave) to the swept hex weld zone (master).
+** The faces of the hex side were mapped with 300 steps (1.2 deg): the midside
+** nodes of the tets fall on the hex nodes.
+** ------------------------------------------------------------------
+*TIE, NAME=TIE_CROWN, TYPE=SURFACE TO SURFACE, ADJUST=YES, POSITION TOLERANCE=0.01
+CROWN_TET_TIE, CROWN_HEX_TIE
+*TIE, NAME=TIE_CARRIER, TYPE=SURFACE TO SURFACE, ADJUST=YES, POSITION TOLERANCE=0.01
+CARRIER_TET_TIE, CARRIER_HEX_TIE
+**
+** Time points of the weld steps (step time): BEAM_* = every increment (the beam peak on
+** a node of the joint line at every increment end), FRAMES_* = field output every 3 deg
+*TIME POINTS, NAME=BEAM_WELD, GENERATE
+0.023038346126, 17.278759594500, 0.023038346126
+*TIME POINTS, NAME=FRAMES_WELD, GENERATE
+0.115191730630, 17.278759594500, 0.115191730630
+*TIME POINTS, NAME=ME_FRAMES, GENERATE
+1.151917306300, 17.278759594500, 1.151917306300
+*TIME POINTS, NAME=COOLING_FRAMES
+0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0
+5.0, 6.0, 8.0, 10.0, 12.5, 15.0, 20.0, 25.0
+30.0, 40.0, 50.0, 60.0, 75.0, 90.0, 105.0, 120.0
+150.0, 180.0, 210.0, 240.0, 270.0, 300.0
+**
+** Temperatures: thermal job bimaterial_RLS_TH (results file bimaterial_RLS_TH.fil); thermal step
+** n is read by mechanical step n + 1 (step 1 is the press fit).
+**
+** ------------------------------------------------------------------
+** PRESS FIT: hard contact, friction 0.15. Radial interference 0.035 mm
+** (0.07 mm on the diameter, mean of D = 110 H7/s6), applied on the bore / seat pair
+** only, resolved in step 1 (SHRINK). The mesh is nominal (coincident faces).
+** Small sliding (*CLEARANCE is only accepted there); its main surface must be of one
+** element order, so the bore / seat pair is split into its hex (C3D8) and tet (C3D10M) parts.
+** ------------------------------------------------------------------
+*SURFACE INTERACTION, NAME=PRESS_ME
+*FRICTION
+0.15,
+*SURFACE BEHAVIOR, PRESSURE-OVERCLOSURE=HARD
+*CONTACT PAIR, INTERACTION=PRESS_ME, TYPE=SURFACE TO SURFACE, SMALL SLIDING
+CROWN_BORE_HEX, DIFF_SEAT_HEX
+CROWN_BORE_TET, DIFF_SEAT_TET
+CROWN_BASE_IN, DIFF_FLANGE
+*CLEARANCE, SLAVE=CROWN_BORE_HEX, MASTER=DIFF_SEAT_HEX, VALUE=-0.035
+*CLEARANCE, SLAVE=CROWN_BORE_TET, MASTER=DIFF_SEAT_TET, VALUE=-0.035
+**
+** ------------------------------------------------------------------
+** SUPPORT: carrier lower face in z, lower bearing seat in x and y
+** ------------------------------------------------------------------
+*BOUNDARY
+CARRIER_SUPPORT_Z, 3, 3, 0.0
+CARRIER_SUPPORT_XY, 1, 2, 0.0
+**
+** ==================================================================
+** STEP 1: PRESS FIT at 25 C. The filler is in the model, raw wire (RLS = -1): no stiffness.
+** Automatic stabilisation until the contact
+** holds the crown (check ALLSD << ALLIE).
+** ==================================================================
+*STEP, NAME=PRESS_FIT, NLGEOM=NO, INC=200
+*STATIC, STABILIZE=2.0E-4, ALLSDTOL=0.05
+** one increment: *CONTACT INTERFERENCE, SHRINK resolves the whole interference in the first
+** increment, further increments would only repeat the equilibrium (cut-back if needed)
+1.0, 1.0, 1.0E-06, 1.0
+*CONTACT INTERFERENCE, SHRINK
+CROWN_BORE_HEX, DIFF_SEAT_HEX
+CROWN_BORE_TET, DIFF_SEAT_TET
+*OUTPUT, FIELD, FREQUENCY=99999
+*NODE OUTPUT
+U, RF, NT
+*ELEMENT OUTPUT
+S, PEEQ, LE
+*CONTACT OUTPUT
+CSTRESS, CDISP
+*OUTPUT, HISTORY, FREQUENCY=1
+*ENERGY OUTPUT
+ALLIE, ALLSD
+*END STEP
+**
+** ==================================================================
+** WELD SCHEDULE
+** 4 kW at 1500 mm/min (25 mm/s) on R = 55 mm: omega = v / R = 0.454545 rad/s.
+** Beam (dflux_bimaterial_keyhole.f, total time): 10 deg ramp-up, 360 deg weld,
+** 10 deg ramp-down, off at 380 deg (t = 14.5910 s).
+** Increment dt = 0.0230383 s = 0.6 deg of travel = one circumferential element
+** (Courant number 1, beam peak on a node at every increment end).
+** RLS version: the whole filler is active from the start, raw wire (RLS = -1, 1 %
+** conductivity, quiet in the stress run) until it melts; no *MODEL CHANGE below.
+** One step WELD: 0 -> 450 deg (17.278760 s, 750 increments): weld, overlap,
+** ramp-down and 70 deg of travel without beam. Then COOLING: 300 s.
+** ==================================================================
+*STEP, NAME=WELD, NLGEOM=NO, INC=2000
+*STATIC
+0.023038346126, 17.278759594500, 1.0E-08, 0.023038346126
+*CONTROLS, PARAMETERS=LINE SEARCH
+10, 1, 0.001, 0.25, 0.01
+*CONTROLS, PARAMETERS=TIME INCREMENTATION
+20, 30, 10, 50, 20, 10, , 5
+*TEMPERATURE, FILE=bimaterial_RLS_TH, BSTEP=1, ESTEP=1
+** Field output every 30 deg (multiples of the increment)
+*OUTPUT, FIELD, TIME POINTS=ME_FRAMES
+*NODE OUTPUT
+U, NT
+*ELEMENT OUTPUT
+S, PEEQ, LE
+*OUTPUT, HISTORY, FREQUENCY=0
+*END STEP
+**
+*STEP, NAME=COOLING, NLGEOM=NO, INC=3000
+*STATIC
+0.1, 300.0, 1.0E-05, 10.0
+*TEMPERATURE, FILE=bimaterial_RLS_TH, BSTEP=2, ESTEP=2
+*OUTPUT, FIELD, TIME POINTS=COOLING_FRAMES
+*NODE OUTPUT
+U, RF, NT
+*ELEMENT OUTPUT
+S, PEEQ, LE
+*CONTACT OUTPUT
+CSTRESS, CDISP
+*OUTPUT, HISTORY, FREQUENCY=0
+*END STEP
