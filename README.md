@@ -114,11 +114,9 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── run_pipeline.sh                        # Headless Linux / HPC batch execution script
 │   └── README.md                              # Comprehensive Technical Report
 ├── 02_dflux_laser_welding/
-│   ├── bimaterial_RLS_TH.inp / _ME.inp       # Thermal and stress decks, raw-wire (RLS) filler
-│   ├── bimaterial_EA_TH.inp / _ME.inp        # Thermal and stress decks, element activation
-│   ├── dflux_bimaterial_keyhole.f            # User Subroutine (double conical keyhole source)
-│   ├── Material_*.inp                        # 20MnCr5, EN-GJS-600-10, Ni 6082 cards (phase framework) + plain tet cards
-│   ├── bimaterial_assembly.step              # Geometry, five named solids (hex / tet split, filler)
+│   ├── THERMAL_RLS/                          # Thermal deck, DFLUX keyhole source, geometry (STEP), material cards
+│   ├── PRESS_RLS/                            # Stress model and press fit (writes the restart), material cards
+│   ├── MECHANICAL_RLS/                       # Weld stress analysis, restart of the press fit
 │   └── README.md                             # Technical Report
 ├── 03_uinter_welding_interface/
 │   ├── uinter_btr_hot_cracking.f              # User Subroutine (UINTER State Machine in Fortran)

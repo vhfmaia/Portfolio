@@ -5,7 +5,7 @@
 !         double conical Gaussian (head cone over body cone) with a
 !         hemispherical bottom
 !         Crown Gear & Differential Carrier Assembly with Ni 6082 filler
-!         (bimaterial weld model: EA/bimaterial_EA_TH.inp, RLS/bimaterial_RLS_TH.inp)
+!         (bimaterial weld model: THERMAL_RLS/bimaterial_RLS_Thermal.inp)
 !  Author: Victor Maia (vhfm08@gmail.com)
 !
 !  Target shape: "nail head" keyhole weld, a wide and shallow head at the
@@ -39,12 +39,11 @@
 !    - Volumetric flux: mJ/(s.mm3) = mW/mm3
 !    - Trajectory: Circular weld along radius R in X-Y plane about Z axis
 !    - Ramping: 10 deg ramp-up, 360 deg steady weld, 10 deg ramp-down
-!    - Process: 4 kW at 1500 mm/min (25 mm/s); 160 J/mm nominal, 120 J/mm
-!      absorbed with eta = 0.75.
-!    - Shape parameters: values assumed by the author for a nail-head weld,
-!      set with a conduction surrogate calibrated on the previous run; to be
-!      checked against the computed fusion line.
-!    - Calibration (2026-10-15): heat_source_calibrator.py (conduction
+!    - Process: 4 kW at 1500 mm/min (25 mm/s); 160 J/mm nominal, 82.6 J/mm
+!      absorbed in the 5 mm weld land with eta = 0.516: in a full-penetration
+!      keyhole part of the beam leaves through the open root into the gas
+!      escape chamber; eta is the share that stays in the land.
+!    - First calibration (2026-10-15): heat_source_calibrator.py (conduction
 !      surrogate, k = 0.0349 W/mm.K, alpha = 8.0 mm2/s) fitted to the
 !      fusion zone of Nogueira (2021), Fig. 6.13(a), CC BY 4.0: 2.42 mm wide
 !      at the surface, 5.21 mm deep (full penetration of the weld land into
@@ -54,12 +53,23 @@
 !      shape stays close to the previous one (depth_total 7.1 mm).
 !      Widths fitted / measured [mm] at depth 0.15 / 1.12 / 2.24 / 3.51 /
 !      4.79: 2.22/2.38, 1.67/1.68, 1.16/0.83, 1.05/0.93, 0.62/1.29; the
-!      widening of the root at the chamber is not reproduced.
-!    - mesh_factor = 0.961: in the fit, 2286 W of the 3000 W absorbed stay in
-!      the weld land; integrated on the DC3D8 mesh (2x2x2 Gauss points), beam
-!      on a node of the joint line as at every increment end, the source
-!      gives 2379 W. Between two nodes it would give 2153 W (-10 %): the
-!      body radius (0.43 mm) is smaller than the circumferential element
+!      widening of the root at the chamber is not reproduced. The Abaqus run
+!      with that source was too wide in the body (1.32 mm at 2.24 mm, +59 %):
+!      the surrogate has no latent heat, no liquid conductivity, no chamber.
+!    - Second calibration (2026-10-16, these values): the ratio of the FE
+!      solidus width to the surrogate width at each depth, from the first
+!      run, kept fixed (space mapping), and the source fitted so that
+!      ratio x surrogate matches the macrograph down to 4.2 mm; depth_total
+!      fixed at the measured penetration (5.2 mm), eta_absorb free. Widths
+!      predicted / measured [mm] at 0.15 / 0.63 / 1.12 / 1.60 / 2.24 / 2.88 /
+!      3.51 / 4.15: 2.26/2.38, 2.05/1.92, 1.68/1.68, 1.23/1.29, 0.95/0.83,
+!      0.88/0.94, 0.85/0.93, 1.06/1.01. The ratios come from a run with the
+!      first source: the next thermal run checks them.
+!    - mesh_factor = 0.963: 2054 W of the 2064 W absorbed fall in the weld
+!      land; integrated on the DC3D8 mesh (2x2x2 Gauss points), beam on a
+!      node of the joint line as at every increment end, the source gives
+!      2133 W. Between two nodes it would give 1951 W (-8.5 %): the body
+!      radius (0.42-0.45 mm) is smaller than the circumferential element
 !      (0.58 mm), keep the increments aligned.
 !=======================================================================
 
@@ -71,23 +81,23 @@ module laser_dflux_mod
     ! 1. PROCESS PARAMETERS
     ! ------------------------------------------------------------------
     real(real64), parameter :: qtot_nominal = 4.00d6        ! Nominal beam power [mW = mJ/s] (4000 W)
-    real(real64), parameter :: eta_absorb   = 0.75d0        ! Laser absorption efficiency, keyhole mode [-]
+    real(real64), parameter :: eta_absorb   = 0.516d0       ! Share of the beam absorbed in the weld land (full penetration) [-]
     real(real64), parameter :: weld_radius  = 55.00d0       ! Circular joint radius [mm] (crown / carrier interface)
     real(real64), parameter :: travel_speed = 1500.0d0      ! Travel speed [mm/min] (25 mm/s)
     real(real64), parameter :: z_surface    = 25.00d0       ! Top irradiated surface Z coordinate [mm]
     real(real64), parameter :: cutoff_tol   = 1.0d-8        ! Gaussian tail cut-off, fraction of the peak [-]
-    real(real64), parameter :: mesh_factor  = 0.961d0       ! Correction of the power integrated on the mesh [-]
+    real(real64), parameter :: mesh_factor  = 0.963d0       ! Correction of the power integrated on the mesh [-]
 
     ! ------------------------------------------------------------------
     ! 2. SOURCE GEOMETRY AND POWER SPLIT
     ! ------------------------------------------------------------------
-    real(real64), parameter :: depth_total  = 7.105d0        ! Penetration of the source, depth_cone + r_cap [mm]
-    real(real64), parameter :: d_up         = 1.048d0        ! Depth of the head cone [mm]
-    real(real64), parameter :: r_top        = 1.213d0        ! Head Gaussian radius at the surface [mm]
-    real(real64), parameter :: r_mid        = 0.434d0        ! Gaussian radius at the head / body junction [mm]
-    real(real64), parameter :: r_bottom     = 0.434d0        ! Body Gaussian radius at the bottom of the cone [mm] (= r_mid: cylindrical body)
-    real(real64), parameter :: r_cap        = 0.434d0        ! Depth radius of the bottom (= r_bottom: hemisphere) [mm]
-    real(real64), parameter :: f_up         = 0.261d0        ! Fraction of the absorbed power in the head cone [-]
+    real(real64), parameter :: depth_total  = 5.200d0        ! Penetration of the source, depth_cone + r_cap [mm]
+    real(real64), parameter :: d_up         = 0.750d0        ! Depth of the head cone [mm]
+    real(real64), parameter :: r_top        = 1.016d0        ! Head Gaussian radius at the surface [mm]
+    real(real64), parameter :: r_mid        = 0.454d0        ! Gaussian radius at the head / body junction [mm]
+    real(real64), parameter :: r_bottom     = 0.420d0        ! Body Gaussian radius at the bottom of the cone [mm] (the body narrows downwards)
+    real(real64), parameter :: r_cap        = 0.420d0        ! Depth radius of the bottom (= r_bottom: hemisphere) [mm]
+    real(real64), parameter :: f_up         = 0.418d0        ! Fraction of the absorbed power in the head cone [-]
 
     ! ------------------------------------------------------------------
     ! 3. ANGULAR POWER SCHEDULE PARAMETERS

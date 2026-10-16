@@ -1,12 +1,12 @@
 *HEADING
-Crown gear / carrier laser weld with Ni 6082 filler - sequentially coupled stress analysis
+Crown gear / carrier laser weld with Ni 6082 filler - transient thermal analysis (phase transformations), raw filler (RLS), unsymmetric solver, linear tets DC3D4, source of the second calibration (job bimaterial_RLS_Thermal)
 **
 *PHYSICAL CONSTANTS, ABSOLUTE ZERO=-273.15, STEFAN BOLTZMANN=5.67E-11
 **
 ** Units: mm, s, tonne, N, MPa, mJ, C
 ** Crown gear 20MnCr5 (Material_20MnCr5.inp), carrier EN-GJS-600-10
 ** (Material_GJS600_10.inp), filler wire Ni 6082 / Inconel 82 (Material_Inconel82_RLS.inp)
-** Mesh: mesh_nodes.inp, mesh_elements_ME.inp, mesh_sets_RLS.inp (build_run_mesh.py from
+** Mesh: mesh_nodes.inp, mesh_elements_TH.inp, mesh_sets_RLS_TH.inp (build_run_mesh.py from
 ** bimaterial_assembly.inp, ANSA export fixed by fix_assembly.py)
 **
 ** Table types of the phase transformation framework: once, before the materials
@@ -18,8 +18,8 @@ Crown gear / carrier laser weld with Ni 6082 filler - sequentially coupled stres
 *INCLUDE, INPUT=Material_GJS600_10_TET.inp
 *INCLUDE, INPUT=Material_Inconel82_RLS.inp
 *INCLUDE, INPUT=mesh_nodes.inp
-*INCLUDE, INPUT=mesh_elements_ME.inp
-*INCLUDE, INPUT=mesh_sets_RLS.inp
+*INCLUDE, INPUT=mesh_elements_TH.inp
+*INCLUDE, INPUT=mesh_sets_RLS_TH.inp
 **
 ** ------------------------------------------------------------------
 ** INITIAL CONDITIONS
@@ -70,58 +70,18 @@ CARRIER_TET_TIE, CARRIER_HEX_TIE
 30.0, 40.0, 50.0, 60.0, 75.0, 90.0, 105.0, 120.0
 150.0, 180.0, 210.0, 240.0, 270.0, 300.0
 **
-** Temperatures: thermal job bimaterial_RLS_TH (results file bimaterial_RLS_TH.fil); thermal step
-** n is read by mechanical step n + 1 (step 1 is the press fit).
-**
 ** ------------------------------------------------------------------
-** PRESS FIT: hard contact, friction 0.15. Radial interference 0.035 mm
-** (0.07 mm on the diameter, mean of D = 110 H7/s6), applied on the bore / seat pair
-** only, resolved in step 1 (SHRINK). The mesh is nominal (coincident faces).
-** Small sliding (*CLEARANCE is only accepted there); its main surface must be of one
-** element order, so the bore / seat pair is split into its hex (C3D8) and tet (C3D10M) parts.
+** PRESS FIT, THERMAL: gap conductance of the closed press fit (radial bore / seat and
+** axial base / flange), 10 kW/m2.K (10 mW/mm2.K), falling to 0 at 0.05 mm clearance.
+** The lead-in chamfer and the base recess are free faces.
 ** ------------------------------------------------------------------
-*SURFACE INTERACTION, NAME=PRESS_ME
-*FRICTION
-0.15,
-*SURFACE BEHAVIOR, PRESSURE-OVERCLOSURE=HARD
-*CONTACT PAIR, INTERACTION=PRESS_ME, TYPE=SURFACE TO SURFACE, SMALL SLIDING
-CROWN_BORE_HEX, DIFF_SEAT_HEX
-CROWN_BORE_TET, DIFF_SEAT_TET
-CROWN_BASE_IN, DIFF_FLANGE
-*CLEARANCE, SLAVE=CROWN_BORE_HEX, MASTER=DIFF_SEAT_HEX, VALUE=-0.035
-*CLEARANCE, SLAVE=CROWN_BORE_TET, MASTER=DIFF_SEAT_TET, VALUE=-0.035
-**
-** ------------------------------------------------------------------
-** SUPPORT: carrier lower face in z, lower bearing seat in x and y
-** ------------------------------------------------------------------
-*BOUNDARY
-CARRIER_SUPPORT_Z, 3, 3, 0.0
-CARRIER_SUPPORT_XY, 1, 2, 0.0
-**
-** ==================================================================
-** STEP 1: PRESS FIT at 25 C. The filler is in the model, raw wire (RLS = -1): no stiffness.
-** Automatic stabilisation until the contact
-** holds the crown (check ALLSD << ALLIE).
-** ==================================================================
-*STEP, NAME=PRESS_FIT, NLGEOM=NO, INC=200
-*STATIC, STABILIZE=2.0E-4, ALLSDTOL=0.05
-** one increment: *CONTACT INTERFERENCE, SHRINK resolves the whole interference in the first
-** increment, further increments would only repeat the equilibrium (cut-back if needed)
-1.0, 1.0, 1.0E-06, 1.0
-*CONTACT INTERFERENCE, SHRINK
-CROWN_BORE_HEX, DIFF_SEAT_HEX
-CROWN_BORE_TET, DIFF_SEAT_TET
-*OUTPUT, FIELD, FREQUENCY=99999
-*NODE OUTPUT
-U, RF, NT
-*ELEMENT OUTPUT
-S, PEEQ, LE
-*CONTACT OUTPUT
-CSTRESS, CDISP
-*OUTPUT, HISTORY, FREQUENCY=1
-*ENERGY OUTPUT
-ALLIE, ALLSD
-*END STEP
+*SURFACE INTERACTION, NAME=PRESS_TH
+*GAP CONDUCTANCE
+10.0, 0.0
+0.0, 0.05
+*CONTACT PAIR, INTERACTION=PRESS_TH, TYPE=SURFACE TO SURFACE
+CROWN_BORE, DIFF_SEAT
+CROWN_BASE, DIFF_FLANGE
 **
 ** ==================================================================
 ** WELD SCHEDULE
@@ -135,52 +95,66 @@ ALLIE, ALLSD
 ** One step WELD: 0 -> 450 deg (17.278760 s, 750 increments): weld, overlap,
 ** ramp-down and 70 deg of travel without beam. Then COOLING: 300 s.
 ** ==================================================================
-*STEP, NAME=WELD, NLGEOM=NO, INC=2000
-*STATIC
-0.023038346126, 17.278759594500, 1.0E-08, 0.023038346126
-*CONTROLS, PARAMETERS=LINE SEARCH
-10, 1, 0.001, 0.25, 0.01
+*STEP, NAME=WELD, AMPLITUDE=STEP, INC=2000, UNSYMM=YES, EXTRAPOLATION=NO
+*HEAT TRANSFER, DELTMX=5000.
+0.023038346126, 17.278759594500, 1.0E-10, 0.023038346126
+*CONTROLS, PARAMETERS=FIELD, FIELD=TEMPERATURE
+0.01, 0.02, , 250.0, 0.05
+** Cut-backs of 0.5 and increases of 2.0 keep the increment a binary fraction of dt,
+** so it returns to the aligned value
 *CONTROLS, PARAMETERS=TIME INCREMENTATION
-20, 30, 10, 50, 20, 10, , 5
-*TEMPERATURE, FILE=bimaterial_RLS_TH, BSTEP=1, ESTEP=1
-** Field output every 30 deg (multiples of the increment), filtered: hex region and filler in full, tets at the centroid (2026-10-16)
-*OUTPUT, FIELD, TIME POINTS=ME_FRAMES, OP=NEW
+14, 16, 9, 25, 18, 7, ,
+0.5, 0.5, 0.5, 0.5, , , 2.0,
+*CONTROLS, PARAMETERS=LINE SEARCH
+5, 1.0, 0.25, 0.25, 0.10
+** Heat source on the hex weld zone and the filler (the source ends at z = 20, inside it)
+*DFLUX, OP=NEW
+HEAT_ZONE, BFNU, 1.0
+** Convection 21 W/m2.K and radiation on the free faces; weld top emissivity 0.8 (molten,
+** oxidised), elsewhere 0.6; the closed gas escape groove (GROOVE) is adiabatic
+*SFILM, OP=NEW
+WELD_TOP, F, 25.0, 0.021
+CROWN_FREE, F, 25.0, 0.021
+CARRIER_FREE, F, 25.0, 0.021
+*SRADIATE, OP=NEW
+WELD_TOP, R, 25.0, 0.80
+CROWN_FREE, R, 25.0, 0.60
+CARRIER_FREE, R, 25.0, 0.60
+*OUTPUT, FIELD, TIME POINTS=FRAMES_WELD
 *NODE OUTPUT
-U, NT
+NT,
 *ELEMENT OUTPUT, ELSET=WELD_PT
-S, PEEQ, E, SDV
+SDV1, SDV4, SDV5, SDV6, SDV7
 *ELEMENT OUTPUT, ELSET=FILLER
-S, PEEQ, E
-*ELEMENT OUTPUT, ELSET=CROWN_TET, POSITION=CENTROIDAL
-S,
-*ELEMENT OUTPUT, ELSET=CARRIER_TET, POSITION=CENTROIDAL
-S,
-** contact pressure of the press fit (bore and base) at the end of the step
-*OUTPUT, FIELD, FREQUENCY=99999
-*CONTACT OUTPUT
-CSTRESS, CDISP
-*OUTPUT, HISTORY, FREQUENCY=0
+SDV1, SDV4
+** Nodal temperatures at every increment to the results file, read by the mechanical run
+*NODE FILE, FREQUENCY=1
+NT,
+** Forces an increment end at every aligned time (one node)
+*OUTPUT, HISTORY, TIME POINTS=BEAM_WELD
+*NODE OUTPUT, NSET=SYNC_NODE
+NT,
 *END STEP
 **
-*STEP, NAME=COOLING, NLGEOM=NO, INC=3000
-*STATIC
-0.1, 300.0, 1.0E-05, 10.0
-*TEMPERATURE, FILE=bimaterial_RLS_TH, BSTEP=2, ESTEP=2
-** Field output of the cooling, filtered: hex region and filler in full, tets at the centroid (2026-10-16)
-*OUTPUT, FIELD, TIME POINTS=COOLING_FRAMES, OP=NEW
+** ==================================================================
+** COOLING: 300 s, automatic increments; DELTMX = 50 K so the phase transformation
+** windows are not skipped
+** ==================================================================
+*STEP, NAME=COOLING, AMPLITUDE=STEP, INC=3000, UNSYMM=YES
+*HEAT TRANSFER, DELTMX=50.
+0.05, 300.0, 1.0E-05, 15.0
+*CONTROLS, PARAMETERS=TIME INCREMENTATION
+14, 16, 9, 25, 18, 4, ,
+0.5, 0.5, 0.5, 0.5, , , ,
+*DFLUX, OP=NEW
+*OUTPUT, FIELD, TIME POINTS=COOLING_FRAMES
 *NODE OUTPUT
-U, NT
+NT,
 *ELEMENT OUTPUT, ELSET=WELD_PT
-S, PEEQ, E, SDV
+SDV1, SDV4, SDV5, SDV6, SDV7
 *ELEMENT OUTPUT, ELSET=FILLER
-S, PEEQ, E
-*ELEMENT OUTPUT, ELSET=CROWN_TET, POSITION=CENTROIDAL
-S,
-*ELEMENT OUTPUT, ELSET=CARRIER_TET, POSITION=CENTROIDAL
-S,
-** contact pressure of the press fit (bore and base) at the end of the step
-*OUTPUT, FIELD, FREQUENCY=99999
-*CONTACT OUTPUT
-CSTRESS, CDISP
+SDV1, SDV4
+*NODE FILE, FREQUENCY=1
+NT,
 *OUTPUT, HISTORY, FREQUENCY=0
 *END STEP

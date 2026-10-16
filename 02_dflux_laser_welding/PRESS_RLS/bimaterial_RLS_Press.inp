@@ -1,0 +1,147 @@
+*HEADING
+Crown gear / carrier laser weld with Ni 6082 filler - stress analysis, PRESS FIT only (frictionless, crown held at three nodes), writes restart data
+**
+*PHYSICAL CONSTANTS, ABSOLUTE ZERO=-273.15, STEFAN BOLTZMANN=5.67E-11
+**
+** Units: mm, s, tonne, N, MPa, mJ, C
+** Crown gear 20MnCr5 (Material_20MnCr5.inp), carrier EN-GJS-600-10
+** (Material_GJS600_10.inp), filler wire Ni 6082 / Inconel 82 (Material_Inconel82_RLS.inp)
+** Mesh: mesh_nodes.inp, mesh_elements_ME.inp, mesh_sets_RLS_ME.inp (build_run_mesh.py from
+** bimaterial_assembly.inp, ANSA export fixed by fix_assembly.py)
+**
+** Table types of the phase transformation framework: once, before the materials
+*INCLUDE, INPUT=Material_phase_trans_table_types.inp
+*INCLUDE, INPUT=Material_20MnCr5.inp
+*INCLUDE, INPUT=Material_GJS600_10.inp
+** Tets away from the weld: plain cards, no SDV (below Ac1, no transformation)
+*INCLUDE, INPUT=Material_20MnCr5_TET.inp
+*INCLUDE, INPUT=Material_GJS600_10_TET.inp
+*INCLUDE, INPUT=Material_Inconel82_RLS.inp
+*INCLUDE, INPUT=mesh_nodes.inp
+*INCLUDE, INPUT=mesh_elements_ME.inp
+*INCLUDE, INPUT=mesh_sets_RLS_ME.inp
+**
+** ------------------------------------------------------------------
+** INITIAL CONDITIONS
+** - RLS (SDV1) = 1.0 (solid), initial phase 100 % ferrite (SDV4 = 1.0), only on the
+**   phase transformation materials (the filler card has no SDV)
+** - Initial temperature: 25.0 C uniform
+** ------------------------------------------------------------------
+*INITIAL CONDITIONS, TYPE=SOLUTION
+ELSET_PHASE_TRANS, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+0.0, 0.0
+** Filler: raw wire (RLS = -1), austenite (Material_Inconel82_RLS.inp, 4 SDV). Abaqus
+** wants the maximum number of SDV of the model (25) on every set: the last 21 are padding
+*INITIAL CONDITIONS, TYPE=SOLUTION
+FILLER, -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+0.0, 0.0
+**
+*INITIAL CONDITIONS, TYPE=FIELD, VARIABLE=3
+NSET_ALL, 0., 0., 0.,
+**
+*INITIAL CONDITIONS, TYPE=TEMPERATURE
+NSET_ALL, 25.0
+**
+** ------------------------------------------------------------------
+** TIES: tetrahedral volumes (slave) to the swept hex weld zone (master).
+** The faces of the hex side were mapped with 300 steps (1.2 deg): the midside
+** nodes of the tets fall on the hex nodes.
+** ------------------------------------------------------------------
+*TIE, NAME=TIE_CROWN, TYPE=SURFACE TO SURFACE, ADJUST=YES, POSITION TOLERANCE=0.01
+CROWN_TET_TIE, CROWN_HEX_TIE
+*TIE, NAME=TIE_CARRIER, TYPE=SURFACE TO SURFACE, ADJUST=YES, POSITION TOLERANCE=0.01
+CARRIER_TET_TIE, CARRIER_HEX_TIE
+**
+** Time points of the weld steps (step time): BEAM_* = every increment (the beam peak on
+** a node of the joint line at every increment end), FRAMES_* = field output every 3 deg
+*TIME POINTS, NAME=BEAM_WELD, GENERATE
+0.023038346126, 17.278759594500, 0.023038346126
+*TIME POINTS, NAME=FRAMES_WELD, GENERATE
+0.115191730630, 17.278759594500, 0.115191730630
+*TIME POINTS, NAME=ME_FRAMES, GENERATE
+1.151917306300, 17.278759594500, 1.151917306300
+*TIME POINTS, NAME=COOLING_FRAMES
+0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0
+5.0, 6.0, 8.0, 10.0, 12.5, 15.0, 20.0, 25.0
+30.0, 40.0, 50.0, 60.0, 75.0, 90.0, 105.0, 120.0
+150.0, 180.0, 210.0, 240.0, 270.0, 300.0
+**
+** Temperatures: thermal job bimaterial_RLS_UNSYMM_TH (results file bimaterial_RLS_UNSYMM_TH.fil); thermal step
+** n is read by mechanical step n + 1 (step 1 is the press fit).
+**
+** ------------------------------------------------------------------
+** PRESS FIT: hard contact, friction 0.15. Radial interference 0.035 mm
+** (0.07 mm on the diameter, mean of D = 110 H7/s6), applied on the bore / seat pair
+** only, resolved in step 1 (SHRINK). The mesh is nominal (coincident faces).
+** Small sliding (*CLEARANCE is only accepted there); its main surface must be of one
+** element order, so the bore / seat pair is split into its hex (C3D8) and tet (C3D10M) parts.
+** ------------------------------------------------------------------
+*SURFACE INTERACTION, NAME=PRESS_ME
+*FRICTION
+0.15,
+*SURFACE BEHAVIOR, PRESSURE-OVERCLOSURE=HARD
+*CONTACT PAIR, INTERACTION=PRESS_ME, TYPE=SURFACE TO SURFACE, SMALL SLIDING
+CROWN_BORE_HEX, DIFF_SEAT_HEX
+CROWN_BORE_TET, DIFF_SEAT_TET
+** Crown base without the 1.1 mm overhang beyond the flange edge (r > 80 mm, free face): the
+** overhanging nodes sat on the flange corner and chattered (corrections of 0.15-0.19 mm at the corner)
+CROWN_BASE_IN, DIFF_FLANGE
+*CLEARANCE, SLAVE=CROWN_BORE_HEX, MASTER=DIFF_SEAT_HEX, VALUE=-0.035
+*CLEARANCE, SLAVE=CROWN_BORE_TET, MASTER=DIFF_SEAT_TET, VALUE=-0.035
+**
+** ------------------------------------------------------------------
+** SUPPORT: carrier lower face in z, lower bearing seat in x and y
+** ------------------------------------------------------------------
+*BOUNDARY
+CARRIER_SUPPORT_Z, 3, 3, 0.0
+CARRIER_SUPPORT_XY, 1, 2, 0.0
+**
+** C3D4 tets (memory limit of the HPC, 2026-10-16): hold nodes moved to the nearest tet corner
+** nodes of the top face (r 78.8-80.7 mm, -0.6 / 120.3 / -119.7 deg).
+** PRESS HOLD: without friction in the press fit nothing else holds the crown axially upwards
+** or about the axis. Three nodes of the crown top face at r = 80 mm (25 mm from the weld),
+** 0 / 120 / 240 deg: U3 = 0; the one at 0 deg (on the x axis) also U2 = 0 (tangential).
+** Applied in PRESS_FIT and kept in the weld (fixture).
+*NSET, NSET=PRESS_HOLD_Z
+863613, 857954, 852758
+*NSET, NSET=PRESS_HOLD_T
+863613,
+**
+** ==================================================================
+** STEP 1: PRESS FIT at 25 C. The filler is removed (switched on sector by sector in
+** the weld steps, strain free). Automatic stabilisation until the contact holds the
+** crown (check ALLSD << ALLIE).
+** ==================================================================
+*STEP, NAME=PRESS_FIT, NLGEOM=NO, INC=200
+*STATIC, STABILIZE=2.0E-4, ALLSDTOL=0.05
+** one increment: *CONTACT INTERFERENCE, SHRINK resolves the whole interference in the first
+** increment, further increments would only repeat the equilibrium (cut-back if needed)
+1.0, 1.0, 1.0E-06, 1.0
+*CONTACT INTERFERENCE, SHRINK
+CROWN_BORE_HEX, DIFF_SEAT_HEX
+CROWN_BORE_TET, DIFF_SEAT_TET
+*BOUNDARY
+PRESS_HOLD_Z, 3, 3, 0.0
+PRESS_HOLD_T, 2, 2, 0.0
+** Frictionless press fit (with friction it diverged on one sticking base node); the radial
+** interference does not depend on friction; friction 0.15 is set back in the weld step
+*CHANGE FRICTION, INTERACTION=PRESS_ME
+*FRICTION
+0.0,
+*OUTPUT, FIELD, FREQUENCY=99999
+*NODE OUTPUT
+U, RF, NT
+*ELEMENT OUTPUT
+S, PEEQ, LE
+*CONTACT OUTPUT
+CSTRESS, CDISP
+*OUTPUT, HISTORY, FREQUENCY=1
+*ENERGY OUTPUT
+ALLIE, ALLSD
+** restart data for the weld jobs (oldjob=bimaterial_RLS_Press), written at the end of the step
+*RESTART, WRITE, FREQUENCY=999
+*END STEP
