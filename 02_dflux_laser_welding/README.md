@@ -84,7 +84,7 @@ The mesh follows what the weld needs, and nothing more:
   - **Z2, transition**, +-4 mm about the joint, down to the bottom of the region;
   - **Z3, outer**, coarsening towards the tie planes.
 - **The filler solid is meshed conformally** with the crown and the carrier: the three sections are fused before meshing, so the nodes of the 0.3 mm gap (one element across, 25 along the 5 mm land) are shared node to node with both parts. No tie or contact sits inside the weld.
-- **Tetrahedra everywhere else** (linear, DC3D4 / C3D4): teeth, web, rim, flange, bowl and hubs. They are joined to the hex region by surface-to-surface `*TIE` (with node adjustment) on three faces, z = 13.5, r = 49 and r = 64.3: 6 mm and more to the side of the joint, and 2.1 mm under the gas escape chamber, out of the pool and its heat-affected zone.
+- **Tetrahedra everywhere else** (linear, DC3D4 / C3D4): teeth, web, rim, flange, bowl and hubs. They are joined to the hex region by surface-to-surface `*TIE` (with node adjustment; the hex faces, finer than the linear tet faces, are the secondary side) on three faces, z = 13.5, r = 49 and r = 64.3: 6 mm and more to the side of the joint, and 2.1 mm under the gas escape chamber, out of the pool and its heat-affected zone.
 
 | Why | How |
 | :--- | :--- |

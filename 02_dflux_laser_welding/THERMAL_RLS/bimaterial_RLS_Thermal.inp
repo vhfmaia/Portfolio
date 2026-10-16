@@ -47,14 +47,15 @@ NSET_ALL, 0., 0., 0.,
 NSET_ALL, 25.0
 **
 ** ------------------------------------------------------------------
-** TIES: tetrahedral volumes (slave) to the swept hex weld zone (master).
-** The faces of the hex side were mapped with 300 steps (1.2 deg): the midside
-** nodes of the tets fall on the hex nodes.
+** TIES: swept hex weld zone (secondary, first line) to the tetrahedral volumes (main).
+** The tets are linear (C3D4 / DC3D4): their faces (1.2 deg) are coarser than the hex
+** faces (0.6 deg), so the hex side is the secondary one. Contact secondary faces that
+** touch the hex tie surface are left out of CROWN_BORE (a node cannot be secondary of both).
 ** ------------------------------------------------------------------
 *TIE, NAME=TIE_CROWN, TYPE=SURFACE TO SURFACE, ADJUST=YES, POSITION TOLERANCE=0.01
-CROWN_TET_TIE, CROWN_HEX_TIE
+CROWN_HEX_TIE, CROWN_TET_TIE
 *TIE, NAME=TIE_CARRIER, TYPE=SURFACE TO SURFACE, ADJUST=YES, POSITION TOLERANCE=0.01
-CARRIER_TET_TIE, CARRIER_HEX_TIE
+CARRIER_HEX_TIE, CARRIER_TET_TIE
 **
 ** Time points of the weld steps (step time): BEAM_* = every increment (the beam peak on
 ** a node of the joint line at every increment end), FRAMES_* = field output every 3 deg
