@@ -270,27 +270,33 @@ Raw-wire (RLS) thermal run, symmetric and unsymmetric solvers compared node by n
 </div>
 
 <p align="center">
-  <img src="../99_images_and_miscelania/bimaterial_macrograph_vs_neto.png" alt="Measured macrograph of a 4 kW weld cut at 180 deg next to the simulated macrograph at the same scale" width="100%">
+  <img src="../99_images_and_miscelania/bimaterial_macrograph_vs_nogueira.png" alt="Published macrograph of a 4 kW, 1.5 m/min weld of this joint type next to the simulated macrograph at the same scale" width="100%">
 </p>
-
-| Depth below the surface | Model, solidus width | Published, same process |
-| :--- | :--- | :--- |
-| Surface | 2.13 mm | 2.45 mm (2.39 to 2.52, five parts cut at 180 deg [2]); 2.45 mm [1] |
-| 0.5 mm | 1.97 mm | about 1.9 mm (hardness traverse) [2] |
-| 2 mm | 1.35 mm | 0.9 to 1.25 mm (hardness traverse to etched band) [2] |
-| 4 mm | 1.26 mm | 0.9 to 1.3 mm [2] |
-| Penetration | full, 5 mm, into the chamber | full, 5.07 to 5.12 mm [2]; 5.10 mm [1] |
 
 <div align="justify">
 
-The model reproduces the full penetration and the nail-head shape. The head is about 13 % narrower than measured at the surface and the body sits at the upper end of the measured band: the split of the source power between head and body is the next calibration. Peak temperature in the keyhole: 2 326 C (a conduction model; the physics of the vapour capillary is not represented).
+The comparison is made against the macrograph used to calibrate the heat source, Nogueira (2021), Fig. 6.13(a) [1]: same process (4 kW, 1.5 m/min), steel on the left, cast iron on the right, both pictures on the same scale in mm (the 1 mm bar of the photograph and the bar drawn from the calibration coincide). The measured widths are read on that photograph at the depths of the source calibration.
 
 </div>
 
-<p align="center">
-  <img src="../99_images_and_miscelania/macrograph_nogueira_2021_fig6_13a.jpg" alt="Published nail-head macrograph, Nogueira (2021), Fig. 6.13(a)" width="45%">
-</p>
-<p align="center"><i>Shape reference used for the source calibration: Nogueira (2021), Fig. 6.13(a), CC BY 4.0 [1].</i></p>
+| Depth below the surface | Model, solidus width | Nogueira (2021), Fig. 6.13(a) | Difference |
+| :--- | :--- | :--- | :--- |
+| Surface | 2.13 mm | 2.45 mm | -13 % |
+| 0.15 mm | 2.08 mm | 2.38 mm | -13 % |
+| 1.12 mm | 1.63 mm | 1.68 mm | -3 % |
+| 2.24 mm (neck) | 1.32 mm | 0.83 mm | +59 % |
+| 3.51 mm | 1.27 mm | 0.93 mm | +37 % |
+| 4.79 mm (root) | 1.22 mm | 1.29 mm | -6 % |
+| Penetration | full, 5 mm, into the chamber | full, 5.10 mm | |
+| Cap | 0.08 mm (metal balance of the wire) | 0.82 mm | |
+
+<div align="justify">
+
+The model reproduces the full penetration, the nail head and the width of the root at the chamber. It misses the neck: the measured weld narrows to 0.8-0.9 mm between 2 and 3.5 mm, while the model body stays at about 1.3 mm, and the head is 13 % narrower at the surface. The split of the source power between head and body is the next calibration. The cap is the wire metal standing proud of the surface, which a conduction model with a fixed surface does not form (estimated here from the metal balance only). Peak temperature in the keyhole: 2 326 C (a conduction model; the physics of the vapour capillary is not represented).
+
+<b>Hardness (in work).</b> The macrograph of Nogueira (2021) has no hardness traverses, so the hardness predicted from the phase fractions is compared with the HV1 traverses of Neto (2023) [2], measured on welds of the same process at 0.5, 2 and 4 mm below the surface.
+
+</div>
 
 ---
 
@@ -320,8 +326,8 @@ Units: mm, s, tonne, mJ, MPa, C. Abaqus/Standard 2025x; runs on one 32-core node
 
 ## 11. References
 
-1. L. F. J. Nogueira, *Rotura diferida em soldadura laser de materiais dissimilares*, MSc thesis, Universidade de Coimbra, 2021, [hdl.handle.net/10316/97996](https://hdl.handle.net/10316/97996), CC BY 4.0. Fig. 6.13(a) reproduced above.
-2. A. A. R. Neto, *Impacto da proteção do diâmetro interno da coroa nos tratamentos térmicos na soldadura*, MSc report (welding engineering), Universidade de Aveiro, 2023, [hdl.handle.net/10773/41648](http://hdl.handle.net/10773/41648), CC BY 4.0. Fig. 6.11(c) cropped and scaled above; weld widths of Fig. 6.10 and hardness traverses of Figs. 6.12 and 6.13.
+1. L. F. J. Nogueira, *Rotura diferida em soldadura laser de materiais dissimilares*, MSc thesis, Universidade de Coimbra, 2021, [hdl.handle.net/10316/97996](https://hdl.handle.net/10316/97996), CC BY 4.0. Fig. 6.13(a): calibration of the heat source and comparison of the weld section (cropped above).
+2. A. A. R. Neto, *Impacto da proteção do diâmetro interno da coroa nos tratamentos térmicos na soldadura*, MSc report (welding engineering), Universidade de Aveiro, 2023, [hdl.handle.net/10773/41648](http://hdl.handle.net/10773/41648), CC BY 4.0. HV1 hardness traverses at 0.5, 2 and 4 mm (Figs. 6.12-6.14 and appendix A.3), used for the hardness comparison.
 3. C. S. Wu, H. G. Wang, Y. M. Zhang, A new heat source model for keyhole plasma arc welding in FEM analysis, *Welding Journal* 85 (2006) 284-291.
 4. F. Farrokhi, B. Endelt, M. Kristiansen, A numerical model for full and partial penetration hybrid laser welding of thick-section steels, *Optics and Laser Technology* 109 (2019) 629-642.
 5. M. V. Li, D. V. Niebuhr, L. L. Meekisho, D. G. Atteridge, A computational model for the prediction of steel hardenability, *Metallurgical and Materials Transactions B* 29 (1998) 661-672.
