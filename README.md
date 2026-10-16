@@ -165,6 +165,7 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── bimaterial_filler_ea_vs_rls.svg        # Filler: element activation vs raw wire (SVG)
 │   ├── bimaterial_rls_phase_map.svg           # RLS state and phase transformations (SVG)
 │   ├── bimaterial_weld_workflow.svg           # Analysis chain of the weld model (SVG)
+│   ├── bimaterial_courant_number.gif          # Courant number below / equal to / above 1 for the moving source (GIF)
 │   ├── bimaterial_macrograph_vs_nogueira.png  # Measured vs simulated macrograph, Nogueira (2021), CC BY 4.0 (PNG)
 │   ├── macrograph_nogueira_2021_fig6_13a.jpg  # Published nail-head weld macrograph, Nogueira (2021), CC BY 4.0 (JPG)
 │   ├── uinter_3state_state_machine.svg        # UINTER 3-State Contact State Machine & Won Criteria (SVG)

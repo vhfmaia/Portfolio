@@ -257,6 +257,24 @@ $$\Delta t = \frac{\Delta\theta}{\omega} = \frac{\pi/300}{5/11} = \frac{11\pi}{1
 
 With a Courant number of exactly 1, the beam axis sits on a node at the end of every increment, so every node of the joint line is heated at its peak once, and the source is integrated by the mesh in the same position every time. This matters here more than in a coarse model: the body of the keyhole has a Gaussian radius of 0.43 mm, smaller than the 0.58 mm element, and with the beam between two nodes the mesh would integrate 10 % less power (the factor 0.961 of section 4 is calibrated for the beam on a node).
 
+</div>
+
+<p align="center">
+  <img src="../99_images_and_miscelania/bimaterial_courant_number.gif" alt="Courant number below 1, equal to 1 and above 1: where the solver sees the source, which nodes are heated at their peak, and the power integrated by the mesh at every increment" width="100%">
+</p>
+
+<div align="justify">
+
+<b>Why the source has to land on a node.</b> A node is heated by the source sampled at the integration points of the elements around it. With the beam axis on a node at the end of every increment, those points sit symmetrically about the beam, the mesh integrates the same power at every increment, and each node of the joint line is once in the centre of the source, so its peak temperature is reached at an increment end and written to the results. The animation shows the body of the keyhole (Gaussian radius 0.43 mm) on the 0.58 mm elements, with the two integration points of each element along the travel:
+
+</div>
+
+- **C &lt; 1** (0.5 shown): twice the increments for the same weld, and the source alternates between a node and the middle of an element. Along the travel the mesh then integrates 7 % more and 8 % less power than the exact source, so the power fed into the pool swings at every increment (10 % between the two positions for the whole source on the actual mesh). The temperature field pulses, convergence suffers, and nothing is gained: the element, not the increment, limits the resolution.
+- **C = 1**: one increment per element, the same integrated power at every increment (corrected once by the factor 0.961 of section 4), and every node of the joint line heated at its peak: the fewest increments that skip no node.
+- **C &gt; 1** (1.6 shown): fewer increments, but the beam jumps over nodes. The red nodes never have the source centred on them: their peak temperature, and with it melting, austenitisation and the phases formed on cooling, is underestimated there, the power arrives in irregular chunks, and the stress run, which reads the temperatures at the increment ends, never sees those peaks either.
+
+<div align="justify">
+
 <b>Rounding.</b> The deck writes <code>0.023038346126</code> s (12 decimals): 3.3 &times; 10<sup>-13</sup> s short of the exact value per increment, 2.4 &times; 10<sup>-10</sup> s after the 750 increments of the weld, so the beam drifts by 6 &times; 10<sup>-9</sup> mm along the joint. The number of decimals is not cosmetic: every step time and every time point is written as an exact decimal multiple of that increment. With 7 decimals, Abaqus inserted 2 &times; 10<sup>-7</sup> s increments to land on the time points (rounding of the multiples), and the increments after them were shifted off the nodes.
 
 </div>
