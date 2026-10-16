@@ -384,7 +384,8 @@ Three folders, run in this order:
 | `THERMAL_RLS/dflux_bimaterial_keyhole.f` | double conical keyhole heat source, user subroutine `DFLUX` |
 | `THERMAL_RLS/bimaterial_assembly.step` | geometry, five named solids (section 2) |
 | `PRESS_RLS/bimaterial_RLS_Press.inp` | stress model and press fit at 25 C, writes the restart data |
-| `MECHANICAL_RLS/bimaterial_RLS_Mech.inp` | weld stress analysis, restart of the press fit, reads the thermal results file |
+| `MECHANICAL_RLS/bimaterial_RLS_Mech.inp` | weld (750 increments, one per thermal increment) and cooling (300 s) stress analysis, restart of the press fit, reads the thermal results file |
+| `MECHANICAL_RLS/bimaterial_RLS_Mech_dt2.inp` | the same with one stress increment per two thermal increments (375 in the weld), to compare the cost |
 | `Material_20MnCr5.inp`, `Material_GJS600_10.inp` | base metals in the phase transformation framework (in `THERMAL_RLS` and `PRESS_RLS`) |
 | `Material_20MnCr5_TET.inp`, `Material_GJS600_10_TET.inp` | plain cards for the tetrahedra |
 | `Material_Inconel82_RLS.inp` | filler, raw wire in the RLS state |

@@ -1,11 +1,13 @@
 *HEADING
-Crown gear / carrier laser weld - stress analysis, restart of bimaterial_RLS_Press: WELD stopped at 100 thermal increments, symmetric solver, NLGEOM=NO
-** Restart job: launch with oldjob=bimaterial_RLS_Press; temperatures from the thermal results file named in *TEMPERATURE
+Crown gear / carrier laser weld - stress analysis, restart of bimaterial_RLS_Press: WELD (750 increments, thermal dt) + COOLING 300 s, symmetric solver, NLGEOM=NO
+** Restart job: launch with oldjob=bimaterial_RLS_Press; temperatures from bimaterial_RLS_Thermal.fil
+** (job name of the thermal run). Stress increment = 1 x the thermal dt (0.023038346126 s); symmetric solver,
+** NLGEOM=NO. Linear tets (C3D4), hex region C3D8.
 *RESTART, READ, STEP=1
 **
-*STEP, NAME=WELD, NLGEOM=NO, INC=2000
+*STEP, NAME=WELD, NLGEOM=NO, INC=3000
 *STATIC
-0.023038346126, 2.303834612600, 1.0E-08, 0.023038346126
+0.023038346126, 17.278759594500, 1.0E-08, 0.023038346126
 *CONTROLS, PARAMETERS=LINE SEARCH
 10, 1, 0.001, 0.25, 0.01
 *CONTROLS, PARAMETERS=TIME INCREMENTATION
@@ -28,7 +30,36 @@ S, PEEQ, E
 S,
 *ELEMENT OUTPUT, ELSET=CARRIER_TET, POSITION=CENTROIDAL
 S,
-** contact pressure of the press fit (bore and base) at the end of the step
+** full state and contact pressure at the end of the step
+*OUTPUT, FIELD, FREQUENCY=99999
+*NODE OUTPUT
+U, NT
+*ELEMENT OUTPUT, ELSET=WELD_PT
+S, PEEQ, E, SDV
+*ELEMENT OUTPUT, ELSET=FILLER
+S, PEEQ, E
+*CONTACT OUTPUT
+CSTRESS, CDISP
+*OUTPUT, HISTORY, FREQUENCY=0
+*END STEP
+**
+** COOLING: 300 s, thermal step 2 of the results file; automatic increment up to 10 s
+*STEP, NAME=COOLING, NLGEOM=NO, INC=3000
+*STATIC
+0.1, 300.0, 1.0E-05, 10.0
+*TEMPERATURE, FILE=bimaterial_RLS_Thermal, BSTEP=2, ESTEP=2
+*OUTPUT, FIELD, TIME POINTS=COOLING_FRAMES, OP=NEW
+*NODE OUTPUT
+U, NT
+*ELEMENT OUTPUT, ELSET=WELD_PT
+S, PEEQ, E, SDV
+*ELEMENT OUTPUT, ELSET=FILLER
+S, PEEQ, E
+*ELEMENT OUTPUT, ELSET=CROWN_TET, POSITION=CENTROIDAL
+S,
+*ELEMENT OUTPUT, ELSET=CARRIER_TET, POSITION=CENTROIDAL
+S,
+** residual state and contact pressure at the end of the cooling
 *OUTPUT, FIELD, FREQUENCY=99999
 *CONTACT OUTPUT
 CSTRESS, CDISP
