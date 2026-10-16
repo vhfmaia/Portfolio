@@ -37,7 +37,9 @@
 !  Conventions & Units:
 !    - Global coordinates: mm, s, tonne, mJ, C
 !    - Volumetric flux: mJ/(s.mm3) = mW/mm3
-!    - Trajectory: Circular weld along radius R in X-Y plane about Z axis
+!    - Trajectory: Circular weld in the X-Y plane about the Z axis, on the joint
+!      radius R = 55 mm (centre of the 0.3 mm filler gap), with the beam axis
+!      offset by 0.2 mm towards the steel crown (r = 55.2 mm), as in production.
 !    - Ramping: 10 deg ramp-up, 360 deg steady weld, 10 deg ramp-down
 !    - Process: 4 kW at 1500 mm/min (25 mm/s); 160 J/mm nominal, 82.6 J/mm
 !      absorbed in the 5 mm weld land with eta = 0.516: in a full-penetration
@@ -65,10 +67,10 @@
 !      3.51 / 4.15: 2.26/2.38, 2.05/1.92, 1.68/1.68, 1.23/1.29, 0.95/0.83,
 !      0.88/0.94, 0.85/0.93, 1.06/1.01. The ratios come from a run with the
 !      first source: the next thermal run checks them.
-!    - mesh_factor = 0.963: 2054 W of the 2064 W absorbed fall in the weld
-!      land; integrated on the DC3D8 mesh (2x2x2 Gauss points), beam on a
-!      node of the joint line as at every increment end, the source gives
-!      2133 W. Between two nodes it would give 1951 W (-8.5 %): the body
+!    - mesh_factor = 0.960: 2054 W of the 2064 W absorbed fall in the weld
+!      land; integrated on the DC3D8 mesh (2x2x2 Gauss points), beam at
+!      r = 55.2 mm on a node line as at every increment end, the source gives
+!      2139 W. Between two node lines it would give 1955 W (-8.6 %): the body
 !      radius (0.42-0.45 mm) is smaller than the circumferential element
 !      (0.58 mm), keep the increments aligned.
 !=======================================================================
@@ -82,11 +84,12 @@ module laser_dflux_mod
     ! ------------------------------------------------------------------
     real(real64), parameter :: qtot_nominal = 4.00d6        ! Nominal beam power [mW = mJ/s] (4000 W)
     real(real64), parameter :: eta_absorb   = 0.516d0       ! Share of the beam absorbed in the weld land (full penetration) [-]
-    real(real64), parameter :: weld_radius  = 55.00d0       ! Circular joint radius [mm] (crown / carrier interface)
+    real(real64), parameter :: weld_radius  = 55.00d0       ! Circular joint radius [mm] (centre of the filler gap)
+    real(real64), parameter :: beam_offset  = 0.20d0        ! Radial offset of the beam axis towards the steel crown [mm]
     real(real64), parameter :: travel_speed = 1500.0d0      ! Travel speed [mm/min] (25 mm/s)
     real(real64), parameter :: z_surface    = 25.00d0       ! Top irradiated surface Z coordinate [mm]
     real(real64), parameter :: cutoff_tol   = 1.0d-8        ! Gaussian tail cut-off, fraction of the peak [-]
-    real(real64), parameter :: mesh_factor  = 0.963d0       ! Correction of the power integrated on the mesh [-]
+    real(real64), parameter :: mesh_factor  = 0.960d0       ! Correction of the power integrated on the mesh [-]
 
     ! ------------------------------------------------------------------
     ! 2. SOURCE GEOMETRY AND POWER SPLIT
@@ -122,7 +125,11 @@ module laser_dflux_mod
     real(real64), parameter :: cut_factor = sqrt(-log(cutoff_tol) / 3.0d0)
 
     real(real64), parameter :: v_sec      = travel_speed / 60.0d0
+    ! The angular speed is taken on the joint radius, not on the offset beam radius, so the beam
+    ! axis stays on a node line at every increment end (dt = 0.6 deg / omega); the travel speed
+    ! of the beam itself is then v (weld_radius + beam_offset) / weld_radius, +0.4 %
     real(real64), parameter :: omega      = v_sec / weld_radius
+    real(real64), parameter :: r_beam     = weld_radius + beam_offset
     real(real64), parameter :: rad_to_deg = 180.0d0 / pi_const
 
 contains
@@ -159,8 +166,8 @@ contains
         if (amp <= 0.0d0) return
 
         ! Horizontal distance to the beam axis and depth below the irradiated face
-        r_dist_sq = (coords(1) - weld_radius * cos(theta_rad))**2 + &
-                    (coords(2) - weld_radius * sin(theta_rad))**2
+        r_dist_sq = (coords(1) - r_beam * cos(theta_rad))**2 + &
+                    (coords(2) - r_beam * sin(theta_rad))**2
         z_local = max(z_surface - coords(3), 0.0d0)
 
         ! Head cone, body cone, hemispherical bottom
