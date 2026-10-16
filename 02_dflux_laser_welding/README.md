@@ -39,7 +39,7 @@ A 20MnCr5 crown gear is laser welded to an EN-GJS-600-10 spheroidal graphite cas
 | Process | Value |
 | :--- | :--- |
 | Laser power, absorbed | 4 000 W nominal; 0.516 stays in the weld land (full penetration, part of the beam leaves through the root): 2 064 W |
-| Travel speed | 1.5 m/min (25 mm/s), joint radius R = 55 mm, angular speed 0.4545 rad/s; beam axis offset 0.2 mm towards the steel crown |
+| Travel speed | 1.5 m/min (25 mm/s), joint radius R = 55 mm, angular speed 0.4545 rad/s; beam axis offset 0.2 mm towards the steel crown, for a pool even on both sides (the cast iron melts some 300 C lower) |
 | Heat input | 160 J/mm nominal, 120 J/mm absorbed |
 | Weld | 10 deg ramp-up, 360 deg at full power, 10 deg ramp-down (overlap), off at 380 deg, run-out to 450 deg, then 300 s of cooling |
 | Joint | weld land 5 mm deep, filler gap 0.15 mm (crown) + 0.15 mm (carrier), gas escape chamber under it, press fit below (0.07 mm interference on the diameter) |
@@ -123,7 +123,7 @@ $$q(r,\zeta) = q_{0,i}\,\exp\left(-\frac{3\,r^2}{r_0(\zeta)^2}\right) g(\zeta)$$
 
 $$q_{0,\mathrm{up}} = \frac{3 f_\mathrm{up} Q}{\pi V_\mathrm{up}}, \qquad V_\mathrm{up} = \frac{d_\mathrm{up}\left(r_\mathrm{top}^2 + r_\mathrm{top} r_\mathrm{mid} + r_\mathrm{mid}^2\right)}{3}, \qquad q_{0,\mathrm{low}} = \frac{3\,(1 - f_\mathrm{up})\,Q}{\pi\,(V_\mathrm{low} + V_\mathrm{tip})}$$
 
-with <i>Q</i> = 2 064 W absorbed in the weld land (&eta; = 0.516 of the 4 kW), so that the source integrates to <i>Q</i> for any split. The beam moves around the joint (R = 55 mm, the centre of the filler gap) with its axis offset by 0.2 mm towards the steel crown (r = 55.2 mm), as in production, with the power schedule of section 1. The angular speed is taken on the joint radius, so the beam axis still sits on a node line at every increment end (section 7.1); the beam itself then travels 0.4 % faster than 25 mm/s.
+with <i>Q</i> = 2 064 W absorbed in the weld land (&eta; = 0.516 of the 4 kW), so that the source integrates to <i>Q</i> for any split. The beam moves around the joint (R = 55 mm, the centre of the filler gap) with its axis offset by 0.2 mm towards the steel crown (r = 55.2 mm), with the power schedule of section 1. The offset is there because the two base metals respond differently to the same heat: the cast iron melts some 300 C lower (solidus 1 150 C against 1 470 C for the steel), so a centred beam gives a pool that leans into the cast iron; moving the beam towards the steel evens out the pool on both sides of the joint. The angular speed is taken on the joint radius, so the beam axis still sits on a node line at every increment end (section 7.1); the beam itself then travels 0.4 % faster than 25 mm/s.
 
 <b>Calibration.</b> The source is fitted to the fusion zone of the published macrograph of this type of joint, Nogueira (2021), Fig. 6.13(a) [1]: 2.45 mm wide at the surface, a neck of 0.83 mm at 2.24 mm, full penetration of the 5 mm land.
 

@@ -39,7 +39,9 @@
 !    - Volumetric flux: mJ/(s.mm3) = mW/mm3
 !    - Trajectory: Circular weld in the X-Y plane about the Z axis, on the joint
 !      radius R = 55 mm (centre of the 0.3 mm filler gap), with the beam axis
-!      offset by 0.2 mm towards the steel crown (r = 55.2 mm), as in production.
+!      offset by 0.2 mm towards the steel crown (r = 55.2 mm): the cast iron
+!      melts some 300 C lower than the steel (solidus 1150 / 1470 C), so the
+!      offset evens out the pool on both sides of the joint.
 !    - Ramping: 10 deg ramp-up, 360 deg steady weld, 10 deg ramp-down
 !    - Process: 4 kW at 1500 mm/min (25 mm/s); 160 J/mm nominal, 82.6 J/mm
 !      absorbed in the 5 mm weld land with eta = 0.516: in a full-penetration
