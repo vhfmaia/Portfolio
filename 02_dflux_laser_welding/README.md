@@ -399,9 +399,53 @@ The comparison is made against the macrograph used to calibrate the heat source,
 
 The model reproduces the full penetration, the nail head and the width of the root at the chamber. It misses the neck: the measured weld narrows to 0.8-0.9 mm between 2 and 3.5 mm, while the model body stays at about 1.3 mm, and the head is 13 % narrower at the surface. The split of the source power between head and body is the next calibration. The cap is the wire metal standing proud of the surface, which a conduction model with a fixed surface does not form (estimated here from the metal balance only). Peak temperature in the keyhole: 2 326 C (a conduction model; the physics of the vapour capillary is not represented).
 
-<b>Hardness (in work).</b> The macrograph of Nogueira (2021) has no hardness traverses, so the hardness predicted from the phase fractions is compared with the HV1 traverses of Neto (2023) [2], measured on welds of the same process at 0.5, 2 and 4 mm below the surface.
+</div>
+
+### Hardness from the phase fractions (first estimate)
+
+<div align="justify">
+
+<b>Which measurements.</b> The macrograph of Nogueira (2021) has no hardness traverses, so the hardness is compared with the HV1 traverses of Neto (2023) [2], measured on welds of the same process at 0.5, 2 and 4 mm below the surface: five parts cut at 180 deg, indents every 0.15 mm.
+
+<b>Which steel.</b> The crown of the model is 20MnCr5 because that grade has far more published data (CCT diagrams, transformation kinetics, thermophysical properties) than the crown steel of the theses, a 27MnCr5 (Nogueira, Tab. 3.1: C 0.23-0.31, Mn 1.10-1.40, Cr 1.00-1.40). The thermal run and the phase fractions are therefore those of 20MnCr5. The hardness is computed with the chemistry of the theses (middle of the ranges: C 0.27, Mn 1.25, Cr 1.20; Si 0.25 assumed), because the traverses were measured on that steel. The mix carries an error that is accepted: with more carbon the real steel has a lower Ms and a higher hardenability, so its phase fractions would not be exactly those of the 20MnCr5 run. The carbon content alone moves the martensite hardness by about 10 % (Maynier gives about 490 HV with C 0.195, 557 HV with C 0.27).
 
 </div>
+
+<b>How it is computed</b> (a post-processing script on the exported VTK frames, not part of this folder):
+
+1. **One steady-state section.** The pool is steady from about 33 deg, so the temperature profile along the joint behind the beam is the thermal history of any section. From one frame (beam at 129 deg) the section at 40 deg is taken, and for each hex element: the phase fractions, the peak temperature (the maximum along its node line behind the beam) and the cooling rate at 700 C (temperature gradient along the joint times the travel speed): 470-1 090 C/s in the steel HAZ.
+2. **Zones.** Peak temperature above the solidus: fusion zone, 330 HV (Ni 6082 diluted with both base metals, median of the traverses). Below Ac1: base metal, 320 HV for the steel (quenched-and-tempered core) and 230 HV for the cast iron, also the medians of the traverses. In between: heat-affected zone.
+3. **HAZ: mixture of phases.** Hardness = sum of the phase fractions times the hardness of each phase. The untransformed ferrite of the model keeps the base hardness; martensite and bainite follow Maynier et al. [10], with the cooling rate <i>V</i><sub>r</sub> in C/h at 700 C:
+
+$$HV_M = 127 + 949\,C + 27\,Si + 11\,Mn + 8\,Ni + 16\,Cr + 21\,\log V_r$$
+
+$$HV_B = -323 + 185\,C + 330\,Si + 153\,Mn + 65\,Ni + 144\,Cr + 191\,Mo + \log V_r\,(89 + 53\,C - 55\,Si - 22\,Mn - 10\,Ni - 20\,Cr - 33\,Mo)$$
+
+4. Austenite still present in the section (it is at 266 C in that frame, below Ms) is counted as martensite, since it transforms on further cooling.
+
+<p align="center">
+  <img src="../99_images_and_miscelania/bimaterial_hardness_vs_neto.png" alt="Hardness traverses of the model against the HV1 traverses of Neto (2023) at 0.5, 2 and 4 mm below the surface" width="100%">
+</p>
+
+| Depth | Fusion zone width, model / Neto | Steel above 450 HV, model / Neto | Steel HAZ peak, model / Neto | Cast-iron fusion-line peak, model / Neto |
+| :--- | :--- | :--- | :--- | :--- |
+| 0.5 mm | 1.90 / 1.95 mm | 0.28 / 0.75 mm | 557 / 549 HV | 671 / 493 HV |
+| 2 mm | 1.23 / 0.90 mm | 0.83 / 0.60 mm | 557 / 525 HV | 689 / 496 HV |
+| 4 mm | 1.23 / 0.90 mm | 0.56 / 0.60 mm | 560 / 543 HV | 544 / 578 HV |
+
+<div align="justify">
+
+Neto values: medians of the five parts. The peak hardness of the steel HAZ is within 2-6 %. The widths repeat the section comparison above: the fusion zone of the body is too wide and the steel HAZ under the head too narrow, both from the split of the power between head and body.
+
+</div>
+
+<b>Limits of the estimate</b>
+
+- **Maynier is a formula for low-alloy steels** (about C 0.1-0.5 %, Si < 1 %, Mn < 2 %, Cr < 3 %, Ni < 4 %, Mo < 1 %). The steel is inside that range; the composition mix above is the main error on the steel side.
+- **The cast iron is far outside it**, and the formula is applied there knowing it: 3.1-3.4 % carbon and 4.2-4.5 % silicon in EN-GJS-600-10. Only the matrix is treated, as a steel with an assumed 0.5 % carbon and the silicon of the cast iron. The cast-iron results are therefore expected to differ from the measurements, and they do (671-689 against 493-496 HV at 0.5 and 2 mm).
+- **No ledeburite and no graphite in the model.** In the partially melted zone next to the fusion line the cast iron forms ledeburite (about 800-1 000 HV) that the phase cards do not have. The graphite nodules are not represented either: they are soft, and their partial dissolution enriches the surrounding matrix in carbon, which hardens its martensite. An indent that lands on a nodule, on a ledeburite band or on an inclusion reads very differently from its neighbour: the measured cast-iron peak is a single indent and scatters from about 490 to 807 HV between parts.
+- **Initial state of the steel.** The crown starts as 100 % ferrite in the framework, standing for its quenched-and-tempered core, and does not fully austenitise just above Ac3 (up to half the ferrite is left), which narrows the hard band at 0.5 mm. Tempering of that core in the outer HAZ is not modelled.
+- **Mesh resolution.** The hex elements are 0.25-0.27 mm across the joint, about two indents, so the model profile is a staircase; an indent-by-indent comparison needs a finer HAZ mesh.
 
 ---
 
@@ -440,6 +484,7 @@ Units: mm, s, tonne, mJ, MPa, C. Abaqus/Standard 2025x; runs on one 32-core node
 7. V. H. F. Maia, MSc report, Universidade de Aveiro, 2023, [hdl.handle.net/10773/39345](http://hdl.handle.net/10773/39345), CC BY 4.0 (general arrangement of the crown gear).
 8. Dassault Systemes, *Abaqus 2025 documentation*: metallurgical phase transformation framework, `*MODEL CHANGE`, `DFLUX`.
 9. EN 1563 (spheroidal graphite cast irons), EN ISO 683-3 (case-hardening steels), ISO 18274 (nickel welding consumables).
+10. P. Maynier, B. Jungmann, J. Dollet, Creusot-Loire system for the prediction of the mechanical properties of low alloy steel products, in *Hardenability Concepts with Applications to Steel*, AIME, 1978, 518-545.
 
 ---
 

@@ -167,6 +167,7 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── bimaterial_weld_workflow.svg           # Analysis chain of the weld model (SVG)
 │   ├── bimaterial_courant_number.gif          # Courant number below / equal to / above 1 for the moving source (GIF)
 │   ├── bimaterial_macrograph_vs_nogueira.png  # Measured vs simulated macrograph, Nogueira (2021), CC BY 4.0 (PNG)
+│   ├── bimaterial_hardness_vs_neto.png        # Model hardness vs HV1 traverses, Neto (2023), CC BY 4.0 (PNG)
 │   ├── macrograph_nogueira_2021_fig6_13a.jpg  # Published nail-head weld macrograph, Nogueira (2021), CC BY 4.0 (JPG)
 │   ├── uinter_3state_state_machine.svg        # UINTER 3-State Contact State Machine & Won Criteria (SVG)
 │   ├── cohesive_3state_state_machine.svg      # Cohesive Zone UMAT Architecture & Softening Law (SVG)
