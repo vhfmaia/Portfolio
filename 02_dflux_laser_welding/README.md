@@ -100,7 +100,7 @@ The mesh follows what the weld needs, and nothing more:
 
 | Why | How |
 | :--- | :--- |
-| One element per increment | 0.6 deg = 0.58 mm at R = 55; the thermal increment is dt = 0.6 deg / omega = 0.023038346126 s, so the beam axis sits on a node at every increment end. The source integrated on the mesh then varies by less than its calibration factor (between two nodes it would lose 10 %, the body radius 0.43 mm being smaller than the element). All step times and time points are exact multiples of dt, written with 12 decimals, so Abaqus never inserts tiny increments to reach them. |
+| One element per increment | 0.6 deg = 0.58 mm at R = 55 (circumferential size; 0.22 mm radially and 0.20 mm in depth in the source region); the thermal increment is dt = 0.6 deg / omega = 0.023038346126 s, so the beam axis sits on a node at every increment end. The source integrated on the mesh then varies by less than its calibration factor (between two nodes it would lose 10 %, the body radius 0.43 mm being smaller than the circumferential element). All step times and time points are exact multiples of dt, written with 12 decimals, so Abaqus never inserts tiny increments to reach them. |
 | Smooth fusion line | Structured hex elements aligned with the travel give the pool a smooth boundary and the same element shape at every angle. The weld is steady from about 33 deg, so every section after that is the same weld. |
 | Cost | Hex where the gradients are, tets where they are not: 785 400 hex and 581 520 tets. |
 | Transformations only where they happen | The tets stay below Ac1 (at most 344 C on the tie faces in the thermal run, against Ac1 = 731 / 850 C), so they carry plain temperature-dependent cards without the phase framework (section 6). This saves about a third of the run time. |
@@ -247,7 +247,7 @@ A moving, concentrated source over latent heat and phase-dependent properties is
 
 <div align="justify">
 
-The beam moves at <i>v</i> = 25 mm/s on <i>R</i> = 55 mm, so its angular speed is &omega; = <i>v</i>/<i>R</i> = 5/11 rad/s. The mesh has 600 elements around the joint (&Delta;&theta; = 0.6 deg = &pi;/300 rad, &Delta;<i>h</i> = 2&pi;<i>R</i>/600 = 0.576 mm). The increment is the time the beam takes to cross one element:
+The beam moves at <i>v</i> = 25 mm/s on <i>R</i> = 55 mm, so its angular speed is &omega; = <i>v</i>/<i>R</i> = 5/11 rad/s. The mesh has 600 elements around the joint (&Delta;&theta; = 0.6 deg = &pi;/300 rad, circumferential element size &Delta;<i>h</i> = 2&pi;<i>R</i>/600 = 0.576 mm); in the cross-section of the source region the elements are much finer, 0.22 mm radially and 0.20 mm in depth, so the travel direction is the coarsest one. The increment is the time the beam takes to cross one element:
 
 </div>
 
@@ -255,7 +255,7 @@ $$\Delta t = \frac{\Delta\theta}{\omega} = \frac{\pi/300}{5/11} = \frac{11\pi}{1
 
 <div align="justify">
 
-With a Courant number of exactly 1, the beam axis sits on a node at the end of every increment, so every node of the joint line is heated at its peak once, and the source is integrated by the mesh in the same position every time. This matters here more than in a coarse model: the body of the keyhole has a Gaussian radius of 0.43 mm, smaller than the 0.58 mm element, and with the beam between two nodes the mesh would integrate 10 % less power (the factor 0.961 of section 4 is calibrated for the beam on a node).
+With a Courant number of exactly 1, the beam axis sits on a node at the end of every increment, so every node of the joint line is heated at its peak once, and the source is integrated by the mesh in the same position every time. This matters here more than in a coarse model: the body of the keyhole has a Gaussian radius of 0.43 mm, smaller than the 0.58 mm circumferential element, and with the beam between two nodes the mesh would integrate 10 % less power (the factor 0.961 of section 4 is calibrated for the beam on a node).
 
 </div>
 
@@ -265,7 +265,7 @@ With a Courant number of exactly 1, the beam axis sits on a node at the end of e
 
 <div align="justify">
 
-<b>Why the source has to land on a node.</b> A node is heated by the source sampled at the integration points of the elements around it. With the beam axis on a node at the end of every increment, those points sit symmetrically about the beam, the mesh integrates the same power at every increment, and each node of the joint line is once in the centre of the source, so its peak temperature is reached at an increment end and written to the results. The animation shows the body of the keyhole (Gaussian radius 0.43 mm) on the 0.58 mm elements, with the two integration points of each element along the travel:
+<b>Why the source has to land on a node.</b> A node is heated by the source sampled at the integration points of the elements around it. With the beam axis on a node at the end of every increment, those points sit symmetrically about the beam, the mesh integrates the same power at every increment, and each node of the joint line is once in the centre of the source, so its peak temperature is reached at an increment end and written to the results. The animation shows the body of the keyhole (Gaussian radius 0.43 mm) on the 0.58 mm circumferential elements, with the two integration points of each element along the travel:
 
 </div>
 
@@ -445,7 +445,7 @@ Neto values: medians of the five parts. The peak hardness of the steel HAZ is wi
 - **The cast iron is far outside it**, and the formula is applied there knowing it: 3.1-3.4 % carbon and 4.2-4.5 % silicon in EN-GJS-600-10. Only the matrix is treated, as a steel with an assumed 0.5 % carbon and the silicon of the cast iron. The cast-iron results are therefore expected to differ from the measurements, and they do (671-689 against 493-496 HV at 0.5 and 2 mm).
 - **No ledeburite and no graphite in the model.** In the partially melted zone next to the fusion line the cast iron forms ledeburite (about 800-1 000 HV) that the phase cards do not have. The graphite nodules are not represented either: they are soft, and their partial dissolution enriches the surrounding matrix in carbon, which hardens its martensite. An indent that lands on a nodule, on a ledeburite band or on an inclusion reads very differently from its neighbour: the measured cast-iron peak is a single indent and scatters from about 490 to 807 HV between parts.
 - **Initial state of the steel.** The crown starts as 100 % ferrite in the framework, standing for its quenched-and-tempered core, and does not fully austenitise just above Ac3 (up to half the ferrite is left), which narrows the hard band at 0.5 mm. Tempering of that core in the outer HAZ is not modelled.
-- **Mesh resolution.** The hex elements are 0.25-0.27 mm across the joint, about two indents, so the model profile is a staircase; an indent-by-indent comparison needs a finer HAZ mesh.
+- **Mesh resolution.** The hex elements are 0.22 mm across the joint near the fusion lines (0.27 mm further out), about one and a half indent spacings, so the model profile is a staircase; an indent-by-indent comparison needs a finer HAZ mesh.
 
 ---
 
