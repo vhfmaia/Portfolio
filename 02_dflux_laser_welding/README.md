@@ -231,12 +231,99 @@ The crown, the carrier and the filler use the built-in metallurgical phase trans
 | :--- | :--- |
 | Elements | DC3D8 (hex region and filler), DC3D10 (tets) |
 | Steps | RLS: `WELD` (0 to 450 deg, 750 increments) and `COOLING` (300 s); EA: `WELD_S01` to `WELD_S24` (25 increments each), `WELD_END` (150), `COOLING` |
-| Increment | fixed dt = 0.023038346126 s in the weld (0.6 deg, beam on a node); `DELTMX` 50 K in the cooling |
-| Solver | `UNSYMM=YES`: k(T), cp(T), latent heat and the phase-dependent properties make the Jacobian unsymmetric; the symmetric solver needed more iterations and line searches for the same temperatures |
-| Controls | line search (`5, 1.0, 0.25, 0.25, 0.10`); field controls with a reference flux; cut-backs and increases of 0.5 / 2.0, so the increment returns to the aligned value |
+| Increment | fixed dt = 0.023038346126 s in the weld (0.6 deg, beam on a node, section 7.1); `DELTMX` 50 K in the cooling |
+| Solver | `UNSYMM=YES` (section 7.5) |
 | Boundary conditions | convection 21 W/m2.K and radiation (emissivity 0.8 on the weld top, 0.6 elsewhere) on the free faces; the closed chamber is adiabatic |
 | Press fit | gap conductance 10 kW/m2.K on the bore / seat and base / flange faces, falling to zero at 0.05 mm clearance |
-| Output | `*NODE FILE` NT at every increment (read by the stress run); field output every 3 deg; a history request at every increment end forces the alignment |
+| Output | `*NODE FILE` NT at every increment (read by the stress run); field output every 3 deg (section 7.6) |
+
+<div align="justify">
+
+A moving, concentrated source over latent heat and phase-dependent properties is the classic recipe for cut-backs, chattering and stalled increments. The thermal runs have gone through every increment so far with <b>no cut-back</b>; these are the choices behind that.
+
+</div>
+
+### 7.1 One element per increment: Courant number 1
+
+<div align="justify">
+
+The beam moves at <i>v</i> = 25 mm/s on <i>R</i> = 55 mm, so its angular speed is &omega; = <i>v</i>/<i>R</i> = 5/11 rad/s. The mesh has 600 elements around the joint (&Delta;&theta; = 0.6 deg = &pi;/300 rad, &Delta;<i>h</i> = 2&pi;<i>R</i>/600 = 0.576 mm). The increment is the time the beam takes to cross one element:
+
+</div>
+
+$$\Delta t = \frac{\Delta\theta}{\omega} = \frac{\pi/300}{5/11} = \frac{11\pi}{1500}\ \mathrm{s} = 0.023038346126\ldots\ \mathrm{s}, \qquad C = \frac{v\,\Delta t}{\Delta h} = 1$$
+
+<div align="justify">
+
+With a Courant number of exactly 1, the beam axis sits on a node at the end of every increment, so every node of the joint line is heated at its peak once, and the source is integrated by the mesh in the same position every time. This matters here more than in a coarse model: the body of the keyhole has a Gaussian radius of 0.43 mm, smaller than the 0.58 mm element, and with the beam between two nodes the mesh would integrate 10 % less power (the factor 0.961 of section 4 is calibrated for the beam on a node).
+
+<b>Rounding.</b> The deck writes <code>0.023038346126</code> s (12 decimals): 3.3 &times; 10<sup>-13</sup> s short of the exact value per increment, 2.4 &times; 10<sup>-10</sup> s after the 750 increments of the weld, so the beam drifts by 6 &times; 10<sup>-9</sup> mm along the joint. The number of decimals is not cosmetic: every step time and every time point is written as an exact decimal multiple of that increment. With 7 decimals, Abaqus inserted 2 &times; 10<sup>-7</sup> s increments to land on the time points (rounding of the multiples), and the increments after them were shifted off the nodes.
+
+</div>
+
+### 7.2 Cut-backs that return to the aligned increment
+
+```inp
+*CONTROLS, PARAMETERS=TIME INCREMENTATION
+14, 16, 9, 25, 18, 7, ,
+0.5, 0.5, 0.5, 0.5, , , 2.0,
+```
+
+<div align="justify">
+
+The default factors (0.25 after a divergence, 1.5 to grow) would put the beam at an arbitrary fraction of an element after any cut-back, and it would never come back to the nodes. Here every cut-back halves the increment and every increase doubles it, so the increment stays a binary fraction of &Delta;<i>t</i> (0.3 deg, 0.15 deg, ...) and returns exactly to &Delta;<i>t</i>, which is also the maximum allowed. The first line relaxes the iteration limits for the increments where the pool first forms: divergence check from iteration 14 (default 4), convergence-rate check from 16, at most 25 iterations, a cut-back of the next increment only after 18, and the increment grows back after two increments of at most 7 iterations.
+
+</div>
+
+### 7.3 Smooth tail of the source
+
+<div align="justify">
+
+A Gaussian cut at its nominal radius <i>r</i><sub>0</sub> drops from 5 % of the peak to zero, a step that integration points move across from one increment to the next: the residual chatters. The <code>DFLUX</code> cuts each Gaussian only where it has fallen to 10<sup>-8</sup> of its peak:
+
+</div>
+
+$$r_\mathrm{cut} = \sqrt{\frac{-\ln 10^{-8}}{3}}\; r_0(\zeta) = 2.478\, r_0(\zeta)$$
+
+<div align="justify">
+
+radially, and the same along the depth of the hemispherical tip. The depth is clamped, &zeta; = max(<i>z</i><sub>surface</sub> - <i>z</i>, 0), so the nodes of the irradiated face get the full surface flux.
+
+</div>
+
+### 7.4 Specific heat without artificial peaks
+
+<div align="justify">
+
+Fire-design curves (EN 1993-1-2) put the heat of the &alpha;/&gamma; transformation of steel in a narrow spike of specific heat near 735 C. In a model where the phase framework already switches the properties between ferrite and austenite, that spike doubles the effect and makes the tangent jump by an order of magnitude across a few degrees: Newton oscillates at every node crossing Ac1. The cards here keep smooth curves for every phase: the magnetic (Curie) peak is carried by the ferrite only, its curve meets the austenite curve at Ac3, and the only latent heat is the one of fusion, in <code>*LATENT HEAT</code> between the solidus and the liquidus. The enthalpy of the solid-state transformations (about 16 J/g against 280 J/g for fusion) is not modelled.
+
+</div>
+
+### 7.5 Unsymmetric solver, reference flux and line search
+
+```inp
+*STEP, NAME=WELD, AMPLITUDE=STEP, INC=2000, UNSYMM=YES, EXTRAPOLATION=NO
+*CONTROLS, PARAMETERS=FIELD, FIELD=TEMPERATURE
+0.01, 0.02, , 250.0, 0.05
+*CONTROLS, PARAMETERS=LINE SEARCH
+5, 1.0, 0.25, 0.25, 0.10
+```
+
+- **Unsymmetric Jacobian.** Temperature-dependent conductivity, latent heat and phase-dependent properties make the tangent unsymmetric. The symmetric solver factors only its symmetric part and loses the quadratic convergence of Newton. In this model, run both ways node by node: the symmetric solver needed 9 iterations per increment instead of 7 and five times the line searches, so it took 52 % more time, for the same temperatures within 0.14 K. Its solver is cheaper per iteration, but the solver is only a quarter of an iteration; the assembly is the rest.
+- **Reference flux.** By default the residual tolerance scales with the time-averaged flux of the whole model. With 1.37 million elements, almost all of them cold, that average is tiny and the tolerance becomes unphysically strict next to a source of 1.9 &times; 10<sup>6</sup> mW/mm<sup>3</sup>. A reference flux of 250 mW/mm<sup>3</sup> fixes the tolerance at 0.01 &times; 250 = 2.5 mW/mm<sup>3</sup>; the alternate criterion (0.05) is used only after many iterations.
+- **Line search.** When a Newton correction carries a node across the whole solidus-liquidus interval, the iteration can settle into a cycle between the solid and the liquid state of that node: the residual repeats every few iterations with an amplitude times &Delta;<i>t</i> equal to the latent heat of the nodal volume, and cutting the increment does not help (the residual grows as 1/&Delta;<i>t</i>). Line search breaks the cycle; its lower bound of 0.25 keeps it from damping the corrections to a stall.
+
+### 7.6 Output that does not cut the increments
+
+<div align="justify">
+
+Output requests by <code>NUMBER INTERVAL</code> with <code>TIME MARKS=YES</code>, or time points that are not exact multiples of &Delta;<i>t</i>, make Abaqus shorten increments to reach them, and the beam leaves the nodes. Here:
+
+</div>
+
+- field output at `TIME POINTS` every 5 increments (3 deg), written as exact multiples of &Delta;<i>t</i>;
+- a history request on one node (`SYNC_NODE`) at time points at **every** increment end: if a cut-back ever happens, the following increments are brought back exactly onto the aligned times;
+- `*NODE FILE, FREQUENCY=1` writes NT at every increment to the results file, which the stress run reads with `*TEMPERATURE, FILE=...`: the stress run gets the full thermal history, not the 3 deg frames.
 
 ---
 
