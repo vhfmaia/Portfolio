@@ -24,7 +24,7 @@ A 20MnCr5 crown gear is laser welded to an EN-GJS-600-10 spheroidal graphite cas
 2. [Geometry](#2-geometry)
 3. [Mesh: swept hex weld region tied to tetrahedra](#3-mesh-swept-hex-weld-region-tied-to-tetrahedra)
 4. [Heat source: double conical keyhole (DFLUX)](#4-heat-source-double-conical-keyhole-dflux)
-5. [Filler wire: element activation or raw wire (RLS)](#5-filler-wire-element-activation-or-raw-wire-rls)
+5. [Filler wire: raw wire (RLS) against element activation](#5-filler-wire-raw-wire-rls-against-element-activation)
 6. [Materials and phase transformations](#6-materials-and-phase-transformations)
 7. [Thermal analysis](#7-thermal-analysis)
 8. [Stress analysis (in work)](#8-stress-analysis-in-work)
@@ -134,24 +134,30 @@ A factor of 0.963 corrects the power integrated on the actual mesh with the beam
 
 ---
 
-## 5. Filler wire: element activation or raw wire (RLS)
+## 5. Filler wire: raw wire (RLS) against element activation
 
 <p align="center">
   <img src="../99_images_and_miscelania/bimaterial_filler_ea_vs_rls.svg" alt="Element activation against the raw-wire RLS state for the filler" width="100%">
 </p>
 
-The filler wire fills a 0.3 mm gap that is open ahead of the beam and becomes weld metal behind it. Two models of that are built on the same mesh, sets and heat source, and both run:
+The filler wire fills a 0.3 mm gap that is open ahead of the beam and becomes weld metal behind it. The model uses the raw wire of the RLS state (B). The classic element activation (A) was run on the same mesh, sets and heat source as a comparison, and is not kept:
 
-**A. Element activation (EA)**, used in the first runs for comparison (decks not kept in the repository). The filler is cut into 24 sectors of 15 deg (sets `FILLER_S01` to `FILLER_S24`). All but the first two are removed at the start (`*MODEL CHANGE, REMOVE`), and each weld step adds the next sector one step ahead of the beam (`*MODEL CHANGE, ADD`; in the stress run `ADD=STRAIN FREE`). It needs no special material, but it cuts the weld into 25 steps, adds a cold, fully conductive sector one step ahead of the pool, and in the stress run the activated wire joins strain free with its thermal strain still referred to 25 C.
+**A. Element activation (EA)**, comparison run only. The filler is cut into 24 sectors of 15 deg (sets `FILLER_S01` to `FILLER_S24`). All but the first two are removed at the start (`*MODEL CHANGE, REMOVE`), and each weld step adds the next sector one step ahead of the beam (`*MODEL CHANGE, ADD`; in the stress run `ADD=STRAIN FREE`). It needs no special material, but it cuts the weld into 25 steps, adds a cold, fully conductive sector one step ahead of the pool, and in the stress run the activated wire joins strain free with its thermal strain still referred to 25 C.
 
-**B. Raw wire in the RLS state (RLS)**, the decks of this folder. The phase transformation framework of Abaqus (section 6) carries, at every integration point, an **RLS** state: **R**aw = -1, **L**iquid = 0, **S**olid = 1. It is meant for powder-bed additive manufacturing, where unmelted powder (raw) melts and solidifies as dense metal. Here the raw state is the **wire**:
+**B. Raw wire in the RLS state (RLS)**, the model. The phase transformation framework of Abaqus (section 6) carries, at every integration point, an **RLS** state: **R**aw = -1, **L**iquid = 0, **S**olid = 1. It is meant for powder-bed additive manufacturing, where unmelted powder (raw) melts and solidifies as dense metal. Here the raw state is the **wire**:
 
 - the whole filler is in the model from the first increment, with `*INITIAL CONDITIONS, TYPE=SOLUTION` RLS = -1 on the set `FILLER`;
 - `Material_Inconel82_RLS.inp` makes the conductivity, the elastic modulus and the yield stress depend on RLS (field variable 1). Raw wire: **1 % of the deposit conductivity**, so the gap ahead of the beam stays thermally open, as with element activation; **E = 214 MPa and yield 1 MPa**, so it carries no load and no stress in the stress run;
 - density, specific heat, latent heat and expansion are those of the deposit: the beam heats and melts the wire with its real heat capacity and its real latent heat of fusion;
 - when the wire melts (RLS = 0) it takes the deposit properties, and solidifies (RLS = 1) as Ni 6082 weld metal. `*ANNEAL TEMPERATURE` at the liquidus clears any plastic strain it had.
 
-**Why the raw wire is used in the filler too.** The base metals already run in the framework (they start solid, RLS = 1, and melt and solidify in the fusion zone), so with the filler in it as well, all three materials are one formulation. The weld becomes **a single step** for the whole ring, the wire turns into weld metal exactly where and when the computed temperature melts it rather than one sector at a time, and the stress run uses the same mesh and sets with no activation bookkeeping. The cost is that the raw wire is in the model from the start, and its card has to be written in the framework format.
+**Why only the raw wire.** Both methods were run with the same unsymmetric solver and the same tet cards, and compared node by node over the first 45 deg:
+
+- **Same weld.** The solidus widths agree within 0.4-1.9 % (0.01-0.02 mm, a tenth of the element), the Ac1 widths within 0.2-2.4 %; the base metal above Ac1 differs by 5.9 K on average. The raw-wire pool is the slightly wider one at every depth. The only local difference sits in the filler band, 0.6 deg ahead of the beam: there the activated sector is already fully conductive while the raw wire still insulates (+318 K in EA on the steel side of the gap).
+- **Same cost.** With the same tet cards both run at the same pace (5.76 min per increment) and need the same 7 iterations per increment once the pool is steady; the element activation needs 10 % more iterations while the pool forms (8.2 against 7.4).
+- **What decides it is the stress run.** The activated wire joins strain free, with its thermal strain still referred to 25 C, one sector at a time, and every sector boundary is a step. The raw wire is in the model from the first increment, carries no load until it melts, and its history is erased at the liquidus: the wire becomes weld metal where and when the computed temperature melts it, in one step for the whole ring.
+
+All three materials are then one formulation (the base metals already melt and solidify in the framework), and the thermal and stress runs share the same mesh and sets with no activation bookkeeping. The price is a raw wire present from the start and a filler card written in the framework format. The model is validated with the raw wire only.
 
 | | Element activation (EA) | Raw wire (RLS) |
 | :--- | :--- | :--- |
@@ -273,6 +279,19 @@ Output requests by <code>NUMBER INTERVAL</code> with <code>TIME MARKS=YES</code>
 - field output at `TIME POINTS` every 5 increments (3 deg), written as exact multiples of &Delta;<i>t</i>;
 - a history request on one node (`SYNC_NODE`) at time points at **every** increment end: if a cut-back ever happens, the following increments are brought back exactly onto the aligned times;
 - `*NODE FILE, FREQUENCY=1` writes NT at every increment to the results file, which the stress run reads with `*TEMPERATURE, FILE=...`: the stress run gets the full thermal history, not the 3 deg frames.
+
+### 7.7 Choices measured on this model
+
+Each choice was measured on this model, changing one thing at a time. Reference: raw wire (RLS), unsymmetric solver, plain cards in the tets; percentages against it (positive = slower or larger).
+
+| Choice | Cost | Effect on the result | Gained | Lost |
+| :--- | :--- | :--- | :--- | :--- |
+| **Unsymmetric solver** instead of the symmetric one | symmetric: **+52 %** wall time per increment (+29 % iterations, 9 against 7; +400 % line searches, 5 against 1) | none: same temperatures, max 0.14 K, RMS below 0.001 K on 1.7 million nodes | **-34 %** wall time | the solver itself: +89 % time per iteration, 2 x the operations, **+72 % memory** (17.5 to 30.1 GB); the solver is a quarter of an iteration, the assembly the rest |
+| **Plain cards in the tets** instead of the phase framework | full cards: **+53 %** wall time per increment, same iterations increment by increment | none: the tets stay below Ac1 (at most 344 C on the tie faces, against 731 / 850 C) | **-35 %** wall time | the tets cannot transform: valid only while they stay below Ac1, checked on every run |
+| **Raw wire (RLS)** instead of element activation | **~0 %** (same pace with the same tet cards); EA +10 % iterations while the pool forms | widths within **0.4-1.9 %** (RLS wider), local difference only in the filler band ahead of the beam | one weld step instead of 26; no activation in the stress run | raw wire in the model from the start; filler card in the framework format |
+| **Linear tets** (C3D4 / DC3D4) instead of quadratic ones (C3D10M / DC3D10) | stress model: **-44 % nodes** (1.72 to 0.96 million), **-43 % equations** (5.09 to about 2.9 million); the quadratic weld restart needed 35 GB on rank 0 against 30.6 GB allowed (+14 %) and stopped | to be measured on the runs with linear tets: press-fit contact pressure and stresses at the tie faces | the stress run fits the memory of one node | stiffer constant-strain tets away from the joint; coarser contact pressure on the tet part of the press fit |
+
+The hex region, where the weld is, is the same in every case; the choices only move cost between the solver, the assembly and the tets.
 
 ---
 
