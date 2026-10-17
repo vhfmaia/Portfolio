@@ -70,7 +70,7 @@ The conductivity rises to about 100 W/m.K in the liquid: the usual enhanced cond
   <img src="../99_images_and_miscelania/ph07_ttt_27MnCr5.png" alt="Isothermal transformation curves of the 27MnCr5 card" width="85%">
 </p>
 
-The curves are drawn as Abaqus reads the tables: k and n interpolated linearly in temperature between the table points. The austenite -> ferrite table had points at 550, 600, 650, 700 and 735 C only, and k falls by almost two orders of magnitude between the last two, so between 700 and 735 C the linear interpolation kept k close to its 700 C value and the ferrite started much earlier than the times the table was built from (at 720 C, start at about 260 s against about 610 s with a log-linear interpolation of the same points). The heating tables already carried extra points for this reason; the cooling tables of the 27MnCr5 card now carry them too (k log-linear and n linear every 5 K between the table points). On continuous cooling the effect is small, because most of the ferrite forms between 650 and 700 C where the table was dense enough: at 1 C/s the ferrite falls from 49.6 to 45.9 % (Python version of the framework; Abaqus run to follow).
+The curves are drawn as Abaqus reads the tables: k and n interpolated linearly in temperature between the table points. The austenite -> ferrite table had points at 550, 600, 650, 700 and 735 C only, and k falls by almost two orders of magnitude between the last two, so between 700 and 735 C the linear interpolation kept k close to its 700 C value and the ferrite started much earlier than the times the table was built from (at 720 C, start at about 260 s against about 610 s with a log-linear interpolation of the same points). The heating tables already carried extra points for this reason; the cooling tables of the 27MnCr5 and EN-GJS-600-10 cards now carry them too (k log-linear and n linear every 5 K between the table points). On continuous cooling the effect is small, because most of the ferrite forms between 650 and 700 C where the table was dense enough: at 1 C/s the ferrite falls from 49.6 to 45.9 % (Python version of the framework; Abaqus run to follow).
 
 ### 2.2 Differential carrier: EN-GJS-600-10
 
@@ -83,7 +83,7 @@ Solid-solution strengthened ferritic spheroidal graphite iron, typical compositi
 | Ms | 290 C | Andrews-type formula with 0.5 % C and 4.2 % Si in the austenite |
 | Solidus / liquidus, latent heat | 1150 / 1220 C, 230 kJ/kg | eutectic of a 4.2 % Si iron, widened to 70 K; handbook latent heat |
 | Room temperature | density 7100 kg/m3, E = 170 GPa, nu = 0.275, Rp0.2 = 470 MPa, Rm = 600 MPa | EN 1563 [9] |
-| Kinetics | Li et al. [3] with 0.5 C - 4.2 Si - 0.25 Mn (outside its silicon range); ferrite -> austenite ten times slower than in steel (carbon from the nodules), assumed | |
+| Kinetics | Li et al. [3] with 0.5 C - 4.2 Si - 0.25 Mn (outside its silicon range); ferrite -> austenite ten times slower than in steel (carbon from the nodules), assumed; cooling tables with log-linear intermediate points every 5 K (section 2.1) | |
 | Retention rule | (0, 0), (0.25, 0.25), (0, 1): no martensite when 25 % austenite or less is left at Ms | kept for now: austenite retention is reported in the heat affected zone of the joint [11], but its amount has no source yet (section 5) |
 
 <p align="center">
