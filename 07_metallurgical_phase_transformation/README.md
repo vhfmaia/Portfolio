@@ -24,7 +24,8 @@ Temperatures are imposed on every node (heat transfer: `*BOUNDARY` on degree of 
 # from 02_dflux_laser_welding/THERMAL_RLS: Material_phase_trans_table_types.inp, Material_20MnCr5.inp,
 # Material_GJS600_10.inp, Material_Inconel82_RLS.inp
 abaqus job=PT01_cct_20MnCr5 input=PT01_cct_20MnCr5.inp interactive
-abaqus python odb_to_vtk.py PT01_cct_20MnCr5.odb      # history of the element to PT01_cct_20MnCr5_history.csv
+# results: *EL PRINT tables in PT01_cct_20MnCr5.dat (centroid values every increment); the ODB keeps the same
+# history output as a backup
 ```
 
 Units: mm, s, tonne, N, MPa, mJ, C. Abaqus/Standard 2025x.
