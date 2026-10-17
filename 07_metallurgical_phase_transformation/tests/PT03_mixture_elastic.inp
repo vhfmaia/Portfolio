@@ -1,12 +1,15 @@
 *HEADING
-Young's modulus of a 50 % austenite + 50 % martensite mixture (20MnCr5)
+Young's modulus of a 50 % austenite + 50 % martensite mixture (27MnCr5)
 ** Units: mm, s, tonne, N, MPa, mJ, C
-** KM: f_M = 1 - exp(-0.01 (385 - T)) = 0.5 at T = 385 - ln 2 / 0.01 = 315.7 C.
-** Quench 1000 -> 316 C at 1000 C/s (no ferrite or bainite), hold, then 10 MPa along z:
-** E_mix = 10 / dE33, to compare with 0.5 E_A(316) + 0.5 E_M(316) of the card (rule of mixtures
-** expected from the hierarchical interpolation in the ratios r2-r4).
+** KM: f_M = 1 - exp(-0.01 (372 - T)) = 0.5 at T = 372 - ln 2 / 0.01 = 302.7 C.
+** Quench 1000 -> 303 C at 1000 C/s (no ferrite or bainite), hold, then 10 MPa along z:
+** E_mix = 10 / dE33, to compare with 0.5 E_A(303) + 0.5 E_M(303) of the card (rule of mixtures
+** expected from the hierarchical interpolation in the ratios r2-r4). The card gives austenite and
+** martensite the same E near 300 C, so the discriminating check is the thermal strain THE33 at the
+** hold: (fA alpha_A + fM alpha_M)(T - ZERO) - alpha_F(25)(25 - ZERO), against -2.4E-3 (pure A) and
+** +5.7E-3 (pure M) in the 20MnCr5 card.
 *INCLUDE, INPUT=Material_phase_trans_table_types.inp
-*INCLUDE, INPUT=Material_20MnCr5.inp
+*INCLUDE, INPUT=Material_27MnCr5.inp
 *NODE, NSET=ALL
 1, 0, 0, 0
 2, 1, 0, 0
@@ -20,7 +23,7 @@ Young's modulus of a 50 % austenite + 50 % martensite mixture (20MnCr5)
 1, 1, 2, 3, 4, 5, 6, 7, 8
 *NSET, NSET=TOP
 5, 6, 7, 8
-*SOLID SECTION, ELSET=ELEMS, MATERIAL="ABQ_PHASE_TRANS_20MNCR5"
+*SOLID SECTION, ELSET=ELEMS, MATERIAL="ABQ_PHASE_TRANS_27MNCR5"
 *INITIAL CONDITIONS, TYPE=TEMPERATURE
 ALL, 25.
 *INITIAL CONDITIONS, TYPE=SOLUTION
@@ -38,9 +41,9 @@ ALL, 0., 0., 0.
 *AMPLITUDE, NAME=HEAT
 0., 25., 9.75, 1000., 19.75, 1000.
 *AMPLITUDE, NAME=QUENCH
-0., 1000., 0.684, 316., 10., 316.
+0., 1000., 0.697, 303., 10., 303.
 *AMPLITUDE, NAME=HOLD
-0., 316., 1., 316.
+0., 303., 1., 303.
 *STEP, NAME=HEAT, INC=100000
 *STATIC, DIRECT
 0.01998987854, 19.75

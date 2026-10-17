@@ -1,8 +1,8 @@
 *HEADING
-Simulated dilatometer, 20MnCr5: heat 10 C/s to 1000 C, hold 10 s, cool 10 C/s; reheat, cool 300 C/s
+Simulated dilatometer, 27MnCr5: heat 10 C/s to 1000 C, hold 10 s, cool 10 C/s; reheat, cool 300 C/s
 ** Units: mm, s, tonne, N, MPa, mJ, C
 *INCLUDE, INPUT=Material_phase_trans_table_types.inp
-*INCLUDE, INPUT=Material_20MnCr5.inp
+*INCLUDE, INPUT=Material_27MnCr5.inp
 *NODE, NSET=ALL
 1, 0, 0, 0
 2, 1, 0, 0
@@ -14,7 +14,7 @@ Simulated dilatometer, 20MnCr5: heat 10 C/s to 1000 C, hold 10 s, cool 10 C/s; r
 8, 0, 1, 1
 *ELEMENT, TYPE=C3D8, ELSET=ELEMS
 1, 1, 2, 3, 4, 5, 6, 7, 8
-*SOLID SECTION, ELSET=ELEMS, MATERIAL="ABQ_PHASE_TRANS_20MNCR5"
+*SOLID SECTION, ELSET=ELEMS, MATERIAL="ABQ_PHASE_TRANS_27MNCR5"
 *INITIAL CONDITIONS, TYPE=TEMPERATURE
 ALL, 25.
 *INITIAL CONDITIONS, TYPE=SOLUTION
