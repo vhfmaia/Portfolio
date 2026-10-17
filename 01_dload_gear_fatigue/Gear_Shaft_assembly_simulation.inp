@@ -1,0 +1,101 @@
+*HEADING
+Automotive Helical Crown Gear & Differential Carrier Assembly with Weld Flaw
+Abaqus/Standard Dynamic Torque Rolling with DLOAD (Z-axis Rotation)
+Units: mm, s, tonne, N, MPa (N/mm2), N.mm
+Author: Victor Maia (vhfm08@gmail.com)
+**
+** ==================================================================
+** 1. MESH & MATERIAL LIBRARY INCLUDES
+** ==================================================================
+*INCLUDE, INPUT=Materials_Assembly.inp
+*INCLUDE, INPUT=Gear_Shaft_geometry.inp
+*INCLUDE, INPUT=Gear_Shaft_bearing_sets.inp
+**
+** ==================================================================
+** 2. MULTI-ZONE TIE DEFINITIONS
+** Tie 1: toothed rim (C3D10) to the structured ring (C3D20) of the crown gear
+** Tie 2: carrier body (C3D10) to the structured ring (C3D20) of the differential carrier
+** ==================================================================
+*TIE, NAME=TIE_CROWN, TYPE=SURFACE TO SURFACE
+TIE_CROWN_TOOTH, TIE_CROWN_DIAMETER
+**
+*TIE, NAME=TIE_DIFF, TYPE=SURFACE TO SURFACE
+TIE_DIFF_VOLUME, TIE_DIFF_DIAMETER
+**
+** ==================================================================
+** 3. INTERFACE CONTACT DEFINITIONS
+** Contact 1: sound laser weld over 252 deg (bonded, no separation)
+** Contact 2: frictional contact over 360 deg; it carries the load across the unbonded
+**            weld flaw (108 deg, theta = 36 to 144 deg, 30% of the circumference)
+** ==================================================================
+*SURFACE INTERACTION, NAME=INTER_WELDED
+*SURFACE BEHAVIOR, NO SEPARATION, PRESSURE-OVERCLOSURE=HARD
+*FRICTION, ROUGH
+**
+*SURFACE INTERACTION, NAME=INTER_DEFECT
+*SURFACE BEHAVIOR, PENALTY
+*FRICTION
+0.20
+**
+*CONTACT PAIR, INTERACTION=INTER_WELDED, TYPE=SURFACE TO SURFACE, SMALL SLIDING, ADJUST=0.05
+CONTACT_DIFF_WELD, CONTACT_CROWN_WELD
+**
+*CONTACT PAIR, INTERACTION=INTER_DEFECT, TYPE=SURFACE TO SURFACE, SMALL SLIDING, ADJUST=0.05
+CONTACT_DIFF_PENALTY, CONTACT_CROWN_PENALTY
+**
+** ==================================================================
+** 4. CARRIER SHAFT BEARING SUPPORT (KINEMATIC COUPLING + BOUNDARY CONDITION)
+** Reference node RP_BEARING on the wheel axis (X = 0, Y = 0, Z = 0)
+** Coupling 1: radial and tangential support of the carrier shaft (DOFs 1 and 2)
+** Coupling 2: nodes shared by both supports (DOFs 1, 2 and 3)
+** Coupling 3: axial shoulder of the carrier (DOF 3)
+** BC: reference node fully fixed -> RM3 = reaction torque about Z
+** ==================================================================
+*NODE, NSET=RP_BEARING
+600001, 0.0, 0.0, 0.0
+**
+*SURFACE, TYPE=NODE, NAME=BEARING_SURF_XY
+BEARING_NODES_XY, 1.0
+*SURFACE, TYPE=NODE, NAME=BEARING_SURF_XYZ
+BEARING_NODES_XYZ, 1.0
+*SURFACE, TYPE=NODE, NAME=BEARING_SURF_Z
+BEARING_NODES_Z, 1.0
+**
+*COUPLING, CONSTRAINT NAME=COUPLING_BEARING_XY, REF NODE=RP_BEARING, SURFACE=BEARING_SURF_XY
+*KINEMATIC
+1, 2
+*COUPLING, CONSTRAINT NAME=COUPLING_BEARING_XYZ, REF NODE=RP_BEARING, SURFACE=BEARING_SURF_XYZ
+*KINEMATIC
+1, 3
+*COUPLING, CONSTRAINT NAME=COUPLING_BEARING_Z, REF NODE=RP_BEARING, SURFACE=BEARING_SURF_Z
+*KINEMATIC
+3, 3
+**
+*BOUNDARY
+RP_BEARING, 1, 6, 0.0
+**
+** ==================================================================
+** 5. DYNAMIC TORQUE ROLLING STEP VIA DLOAD USER SUBROUTINE
+** Total time: 1.20 s (0.20 s stationary ramp + 1.00 s rolling across all 60 teeth)
+** Transmits 270 N.m through tooth flanks (SURF_TOOTH) -> weld interface -> carrier
+** ==================================================================
+*STEP, NAME=GEAR_TORQUE_ROLLING, NLGEOM=NO, INC=1000
+*STATIC
+0.004, 1.20, 1.0E-05, 0.004
+*DSLOAD
+SURF_TOOTH, PNU
+*OUTPUT, FIELD, FREQUENCY=10
+*NODE OUTPUT
+U
+*ELEMENT OUTPUT
+S, PEEQ
+*CONTACT OUTPUT
+CDISP, CSTRESS
+**
+** Bearing reaction at RP_BEARING every increment (RM3 = reaction torque, N.mm)
+*OUTPUT, HISTORY, FREQUENCY=1
+*NODE OUTPUT, NSET=RP_BEARING
+RF1, RF2, RF3, RM1, RM2, RM3
+*NODE PRINT, NSET=RP_BEARING, FREQUENCY=1
+RF1, RF2, RF3, RM1, RM2, RM3
+*END STEP

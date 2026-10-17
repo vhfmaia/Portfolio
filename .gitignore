@@ -1,0 +1,72 @@
+# ==============================================================================
+# Abaqus Specific Output & Scratch Files
+# ==============================================================================
+# Output Databases (ficheiros binários muito pesados)
+*.odb
+*.odb_F
+*.odb_f
+*.sim
+*.prt
+
+# Diagnostics, Status and Message Files
+*.msg
+*.sta
+*.dat
+*.log
+*.lck
+
+# Scratch, Restart and Temporary Solver Files
+*.abq
+*.pac
+*.res
+*.sel
+*.023
+*.fil
+*.ipm
+*.mdl
+*.stt
+*.pes
+*.pmx
+
+# Abaqus Make / Compilation Artefacts
+abaqus.rpt
+abaqus_v6.env
+*.fin
+
+# CAE / Viewer GUI state files
+*.jnl
+*.rpy
+*.rpy.*
+# Generated High-Fidelity Meshes (from pre-processing scripts)
+*_C3D10.inp
+*_C3D10M.inp
+*_C3D10HS.inp
+
+# ==============================================================================
+# Python Post-processing & Virtual Envs
+# ==============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.ipynb_checkpoints/
+.venv/
+venv/
+env/
+
+# ==============================================================================
+# OS & Editor Specifics
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Large simulation datasets (VTK frames & archives)
+*.zip
+*.vtk
+temp_*/
+
+# Gear-shaft assembly mesh and mesh-dependent includes (regenerated from the STEP geometry)
+01_dload_gear_fatigue/Gear_Shaft_geometry.inp
+01_dload_gear_fatigue/Gear_Shaft_bearing_sets.inp
+01_dload_gear_fatigue/Gear_Shaft_coast_flank_surface.inp

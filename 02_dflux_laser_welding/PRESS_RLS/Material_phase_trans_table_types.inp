@@ -1,0 +1,91 @@
+** ==============================================================================
+** Table type definitions of the Abaqus metallurgical phase transformation
+** framework (ABQ_PHASE_TRANS). Model data: include once per model, together with
+** the material cards that do not carry these definitions themselves
+** ==============================================================================
+*********************************************
+** Table types and labels are case sensitive 
+*********************************************
+**-------------------------------------------
+**RLS state
+**-------------------------------------------
+*PARAMETER TABLE TYPE,  NAME="ABQ_PHASE_TRANS_MeltingTemperature", parameters=2
+ FLOAT, , "Solidus Temperature" , , ,
+ FLOAT, , "Liquidus Temperature", , ,
+**-------------------------------------------
+**Solid-phase Transformations
+**-------------------------------------------
+*PARAMETER TABLE TYPE,  NAME="ABQ_PHASE_TRANS_SolidPhases", parameters=2
+ STRING ,   , "Solid Phase Name"                    , , ,
+ FLOAT  ,   , "Initial Fraction upon Solidification", , ,
+**
+*PARAMETER TABLE TYPE, NAME="ABQ_PHASE_TRANS_Transformations", parameters=18
+ STRING ,      , "Solid-Phase Transformation Name"     , ,                        ,
+ STRING ,      , "Temperature Rate Condition"          , , INTERVAL|MIN|MAX|NONE  ,
+ FLOAT  , -1E36, "Lower Bound (Temperature Rate Range)", ,                        ,
+ FLOAT  ,  1E36, "Upper Bound (Temperature Rate Range)", ,                        ,
+ STRING ,      , "Temperature Condition"               , , INTERVAL|MIN|MAX|NONE  ,
+ FLOAT  , -1E36, "Lower Bound (Temperature Range)"     , ,                        ,
+ FLOAT  ,  1E36, "Upper Bound (Temperature Range)"     , ,                        ,
+ STRING ,      , "Transformation Type"                 , , DIFFUSIONAL|MARTENSITIC,
+ STRING ,      , "Input Option"                        , , TTT|JMA|KM             ,
+ STRING ,      , "Reversible Transformation"           , , NO|YES                 ,
+ INTEGER,      , "Parent Phases"                       , ,                        ,
+ INTEGER,      , "Child Phases"                        , ,                        ,
+ STRING , " "  , "Parent Solid Phase 1 Name"           , ,                        ,
+ STRING , " "  , "Parent Solid Phase 2 Name"           , ,                        ,
+ STRING , " "  , "Parent Solid Phase 3 Name"           , ,                        ,
+ STRING , " "  , "Child Solid Phase 1 Name"            , ,                        ,
+ STRING , " "  , "Child Solid Phase 2 Name"            , ,                        ,
+ STRING , " "  , "Child Solid Phase 3 Name"            , ,                        ,
+**
+*PROPERTY TABLE TYPE, NAME="ABQ_PHASE_TRANS_Martensitic_KM_Coefficients", properties=1
+ "KM Coefficient gamma"
+*PARAMETER TABLE TYPE, NAME="ABQ_PHASE_TRANS_Martensitic_TTT_Constants", parameters=2
+ FLOAT, , "Starting Proportion", , ,
+ FLOAT, , "Ending Proportion"  , , ,
+*PROPERTY TABLE TYPE,  NAME="ABQ_PHASE_TRANS_Martensitic_TTT_Diagram", properties=2
+ "Start Temperature"
+ "End Temperature"
+*PROPERTY TABLE TYPE,  NAME="ABQ_PHASE_TRANS_Martensitic_ParentRetainedFrac", properties=1, independent variables=1
+ "Retained Proportion"
+ "Starting Proportion"
+**
+*PROPERTY TABLE TYPE,  NAME="ABQ_PHASE_TRANS_Diffusional_JMA_Coefficients", properties=2
+ "JMA Coefficient k"
+ "JMA Coefficient n"
+*PARAMETER TABLE TYPE, NAME="ABQ_PHASE_TRANS_Diffusional_TTT_Constants", parameters=2
+ FLOAT, , "Starting Proportion", , ,
+ FLOAT, , "Ending Proportion"  , , ,
+*PROPERTY TABLE TYPE, NAME="ABQ_PHASE_TRANS_Diffusional_TTT_Diagram", properties=2
+ "Start Time"
+ "End Time"
+*PROPERTY TABLE TYPE, NAME="ABQ_PHASE_TRANS_Diffusional_ParentEquiFrac", properties=1
+ "Parent Equilibrium Proportion"
+**-------------------------------------------
+**Morphology
+**-------------------------------------------
+*PARAMETER TABLE TYPE, NAME="ABQ_PHASE_TRANS_SolidificationMap_Constants", parameters=2
+ FLOAT, , "Critical Solidification Rate"       , , ,
+ FLOAT, , "Constant Grain Size LogR-LogG Slope", , ,
+*PROPERTY TABLE TYPE, NAME="ABQ_PHASE_TRANS_SolidificationMap_Diagram", properties=1, independent variables=1
+ "LogG"
+ "LogR"
+**-------------------------------------------
+**Grain size
+**-------------------------------------------
+*PARAMETER TABLE TYPE,  name="ABQ_PHASE_TRANS_GrainSize_Definitions", parameters=4
+ FLOAT  ,      , "Initial Grain Size"                          , ,                      ,
+ STRING ,      , "Grain-Growth Temperature Condition"          , , INTERVAL|MIN|MAX|NONE,
+ FLOAT  , -1E36, "Lower Bound (Grain-Growth Temperature Range)", ,                      ,
+ FLOAT  ,  1E36, "Upper Bound (Grain-Growth Temperature Range)", ,                      ,              
+*PROPERTY TABLE TYPE, NAME="ABQ_PHASE_TRANS_GrainSize_Coefficients", properties=3
+ "Grain-Growth Coefficient k"
+ "Grain-Growth Coefficient n"
+ "Grain-Growth Coefficient Q"
+**-------------------------------------------
+**Field Variables
+**-------------------------------------------
+*PARAMETER TABLE TYPE, name="ABQ_PHASE_TRANS_FieldVariables", parameters = 2
+ INTEGER, , "Field Variable Index", ,                                      ,
+ STRING , , "Data Option"         , , RLS|RFPHASEi|GRAINSIZE|FGRAINCOLUMNAR,

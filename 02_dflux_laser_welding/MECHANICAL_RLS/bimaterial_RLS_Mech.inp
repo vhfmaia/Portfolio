@@ -1,0 +1,72 @@
+*HEADING
+Crown gear / carrier laser weld - stress analysis, restart of bimaterial_RLS_Press: WELD (750 increments, thermal dt) + COOLING 300 s, symmetric solver, NLGEOM=NO
+** Restart job: launch with oldjob=bimaterial_RLS_Press; temperatures from bimaterial_RLS_Thermal.fil
+** (job name of the thermal run). Stress increment = 1 x the thermal dt (0.023038346126 s); symmetric solver,
+** NLGEOM=NO. Linear tets (C3D4), hex region C3D8.
+*RESTART, READ, STEP=1
+**
+*STEP, NAME=WELD, NLGEOM=NO, INC=3000
+*STATIC
+0.023038346126, 17.278759594500, 1.0E-08, 0.023038346126
+*CONTROLS, PARAMETERS=LINE SEARCH
+10, 1, 0.001, 0.25, 0.01
+*CONTROLS, PARAMETERS=TIME INCREMENTATION
+20, 30, 10, 50, 20, 10, , 5
+*TEMPERATURE, FILE=bimaterial_RLS_Thermal, BSTEP=1, ESTEP=1
+** friction back to 0.15 (the press fit is frictionless)
+*CHANGE FRICTION, INTERACTION=PRESS_ME
+*FRICTION
+0.15,
+** Field output every 30 deg, filtered: full state on the hex region and the filler, stress at
+** the centroid of the tets (elastic: PEEQ = 0, no phases). OP=NEW drops the press-fit requests.
+*OUTPUT, FIELD, TIME POINTS=ME_FRAMES, OP=NEW
+*NODE OUTPUT
+U, NT
+*ELEMENT OUTPUT, ELSET=WELD_PT
+S, PEEQ, E, SDV
+*ELEMENT OUTPUT, ELSET=FILLER
+S, PEEQ, E
+*ELEMENT OUTPUT, ELSET=CROWN_TET, POSITION=CENTROIDAL
+S,
+*ELEMENT OUTPUT, ELSET=CARRIER_TET, POSITION=CENTROIDAL
+S,
+** full state and contact pressure at the end of the step
+*OUTPUT, FIELD, FREQUENCY=99999
+*NODE OUTPUT
+U, NT
+*ELEMENT OUTPUT, ELSET=WELD_PT
+S, PEEQ, E, SDV
+*ELEMENT OUTPUT, ELSET=FILLER
+S, PEEQ, E
+*CONTACT OUTPUT
+CSTRESS, CDISP
+** Increment ends on the thermal increment ends (beam on a node line): history output on one node at
+** every thermal time (BEAM_WELD, defined in the press-fit model). Abaqus resets the first increment
+** to a value read from the results file; these time points bring the increments back in line.
+*OUTPUT, HISTORY, TIME POINTS=BEAM_WELD
+*NODE OUTPUT, NSET=SYNC_NODE
+U,
+*END STEP
+**
+** COOLING: 300 s, thermal step 2 of the results file; automatic increment up to 10 s
+*STEP, NAME=COOLING, NLGEOM=NO, INC=3000
+*STATIC
+0.1, 300.0, 1.0E-05, 10.0
+*TEMPERATURE, FILE=bimaterial_RLS_Thermal, BSTEP=2, ESTEP=2
+*OUTPUT, FIELD, TIME POINTS=COOLING_FRAMES, OP=NEW
+*NODE OUTPUT
+U, NT
+*ELEMENT OUTPUT, ELSET=WELD_PT
+S, PEEQ, E, SDV
+*ELEMENT OUTPUT, ELSET=FILLER
+S, PEEQ, E
+*ELEMENT OUTPUT, ELSET=CROWN_TET, POSITION=CENTROIDAL
+S,
+*ELEMENT OUTPUT, ELSET=CARRIER_TET, POSITION=CENTROIDAL
+S,
+** residual state and contact pressure at the end of the cooling
+*OUTPUT, FIELD, FREQUENCY=99999
+*CONTACT OUTPUT
+CSTRESS, CDISP
+*OUTPUT, HISTORY, FREQUENCY=0
+*END STEP

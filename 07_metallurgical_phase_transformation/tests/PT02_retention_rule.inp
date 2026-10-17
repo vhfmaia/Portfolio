@@ -1,0 +1,163 @@
+*HEADING
+Retained-fraction rule of the martensitic transformation: absolute or relative starting proportion
+** Units: mm, s, tonne, N, MPa, mJ, C
+** E1: 80 % ferrite at 600 C, then quench, WITH the rule (0, 0), (0.25, 0.25), (0, 1)
+** E2: same history, WITHOUT the rule (0, 0), (0, 1)
+** E3: quench without ferrite (fast through 750-550 C), WITH the rule: control
+** Expected martensite at 25 C: KM 1 - exp(-0.01 (400 - 25)) = 0.976 of the austenite at Ms.
+**   absolute reading: E1 0 (20 % austenite <= 0.25 retained), E2 0.195, E3 0.976
+**   relative reading (A / (A + M) = 1 at Ms): E1 0.195, E2 0.195, E3 0.976
+*INCLUDE, INPUT=Material_phase_trans_table_types.inp
+*MATERIAL, NAME=RET_RULE, USER TYPE=PHASE_TRANSFORMATION
+** Synthetic test card (constant properties): only the kinetics matter here
+*DENSITY
+7.8E-09,
+*CONDUCTIVITY
+0.04,
+*SPECIFIC HEAT
+6.0E+08,
+*DEPVAR
+12
+1, RLS
+2, fGrainColumnar
+3, GrainSize
+4, fPhase_Ferrite
+5, fPhase_Austenite
+6, fPhase_Martensite
+*USER DEFINED FIELD
+*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_MeltingTemperature"
+1470., 1530.
+*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_SolidPhases"
+"Ferrite", 0.
+"Austenite", 1.
+"Martensite", 0.
+*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Transformations"
+"AtoF", MAX, -1E36, 0., INTERVAL, 550., 750., DIFFUSIONAL, JMA, NO, 1, 1, "Austenite", " ", " ", "Ferrite",
+" ", " "
+"AtoM", MAX, -1E36, 0., MAX, -1E36, 400., MARTENSITIC, KM, NO, 1, 1, "Austenite", " ", " ", "Martensite",
+" ", " "
+** ferrite: k t^n = 90 after 300 s at 600 C, saturates at 1 - 0.2 = 80 %
+*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_JMA_Coefficients", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_JMA_Coefficients", TEMPERATURE
+1.0E-03, 2.0, 550.
+1.0E-03, 2.0, 750.
+*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_ParentEquiFrac", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_ParentEquiFrac", TEMPERATURE
+0.2, 550.
+0.2, 750.
+*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_KM_Coefficients", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_KM_Coefficients"
+0.01
+*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_ParentRetainedFrac", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_ParentRetainedFrac"
+0., 0.
+0.25, 0.25
+0., 1.
+*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_FieldVariables"
+1, "RLS"
+*MATERIAL, NAME=RET_NONE, USER TYPE=PHASE_TRANSFORMATION
+** Synthetic test card (constant properties): only the kinetics matter here
+*DENSITY
+7.8E-09,
+*CONDUCTIVITY
+0.04,
+*SPECIFIC HEAT
+6.0E+08,
+*DEPVAR
+12
+1, RLS
+2, fGrainColumnar
+3, GrainSize
+4, fPhase_Ferrite
+5, fPhase_Austenite
+6, fPhase_Martensite
+*USER DEFINED FIELD
+*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_MeltingTemperature"
+1470., 1530.
+*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_SolidPhases"
+"Ferrite", 0.
+"Austenite", 1.
+"Martensite", 0.
+*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Transformations"
+"AtoF", MAX, -1E36, 0., INTERVAL, 550., 750., DIFFUSIONAL, JMA, NO, 1, 1, "Austenite", " ", " ", "Ferrite",
+" ", " "
+"AtoM", MAX, -1E36, 0., MAX, -1E36, 400., MARTENSITIC, KM, NO, 1, 1, "Austenite", " ", " ", "Martensite",
+" ", " "
+** ferrite: k t^n = 90 after 300 s at 600 C, saturates at 1 - 0.2 = 80 %
+*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_JMA_Coefficients", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_JMA_Coefficients", TEMPERATURE
+1.0E-03, 2.0, 550.
+1.0E-03, 2.0, 750.
+*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_ParentEquiFrac", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_ParentEquiFrac", TEMPERATURE
+0.2, 550.
+0.2, 750.
+*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_KM_Coefficients", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_KM_Coefficients"
+0.01
+*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_ParentRetainedFrac", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_ParentRetainedFrac"
+0., 0.
+0., 1.
+*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_FieldVariables"
+1, "RLS"
+*NODE, NSET=N1
+1, 0, 0, 0
+2, 1, 0, 0
+3, 1, 1, 0
+4, 0, 1, 0
+5, 0, 0, 1
+6, 1, 0, 1
+7, 1, 1, 1
+8, 0, 1, 1
+*ELEMENT, TYPE=DC3D8, ELSET=E1
+1, 1, 2, 3, 4, 5, 6, 7, 8
+*NODE, NSET=N2
+9, 2, 0, 0
+10, 3, 0, 0
+11, 3, 1, 0
+12, 2, 1, 0
+13, 2, 0, 1
+14, 3, 0, 1
+15, 3, 1, 1
+16, 2, 1, 1
+*ELEMENT, TYPE=DC3D8, ELSET=E2
+2, 9, 10, 11, 12, 13, 14, 15, 16
+*NODE, NSET=N3
+17, 4, 0, 0
+18, 5, 0, 0
+19, 5, 1, 0
+20, 4, 1, 0
+21, 4, 0, 1
+22, 5, 0, 1
+23, 5, 1, 1
+24, 4, 1, 1
+*ELEMENT, TYPE=DC3D8, ELSET=E3
+3, 17, 18, 19, 20, 21, 22, 23, 24
+*NSET, NSET=ALL12
+N1, N2
+*NSET, NSET=ALL
+N1, N2, N3
+*ELSET, ELSET=ELEMS
+E1, E2, E3
+*SOLID SECTION, ELSET=E1, MATERIAL=RET_RULE
+*SOLID SECTION, ELSET=E2, MATERIAL=RET_NONE
+*SOLID SECTION, ELSET=E3, MATERIAL=RET_RULE
+*INITIAL CONDITIONS, TYPE=TEMPERATURE
+ALL, 900.
+** solid, 100 % austenite at 900 C
+*INITIAL CONDITIONS, TYPE=SOLUTION
+ELEMS, 1, 0, 0, 0, 1, 0, 0
+0, 0, 0, 0, 0
+*INITIAL CONDITIONS, TYPE=FIELD, VARIABLE=1
+ALL, 1.
+*AMPLITUDE, NAME=A12
+0., 900., 3., 600., 303., 600., 308.75, 25.
+320., 25.
+*AMPLITUDE, NAME=A3
+0., 900., 0.875, 25., 320., 25.
+*STEP, NAME=RULE, INC=100000
+*HEAT TRANSFER
+0.02, 320., 0.02, 0.02
+*BOUNDARY, AMPLITUDE=A12
+ALL12, 11, 11, 1.
+*BOUNDARY, AMPLITUDE=A3
+N3, 11, 11, 1.
+*EL PRINT, ELSET=ELEMS, POSITION=CENTROIDAL, SUMMARY=NO, FREQUENCY=25
+TEMP, SDV1, SDV4, SDV5, SDV6
+*OUTPUT, HISTORY, FREQUENCY=5
+*ELEMENT OUTPUT, ELSET=ELEMS
+SDV, TEMP
+*END STEP
