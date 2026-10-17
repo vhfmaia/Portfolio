@@ -41,11 +41,9 @@ S, PEEQ, E
 *CONTACT OUTPUT
 CSTRESS, CDISP
 ** Increment ends on every second thermal increment end (beam on a node line): history output on one
-** node at those times. Abaqus resets the first increment to a value read from the results file
-** (0.0215 s); these time points bring the increments back in line.
-*TIME POINTS, NAME=SYNC_ME, GENERATE
-0.046076692252, 17.278759594500, 0.046076692252
-*OUTPUT, HISTORY, TIME POINTS=SYNC_ME
+** node at those times (SYNC_2DT, defined in the press-fit model). Abaqus resets the first increment to
+** a value read from the results file (0.0215 s); these time points bring the increments back in line.
+*OUTPUT, HISTORY, TIME POINTS=SYNC_2DT
 *NODE OUTPUT, NSET=SYNC_NODE
 U,
 *END STEP
