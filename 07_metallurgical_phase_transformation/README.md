@@ -70,7 +70,7 @@ The conductivity rises to about 100 W/m.K in the liquid: the usual enhanced cond
   <img src="../99_images_and_miscelania/ph07_ttt_27MnCr5.png" alt="Isothermal transformation curves of the 27MnCr5 card" width="85%">
 </p>
 
-The curves are drawn as Abaqus reads the tables: k and n interpolated linearly in temperature between the table points. The austenite -> ferrite table has points at 550, 600, 650, 700 and 735 C only, and k falls by almost two orders of magnitude between the last two, so between 700 and 735 C the linear interpolation keeps k close to its 700 C value and the ferrite starts much earlier than the times the table was built from (at 720 C, start at about 260 s against about 610 s with a log-linear interpolation of the same points). The heating tables already carry extra points for this reason; the cooling tables do not yet (section 5).
+The curves are drawn as Abaqus reads the tables: k and n interpolated linearly in temperature between the table points. The austenite -> ferrite table had points at 550, 600, 650, 700 and 735 C only, and k falls by almost two orders of magnitude between the last two, so between 700 and 735 C the linear interpolation kept k close to its 700 C value and the ferrite started much earlier than the times the table was built from (at 720 C, start at about 260 s against about 610 s with a log-linear interpolation of the same points). The heating tables already carried extra points for this reason; the cooling tables of the 27MnCr5 card now carry them too (k log-linear and n linear every 5 K between the table points). On continuous cooling the effect is small, because most of the ferrite forms between 650 and 700 C where the table was dense enough: at 1 C/s the ferrite falls from 49.6 to 45.9 % (Python version of the framework; Abaqus run to follow).
 
 ### 2.2 Differential carrier: EN-GJS-600-10
 
@@ -193,7 +193,7 @@ The residual expansion of the martensitic steel, +0.17 to +0.18 %, matches the s
 
 ## 5. Limitations and open points
 
-- **Ferrite of 27MnCr5 near 1 C/s too fast** against the 20MnCrS5 bound (section 3.1). It does not touch the weld model (the heat affected zone cools at hundreds of C/s), but it does matter for slower cycles (preheating, post-weld heat treatment). Part of it is numerical: the coarse austenite -> ferrite table is interpolated linearly in k (section 2.1); the first step is to add log-linear intermediate points to the cooling tables, as already done for heating, and to repeat PT01. A measured CCT of 27MnCr5 is then needed to recalibrate the kinetics themselves.
+- **Ferrite of 27MnCr5 near 1 C/s too fast** against the 20MnCrS5 bound (section 3.1). It does not touch the weld model (the heat affected zone cools at hundreds of C/s), but it does matter for slower cycles (preheating, post-weld heat treatment). About 4 points of it were numerical (coarse table interpolated linearly in k, corrected, section 2.1); the rest is in the kinetics themselves, from the times of the base card scaled with Li et al. [3]. A measured CCT of 27MnCr5 is needed to recalibrate them.
 - **Ms is fixed.** In the measured CCT, Ms falls at slow rates as the remaining austenite is enriched in carbon; the cards keep one Ms.
 - **No ledeburite.** The partially melted zone of the cast iron forms martensite and ledeburite, with hardness above 800 HV [11]; the card has no phase for the eutectic carbide.
 - **Retention in the cast iron** is the guide's rule, kept because retained austenite is reported in the heat affected zone of the joint [11], with no measured amount.
