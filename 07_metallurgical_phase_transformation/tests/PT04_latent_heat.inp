@@ -1,0 +1,63 @@
+*HEADING
+Latent heat of fusion: linear release against *LATENT HEAT, SMOOTH (20MnCr5 values)
+** Units: mm, s, tonne, N, MPa, mJ, C
+** Adiabatic elements, constant body flux 274 mW/mm3: 50 C/s sensible heating with rho cp =
+** 7.3E-9 x 7.5E8 = 5.475 mJ/mm3.C, latent heat 280E9 x 7.3E-9 = 2044 mJ/mm3 between 1470 and
+** 1530 C (about 7.5 s). Same history, E1 plain, E2 SMOOTH (scale factor 1).
+*MATERIAL, NAME=LH_PLAIN
+*DENSITY
+7.3E-09,
+*CONDUCTIVITY
+0.03,
+*SPECIFIC HEAT
+7.5E+08,
+*LATENT HEAT
+280E9, 1470., 1530.
+*MATERIAL, NAME=LH_SMOOTH
+*DENSITY
+7.3E-09,
+*CONDUCTIVITY
+0.03,
+*SPECIFIC HEAT
+7.5E+08,
+*LATENT HEAT, SMOOTH
+280E9, 1470., 1530., 1.0
+*NODE, NSET=N1
+1, 0, 0, 0
+2, 1, 0, 0
+3, 1, 1, 0
+4, 0, 1, 0
+5, 0, 0, 1
+6, 1, 0, 1
+7, 1, 1, 1
+8, 0, 1, 1
+*ELEMENT, TYPE=DC3D8, ELSET=E1
+1, 1, 2, 3, 4, 5, 6, 7, 8
+*NODE, NSET=N2
+9, 2, 0, 0
+10, 3, 0, 0
+11, 3, 1, 0
+12, 2, 1, 0
+13, 2, 0, 1
+14, 3, 0, 1
+15, 3, 1, 1
+16, 2, 1, 1
+*ELEMENT, TYPE=DC3D8, ELSET=E2
+2, 9, 10, 11, 12, 13, 14, 15, 16
+*NSET, NSET=ALL
+N1, N2
+*ELSET, ELSET=ELEMS
+E1, E2
+*SOLID SECTION, ELSET=E1, MATERIAL=LH_PLAIN
+*SOLID SECTION, ELSET=E2, MATERIAL=LH_SMOOTH
+*INITIAL CONDITIONS, TYPE=TEMPERATURE
+ALL, 1400.
+*STEP, NAME=MELT, INC=100000
+*HEAT TRANSFER, DELTMX=1.
+0.005, 13., 1.0E-6, 0.02
+*DFLUX
+ELEMS, BF, 274.
+*OUTPUT, HISTORY, FREQUENCY=1
+*ELEMENT OUTPUT, ELSET=ELEMS
+TEMP
+*END STEP

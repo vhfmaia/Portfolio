@@ -33,6 +33,9 @@
 **  - Heating transformations: ferrite / bainite / martensite -> austenite end at
 **    Ac3 = 831 C. Extra points above Ac3 follow a log-linear interpolation of the
 **    times, because Abaqus interpolates the tables linearly.
+**  - 2026-10-17, kinetics fixes (fix_20MnCr5_kinetics_2026_10_17.py): austenite -> ferrite
+**    JMA coefficients recomputed from the TTT reference times; martensite retention rule of
+**    the base card removed (KM law alone).
 **
 ** Not modelled: the enthalpy of the solid-state transformations (about 16 J/g
 ** for alpha -> gamma, against 280 J/g of latent heat of fusion). The framework
@@ -2118,12 +2121,16 @@
 ** 48.8, 337, 700.0
 ** 226, 1560, 735.0
 *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_JMA_Coefficients", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_JMA_Coefficients", TEMPERATURE
-** k = 1/(tau^n),  n,      Temp(C)
- 1.890E-04,         2.15,   550.
- 6.560E-05,         2.30,   600.
- 1.880E-05,         2.40,   650.
- 8.270E-07,         2.35,   700.
- 1.370E-07,         2.15,   735.
+** k, n from the TTT reference times above with the calibration of the Abaqus guide
+** (fs = 0.05, ff = 0.95): n = ln(ln(1-fs)/ln(1-ff)) / ln(ts/tf), k = -ln(1-fs) / ts^n.
+** 2026-10-17: recomputed; the base card had n = 2.15-2.40 with k not recomputed (start
+** times 24-124 % longer than its own TTT data).
+** k (1/s^n),       n,      Temp(C)
+ 3.3985E-04,  2.1002,  550.0
+ 2.4358E-04,  2.1049,  600.0
+ 1.4062E-04,  2.1044,  650.0
+ 1.4326E-05,  2.1049,  700.0
+ 5.6726E-07,  2.1054,  735.0
 *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_ParentEquiFrac", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_ParentEquiFrac", TEMPERATURE
  0.0, 550.
  1.0, 800.
@@ -2166,9 +2173,12 @@
 ** 0.05, 0.90
 ** *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_TTT_Diagram", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_TTT_Diagram"
 ** 385., 155.
+** Retained proportion (relative total volume fraction of the parent phase) against the
+** starting proportion: no retention rule, the retained austenite comes from the KM law alone
+** (about 3 % at 25 C). 2026-10-17: the table (0, 0), (0.25, 0.25), (0, 1) of the base card,
+** which is the one of the AISI 5140 verification input of the Abaqus guide, was removed.
 *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_ParentRetainedFrac", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_ParentRetainedFrac"
  0.,   0.
- 0.25, 0.25
  0.,   1.
 **
 ** --- FtoA, BtoA, MtoA Data ---
