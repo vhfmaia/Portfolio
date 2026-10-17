@@ -2174,8 +2174,9 @@
  0.01
 ** Reference TTT data of AtoM, NOT READ by Abaqus (the input option of AtoM is KM, coefficient above).
 ** The two proportions are of the CHILD phase (5 % martensite at Ms, 90 % at Ms - 230 K), the
-** meaning used to derive the KM coefficient; the guide defines the martensitic TTT constants as
-** proportions of the PARENT phase, so they must be rewritten (0.95, 0.10) before switching to TTT.
+** meaning of the KM calibration formula of the guide and of its AISI 5140 verification input
+** (0.05, 0.90 with gamma = 0.0194 between 333 and 217 C); the table reference page of the guide
+** calls them parent proportions: check on one element before switching AtoM to TTT.
 ** *PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_TTT_Constants", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_TTT_Constants"
 ** 0.05, 0.90
 ** *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_TTT_Diagram", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_TTT_Diagram"
