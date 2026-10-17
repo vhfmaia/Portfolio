@@ -221,9 +221,11 @@ Complete drive + coast cycle (270 N·m in both directions, 61 frames), compared 
   - *Pinion view:* the camera sits radially outside the crown at the loaded tooth and orbits with the load, so the meshing tooth stays in the centre.
   - *Front view along $Z$:* the gear stays still and the loaded zone travels the full 360°; the two ends of the weld flaw show as fixed spots.
   - *90° section:* a quarter of the crown and of the carrier, with one cut face through the meshing tooth, following the load.
-- **`run_pipeline.sh`:** headless batch wrapper for Linux / HPC; runs the exporter and packs the VTK files into `gear_helical_vtk.zip`.
+The exporter runs with the Python interpreter of Abaqus, next to the ODB; the VTK files are then packed into the archive that the GIF compiler reads:
 
 ```bash
+abaqus python odb_to_vtk.py Gear_Shaft_assembly_simulation.odb
+zip -9 gear_helical_vtk.zip gear_helical_*.vtk
 python compile_vtk_to_gif.py                  # extracts gear_helical_vtk.zip to vtk_results/ on first use
 python compile_vtk_to_gif.py --frames 0,8,16  # PNG previews of selected frames
 python compile_vtk_to_gif.py --vtk-dir DIR --output FILE.gif
@@ -344,7 +346,6 @@ The weld and the flaw tips are the region where the contact opens and closes, so
 ├── Materials_Assembly.inp                # 20MC5 and GJS600-10 material cards
 ├── odb_to_vtk.py                         # Abaqus Python ODB to VTK exporter
 ├── compile_vtk_to_gif.py                 # Three-viewport GIF compiler (nodal maximum principal stress)
-├── run_pipeline.sh                       # Headless Linux / HPC batch extraction script
 └── README.md                             # Technical documentation
 ```
 

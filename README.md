@@ -111,7 +111,6 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── Gear_Shaft_geometry.step               # CAD geometry: crown gear + differential carrier
 │   ├── compile_vtk_to_gif.py                  # Multi-viewport visualization compiler
 │   ├── odb_to_vtk.py                          # Abaqus Python ODB to VTK extractor
-│   ├── run_pipeline.sh                        # Headless Linux / HPC batch execution script
 │   └── README.md                              # Comprehensive Technical Report
 ├── 02_dflux_laser_welding/
 │   ├── THERMAL_RLS/                          # Thermal deck, DFLUX keyhole source, geometry (STEP), material cards
