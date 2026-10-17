@@ -40,7 +40,12 @@ S, PEEQ, E, SDV
 S, PEEQ, E
 *CONTACT OUTPUT
 CSTRESS, CDISP
-*OUTPUT, HISTORY, FREQUENCY=0
+** Increment ends on the thermal increment ends (beam on a node line): history output on one node at
+** every thermal time (BEAM_WELD, defined in the press-fit model). Abaqus resets the first increment
+** to a value read from the results file; these time points bring the increments back in line.
+*OUTPUT, HISTORY, TIME POINTS=BEAM_WELD
+*NODE OUTPUT, NSET=SYNC_NODE
+U,
 *END STEP
 **
 ** COOLING: 300 s, thermal step 2 of the results file; automatic increment up to 10 s
