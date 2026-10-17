@@ -71,34 +71,34 @@
 *MATERIAL, NAME="ABQ_PHASE_TRANS_GJS600_10"
 *DENSITY, DEPENDENCIES=3
 **
-** Format: Density (tonne/mm^3), Temp (C), fAustenite, fBainite, fMartensite
+** Format: Density (tonne/mm^3), Temp (C), rAustenite, rBainite, rMartensite
 **
 ** Ferrite Properties
-** fAustenite=0, fBainite=0, fMartensite=0
+** rAustenite=0, rBainite=0, rMartensite=0
  7.100E-09,    20.0, 0., 0., 0.
  6.750E-09,  1220.0, 0., 0., 0.
 **
 ** Austenite Properties
-** fAustenite=1, fBainite=0, fMartensite=0
+** rAustenite=1, rBainite=0, rMartensite=0
  7.220E-09,    20.0, 1., 0., 0.
  6.750E-09,  1220.0, 1., 0., 0.
 **
 ** Bainite Properties
-** fAustenite=0, fBainite=1, fMartensite=0
+** rAustenite=0, rBainite=1, rMartensite=0
  7.100E-09,    20.0, 0., 1., 0.
  6.750E-09,  1220.0, 0., 1., 0.
 **
 ** Martensite Properties
-** fAustenite=0, fBainite=0, fMartensite=1
+** rAustenite=0, rBainite=0, rMartensite=1
  7.100E-09,    20.0, 0., 0., 1.
  6.750E-09,  1220.0, 0., 0., 1.
 **
 *ELASTIC, TYPE=ISOTROPIC, DEPENDENCIES=3
 **
-** Format: E (MPa), nu, Temp (C), fAustenite, fBainite, fMartensite
+** Format: E (MPa), nu, Temp (C), rAustenite, rBainite, rMartensite
 **
 ** Ferrite Properties
-** fAustenite=0, fBainite=0, fMartensite=0
+** rAustenite=0, rBainite=0, rMartensite=0
    170000., 0.275,    20.0, 0., 0., 0.
    161905., 0.275,   200.0, 0., 0., 0.
    141667., 0.275,   400.0, 0., 0., 0.
@@ -113,7 +113,7 @@
      2000., 0.275,  1221.0, 0., 0., 0.
      2000., 0.275,  2800.0, 0., 0., 0.
 ** Austenite Properties
-** fAustenite=1, fBainite=0, fMartensite=0
+** rAustenite=1, rBainite=0, rMartensite=0
    170000., 0.275,    20.0, 1., 0., 0.
    161905., 0.275,   200.0, 1., 0., 0.
    141667., 0.275,   400.0, 1., 0., 0.
@@ -129,7 +129,7 @@
      2000., 0.275,  2800.0, 1., 0., 0.
 **
 ** Bainite Properties
-** fAustenite=0, fBainite=1, fMartensite=0
+** rAustenite=0, rBainite=1, rMartensite=0
    170000., 0.275,    20.0, 0., 1., 0.
    161905., 0.275,   200.0, 0., 1., 0.
    141667., 0.275,   400.0, 0., 1., 0.
@@ -145,7 +145,7 @@
      2000., 0.275,  2800.0, 0., 1., 0.
 **
 ** Martensite Properties
-** fAustenite=0, fBainite=0, fMartensite=1
+** rAustenite=0, rBainite=0, rMartensite=1
    170000., 0.275,    20.0, 0., 0., 1.
    161905., 0.275,   200.0, 0., 0., 1.
    141667., 0.275,   400.0, 0., 0., 1.
@@ -162,7 +162,7 @@
 **
 *PLASTIC, HARDENING=ISOTROPIC, DEPENDENCIES=3, EXTRAPOLATION=LINEAR
 **
-** Format: Stress (MPa), Strain (Unitless), Temp (C) fAustenite, fBainite, fMartensite
+** Format: Stress (MPa), Strain (Unitless), Temp (C) rAustenite, rBainite, rMartensite
 **
 ** Ferrite Properties
 ** Temperature = 20 C
@@ -489,7 +489,7 @@
     25.0, 0,  1200.0, 0., 0., 0.
     25.0, 0,  1220.0, 0., 0., 0.
 ** Austenite Properties
-** fAustenite=1, fBainite=0, fMartensite=0
+** rAustenite=1, rBainite=0, rMartensite=0
 **
 ** Temperature = 20 C
    322.0, 0,    20.0, 1., 0., 0.
@@ -817,7 +817,7 @@
 **
 **
 ** Bainite Properties
-** fAustenite=0, fBainite=1, fMartensite=0
+** rAustenite=0, rBainite=1, rMartensite=0
 **
 ** Temperature = 20 C
    800.0, 0,    20.0, 0., 1., 0.
@@ -1144,7 +1144,7 @@
     25.0, 0,  1220.0, 0., 1., 0.
 **
 ** --- Martensite Properties (Field Variable 3) ---
-** fAustenite=0, fBainite=0, fMartensite=1
+** rAustenite=0, rBainite=0, rMartensite=1
 **
 ** Temperature = 20 C
   1500.0, 0,    20.0, 0., 0., 1.
@@ -1478,7 +1478,7 @@
 ** strain frozen above the liquidus 1220 C; secant from -273.15 with a common shift of
 ** 0.012 (cancels in Abaqus, keeps alpha > 0).
 ** C = 0.5 wt% in the matrix austenite, as in the rest of this card (GJS 600-10: 3.1-3.4 C, 4.2-4.5 Si, Nogueira 2021 and Neto 2023, Tab. 3.3). Volume change of the graphite dissolution not included.
-** Format: secant Alpha from ZERO (1/C), Temp (C), fAustenite, fBainite, fMartensite
+** Format: secant Alpha from ZERO (1/C), Temp (C), rAustenite, rBainite, rMartensite
 ** Ferrite
  4.093468E-05,    20.0, 0., 0., 0.
  3.822528E-05,    50.0, 0., 0., 0.
@@ -1969,10 +1969,10 @@
  1.066724E-05,  2800.0, 0., 0., 1.
 *CONDUCTIVITY, TYPE=ISOTROPIC, DEPENDENCIES=3
 **
-** Format: Thermal conductivity (mJ/s*mm*K), Temp (C), fAustenite, fBainite, fMartensite
+** Format: Thermal conductivity (mJ/s*mm*K), Temp (C), rAustenite, rBainite, rMartensite
 **
 ** Ferrite Properties
-** fAustenite=0, fBainite=0, fMartensite=0
+** rAustenite=0, rBainite=0, rMartensite=0
   27.7,    20.0, 0., 0., 0.
   27.8,   100.0, 0., 0., 0.
   28.0,   200.0, 0., 0., 0.
@@ -1986,7 +1986,7 @@
   94.5,  1220.0, 0., 0., 0.
 **
 ** Austenite Properties
-** fAustenite=1, fBainite=0, fMartensite=0
+** rAustenite=1, rBainite=0, rMartensite=0
   14.0,    20.0, 1., 0., 0.
   15.8,   200.0, 1., 0., 0.
   17.9,   400.0, 1., 0., 0.
@@ -1999,7 +1999,7 @@
   89.1,  1220.0, 1., 0., 0.
 **
 ** Bainite Properties
-** fAustenite=0, fBainite=1, fMartensite=0
+** rAustenite=0, rBainite=1, rMartensite=0
   24.7,    20.0, 0., 1., 0.
   25.3,   100.0, 0., 1., 0.
   26.3,   200.0, 0., 1., 0.
@@ -2012,7 +2012,7 @@
   94.5,  1220.0, 0., 1., 0.
 **
 ** Martensite Properties
-** fAustenite=0, fBainite=0, fMartensite=1
+** rAustenite=0, rBainite=0, rMartensite=1
   26.3,    20.0, 0., 0., 1.
   27.0,   100.0, 0., 0., 1.
   28.0,   200.0, 0., 0., 1.
@@ -2026,10 +2026,10 @@
 **
 *SPECIFIC HEAT, DEPENDENCIES=3
 **
-** Format: Cp (mJ/tonne*K), Temp (C), fAustenite, fBainite, fMartensite
+** Format: Cp (mJ/tonne*K), Temp (C), rAustenite, rBainite, rMartensite
 **
 ** Ferrite Properties
-** fAustenite=0, fBainite=0, fMartensite=0
+** rAustenite=0, rBainite=0, rMartensite=0
  4.580E+08,    20.0, 0., 0., 0.
  4.820E+08,   100.0, 0., 0., 0.
  5.060E+08,   200.0, 0., 0., 0.
@@ -2044,7 +2044,7 @@
  6.800E+08,  1220.0, 0., 0., 0.
 **
 ** Austenite Properties
-** fAustenite=1, fBainite=0, fMartensite=0
+** rAustenite=1, rBainite=0, rMartensite=0
  4.580E+08,    20.0, 1., 0., 0.
  4.820E+08,   100.0, 1., 0., 0.
  5.060E+08,   200.0, 1., 0., 0.
@@ -2057,7 +2057,7 @@
  6.800E+08,  1220.0, 1., 0., 0.
 **
 ** Bainite Properties
-** fAustenite=0, fBainite=1, fMartensite=0
+** rAustenite=0, rBainite=1, rMartensite=0
  4.880E+08,    20.0, 0., 1., 0.
  5.060E+08,   100.0, 0., 1., 0.
  5.280E+08,   200.0, 0., 1., 0.
@@ -2069,7 +2069,7 @@
  6.800E+08,  1220.0, 0., 1., 0.
 **
 ** Martensite Properties
-** fAustenite=0, fBainite=0, fMartensite=1
+** rAustenite=0, rBainite=0, rMartensite=1
  4.700E+08,    20.0, 0., 0., 1.
  4.900E+08,   100.0, 0., 0., 1.
  5.100E+08,   200.0, 0., 0., 1.
@@ -2118,16 +2118,17 @@
 " ", " ",
 ** --- AtoF Data ---
 ** Li et al. (1998) model with 0.5 C - 4.2 Si - 0.25 Mn, upper limit 930 C
-*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_TTT_Constants", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_TTT_Constants"
- 0.05, 0.95
-*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_TTT_Diagram", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_TTT_Diagram", TEMPERATURE
+** Reference TTT data of AtoF, NOT READ by Abaqus (the input option of AtoF is JMA, coefficients below):
+** *PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_TTT_Constants", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_TTT_Constants"
+** 0.05, 0.95
+** *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_TTT_Diagram", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_TTT_Diagram", TEMPERATURE
 ** Start Time, End Time, Temp(C)
- 1.85, 12.7, 620.0
- 1.33, 9.14, 680.0
- 1.29, 8.81, 740.0
- 1.87, 12.8, 800.0
- 6.05, 41.5, 860.0
- 50.7, 347, 900.0
+** 1.85, 12.7, 620.0
+** 1.33, 9.14, 680.0
+** 1.29, 8.81, 740.0
+** 1.87, 12.8, 800.0
+** 6.05, 41.5, 860.0
+** 50.7, 347, 900.0
 *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_JMA_Coefficients", LABEL="ABQ_PHASE_TRANS_Trans_AtoF_JMA_Coefficients", TEMPERATURE
 ** k = 1/(tau^n),  n,      Temp(C)
  1.400E-02,         2.11,   620.
@@ -2142,17 +2143,18 @@
 **
 ** --- AtoB Data ---
 ** Li et al. (1998) model with 0.5 C - 4.2 Si - 0.25 Mn, Bs = 600 C
-*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_TTT_Constants", LABEL="ABQ_PHASE_TRANS_Trans_AtoB_TTT_Constants"
- 0.05, 0.95
-*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_TTT_Diagram", LABEL="ABQ_PHASE_TRANS_Trans_AtoB_TTT_Diagram", TEMPERATURE
+** Reference TTT data of AtoB, NOT READ by Abaqus (the input option of AtoB is JMA, coefficients below):
+** *PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_TTT_Constants", LABEL="ABQ_PHASE_TRANS_Trans_AtoB_TTT_Constants"
+** 0.05, 0.95
+** *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_TTT_Diagram", LABEL="ABQ_PHASE_TRANS_Trans_AtoB_TTT_Diagram", TEMPERATURE
 ** Start Time, End Time, Temp(C)
- 135, 927, 300.0
- 28.1, 192, 350.0
- 8.42, 57.7, 400.0
- 3.61, 24.8, 450.0
- 2.36, 16.2, 500.0
- 3.18, 21.8, 550.0
- 17.8, 122, 585.0
+** 135, 927, 300.0
+** 28.1, 192, 350.0
+** 8.42, 57.7, 400.0
+** 3.61, 24.8, 450.0
+** 2.36, 16.2, 500.0
+** 3.18, 21.8, 550.0
+** 17.8, 122, 585.0
 *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_JMA_Coefficients", LABEL="ABQ_PHASE_TRANS_Trans_AtoB_JMA_Coefficients", TEMPERATURE
 ** k = 1/(tau^n),  n,      Temp(C)
  1.620E-06,         2.11,   300.
@@ -2170,10 +2172,14 @@
 ** Ms = 290 C, 90 % transformed at Ms - 230 K
 *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_KM_Coefficients", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_KM_Coefficients"
  0.01
-*PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_TTT_Constants", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_TTT_Constants"
- 0.05, 0.90
-*PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_TTT_Diagram", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_TTT_Diagram"
- 290., 60.
+** Reference TTT data of AtoM, NOT READ by Abaqus (the input option of AtoM is KM, coefficient above).
+** The two proportions are of the CHILD phase (5 % martensite at Ms, 90 % at Ms - 230 K), the
+** meaning used to derive the KM coefficient; the guide defines the martensitic TTT constants as
+** proportions of the PARENT phase, so they must be rewritten (0.95, 0.10) before switching to TTT.
+** *PARAMETER TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_TTT_Constants", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_TTT_Constants"
+** 0.05, 0.90
+** *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_TTT_Diagram", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_TTT_Diagram"
+** 290., 60.
 *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Martensitic_ParentRetainedFrac", LABEL="ABQ_PHASE_TRANS_Trans_AtoM_ParentRetainedFrac"
  0.,   0.
  0.25, 0.25
@@ -2222,6 +2228,13 @@
 *PROPERTY TABLE, TYPE="ABQ_PHASE_TRANS_Diffusional_ParentEquiFrac", LABEL="ABQ_PHASE_TRANS_Trans_MtoA_ParentEquiFrac", TEMPERATURE
  1.0, 700.
  0.0, 970.
+** Field variables 1-3 are the volume fraction ratios RFPHASE2-4 of the framework (phase order
+** of ABQ_PHASE_TRANS_SolidPhases: 1 Ferrite, 2 Austenite, 3 Bainite, 4 Martensite):
+**   r_i = f_i / (f_1 + ... + f_i),  i = 2..4   (Abaqus Materials Guide, Modeling Metallurgical
+**   Phase Transformations: material properties as functions of metallurgical state)
+** rAustenite = fA/(fF+fA), rBainite = fB/(fF+fA+fB), rMartensite = fM. A pure phase is one row
+** below: ferrite (0,0,0), austenite (1,0,0), bainite (0,1,0), martensite (0,0,1); mixtures are
+** interpolated in the ratios.
 *PARAMETER TABLE,  TYPE="ABQ_PHASE_TRANS_FieldVariables"
 1, "RFPHASE2",
 2, "RFPHASE3",
