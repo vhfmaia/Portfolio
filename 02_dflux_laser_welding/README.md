@@ -307,7 +307,36 @@ The stress decks (C3D8 / C3D4) read the temperatures of the thermal run from its
 - **Base on the flange.** The crown base is wider than the flange; the contact uses only the part of the base above the flange (`CROWN_BASE_IN`), the rest is a free face.
 - **Restart.** The press fit is computed once with `*RESTART, WRITE`; the weld and cooling restart from it, so the solver, the increment and NLGEOM can be changed without repeating it.
 
-Status: the thermal run is verified; the stress run is being set up (press-fit convergence, then the choice of solver, NLGEOM and increment on short weld runs). With quadratic tets the stress model had 5.1 million equations and the weld restart ran out of memory in its fifth increment; with linear tets it has about 2.9 million.
+Status: the thermal run is verified; the stress run is being set up on short weld restarts (sections 8.1-8.2). With quadratic tets the stress model had 5.1 million equations and the weld restart ran out of memory in its fifth increment; with linear tets it has 2.82 million.
+
+### 8.1 Why the weld stress step cuts back
+
+The short weld restarts (40 thermal increments, 24 deg) stop at the same place: at the start of an increment Abaqus reports *"the strain increment is so large that the program will not attempt the plasticity calculation"* at a few points, judges convergence unlikely and cuts the increment before any equilibrium iteration. The check compares the strain increment of a point with its strain at first yield, sigma_y / E, and gives up beyond about 50 times.
+
+- **Where.** The points are just ahead of and under the beam, in the solid heat-affected zone of the steel between about 1 000 and 1 470 C (the solidus), in the filler heating up to its anneal temperature, and in the raw wire ahead of the beam; none of them is liquid. In the steel card the yield stress there is 5-20 MPa for a modulus of 1 500-7 000 MPa, so the strain at first yield is about 3E-3, the smallest of the model; the liquid (25 / 2 000 MPa, 1.3E-2) is not the problem.
+- **Why at the start of the increment.** By default a static step starts each increment from the previous displacement increment, extrapolated linearly. With a moving source the previous increment has the shape of the pool where the beam was, one node line back, and repeating it puts a large strain on the soft points of the new pool position. Without extrapolation the first iteration starts from the converged state and responds only to the new temperatures.
+- **Not the hardening memory.** The cards already anneal at the liquidus (`*ANNEAL TEMPERATURE` 1 530 C steel, 1 220 C cast iron, 1 350 C filler). Annealing removes the accumulated plastic strain, not the size of a strain increment, so it does not take part in this check. It is kept at the liquidus on purpose: the plastic strain in the solidus-liquidus interval is what a solidification and liquation cracking criterion needs.
+
+### 8.2 Choices for the weld step, measured on 40-increment restarts
+
+Every run reads the same thermal results, starts from the same press fit, and keeps the stress increment on the thermal increment (one node line, history output at the thermal times so that a cut-back returns to them). Percentages are against the run in the first row; iterations are summed over the first 17 increments, where every run still converges.
+
+| Weld step | Increments 1-17 | Increment 18 | Gained | Lost |
+| :--- | :--- | :--- | :--- | :--- |
+| No stabilization, linear extrapolation (default) | cut-backs from increment 9: the increment falls to 0.003-0.013 s, mean 0.46 of the thermal dt | cut back | | |
+| One stress increment per two thermal increments | the same cut-backs, the mean increment 0.26 of the requested one; up to 128 points without plasticity in one iteration against 21 | cut back | none: about the same number of iterations per second of weld (+9 %) | twice the time between temperature updates; increments off the thermal times |
+| **Viscous stabilization** (`STABILIZE=2.0E-4, ALLSDTOL=0.05, CONTINUE=NO`) | no cut-back, every increment at the thermal dt; **135 iterations** | cut back (320 points beyond 50 x first yield, 12 without plasticity, at the first evaluation) | the cut-backs of increments 9-17 | damping energy, checked: **ALLSD / ALLIE at most 0.08 %**, the damping of the weld about 0.8 % of its plastic dissipation |
+| + **no extrapolation** (`EXTRAPOLATION=NO`) | **97 iterations (-28 %)** | **converged at the first attempt, 6 iterations**; 239 points beyond 50 x first yield, none without plasticity | the cut-back of increment 18; iterations | none measured |
+| + **force residual on a fixed reference force** (15 N) | **81 iterations (-40 %)** | converged at the first attempt, 5 iterations | -16 % iterations against the run above | a looser equilibrium (under check, below) |
+
+- **Stabilization.** `*STATIC, STABILIZE` adds a damping force proportional to the nodal velocity, scaled so that it dissipates a small fraction of the strain energy. The soft points around the pool are held back when an iteration moves them far; stiff material hardly feels it. `CONTINUE=NO` recomputes the factor for the weld step instead of carrying the one of the press fit. The global check (ALLSD / ALLIE) is passed by two orders of magnitude; the local one (element damping energy ELSD in the heat-affected zone and the filler) is requested in the current runs, because the damping acts where the material is soft, which is also where a hot cracking criterion reads the strain.
+- **Reference force.** Abaqus measures the force residual against the average nodal force of the whole model, about 1.9 N here: 960 000 nodes, nearly all far from the weld, so the tolerance is 0.005 x 1.9 = 0.01 N, against about 75 N at a node of the pool (300 MPa on 0.25 mm2). A fixed reference of 15 N with a 1 % ratio gives 0.15 N, 0.2 % of the force at the pool, the same approach as the reference heat flux of the thermal run (section 7.5): `*CONTROLS, PARAMETERS=FIELD, FIELD=DISPLACEMENT` with `0.01, 0.02, , 15., 0.05`. Unlike a heat flux error, an accepted force imbalance stays in the stresses, so the choice is kept only if the stresses along the joint match the run without it (comparison in progress); the plastic points of the two runs are already the same, increment by increment (180 beyond 50 x first yield in both at increment 18).
+- **NLGEOM stays off.** Geometric nonlinearity does not change the strain-increment check and makes each iteration dearer; the displacement increments are below 0.05 mm on a 55 mm joint radius.
+- **No change of the material cards for convergence.** A mechanical cut-off temperature (properties frozen above about 1 300 C) would remove the problem but also the plastic strain in the solidus-liquidus interval needed for hot cracking, so it is kept as a fallback for a global residual-stress model only.
+
+No saw-tooth (alternating values from element to element or from increment to increment) is seen along the joint in the hoop and radial stress, the plastic strain or the phases, except one physical case: the first element of the steel heat-affected zone to cool below Ms (385 C) takes martensite while its neighbours are still austenite, and the constrained expansion puts it in compression and the neighbours in tension (hydrostatic stress +186 MPa against -326 / -206 MPa), a transformation front resolved on one element.
+
+The pool reaches its quasi-steady size at about 33 deg (thermal run), after the 24 deg of these restarts; the next check runs to 45 deg (75 increments) to see whether the plastic points and the iterations level off in the steady pool before the full weld is launched.
 
 ---
 
@@ -385,7 +414,6 @@ Three folders, run in this order:
 | `THERMAL_RLS/bimaterial_assembly.step` | geometry, five named solids (section 2) |
 | `PRESS_RLS/bimaterial_RLS_Press.inp` | stress model and press fit at 25 C, writes the restart data |
 | `MECHANICAL_RLS/bimaterial_RLS_Mech.inp` | weld (750 increments, one per thermal increment) and cooling (300 s) stress analysis, restart of the press fit, reads the thermal results file |
-| `MECHANICAL_RLS/bimaterial_RLS_Mech_dt2.inp` | the same with one stress increment per two thermal increments (375 in the weld), to compare the cost |
 | `Material_20MnCr5.inp`, `Material_GJS600_10.inp` | base metals in the phase transformation framework (in `THERMAL_RLS` and `PRESS_RLS`) |
 | `Material_20MnCr5_TET.inp`, `Material_GJS600_10_TET.inp` | plain cards for the tetrahedra |
 | `Material_Inconel82_RLS.inp` | filler, raw wire in the RLS state |
