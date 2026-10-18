@@ -2,7 +2,7 @@
 !=======================================================================
 !  Abaqus/Standard User Subroutine: DFLUX
 !  Model: Circumferential Laser Welding - Moving Keyhole Heat Source:
-!         double conical Gaussian (head cone over body cone) with a
+!         triple conical Gaussian (head cone, body cone, root cone) with a
 !         hemispherical bottom
 !         Crown Gear & Differential Carrier Assembly with Ni 6082 filler
 !         (bimaterial weld model: THERMAL_RLS/bimaterial_RLS_Thermal.inp)
@@ -16,9 +16,13 @@
 !    q = q0_i * exp(-3 r2 / r0(z)2) * g(z)
 !  - Head cone (fraction f_up of the absorbed power): 0 <= z <= d_up,
 !      r0 = r_top -> r_mid
-!  - Body cone (fraction 1 - f_up): d_up < z <= depth_cone,
-!      r0 = r_mid -> r_bottom
-!  - Bottom (keyhole tip, part of the body power): z > depth_cone,
+!  - Body cone (fraction 1 - f_up - f_root): d_up < z <= d_root,
+!      r0 = r_mid -> r_neck
+!  - Root cone (fraction f_root): d_root < z <= depth_cone,
+!      r0 = r_neck -> r_bottom (r_bottom > r_neck: the weld widens again at
+!      the root, where it meets the gas escape chamber, as in every 180 deg
+!      macrograph of Nogueira (2021) and Neto (2023))
+!  - Bottom (keyhole tip, part of the root power): z > depth_cone,
 !      r0 = r_bottom, g = exp(-3 (z - depth_cone)2 / r_cap2). With
 !      r_cap = r_bottom the iso-surfaces close as hemispheres.
 !  The radius is continuous at z = d_up; the peak flux steps from q0_up to
@@ -60,7 +64,7 @@
 !      widening of the root at the chamber is not reproduced. The Abaqus run
 !      with that source was too wide in the body (1.32 mm at 2.24 mm, +59 %):
 !      the surrogate has no latent heat, no liquid conductivity, no chamber.
-!    - Second calibration (2026-10-16, these values): the ratio of the FE
+!    - Second calibration (2026-10-16): the ratio of the FE
 !      solidus width to the surrogate width at each depth, from the first
 !      run, kept fixed (space mapping), and the source fitted so that
 !      ratio x surrogate matches the macrograph down to 4.2 mm; depth_total
@@ -69,11 +73,45 @@
 !      3.51 / 4.15: 2.26/2.38, 2.05/1.92, 1.68/1.68, 1.23/1.29, 0.95/0.83,
 !      0.88/0.94, 0.85/0.93, 1.06/1.01. The ratios come from a run with the
 !      first source: the next thermal run checks them.
-!    - mesh_factor = 0.960: 2054 W of the 2064 W absorbed fall in the weld
+!    - Third calibration (2026-10-17, these values): triple cone. Targets:
+!      the 180 deg cuts (steady weld, opposite the overlap) of Nogueira (2021)
+!      Fig. 6.11(b), 6.12(b), 6.13(b) and Neto (2023) Fig. 6.11(c), 4 kW, CC BY
+!      4.0; the earlier target, Fig. 6.13(a), is the 0 deg overlap cut. Mean
+!      widths [mm] at 0 / 0.5 / ... / 5 mm: 2.31 1.94 1.54 1.23 0.97 0.88
+!      0.91 0.95 0.99 1.16 1.41 (the root widens again at the chamber, on the
+!      cast-iron side). Surrogate with the gas escape chamber as an adiabatic
+!      face at 5 mm (image sources); ratio FE / surrogate of the second-source
+!      run (frame 43, steady) 0.97-1.28 at every depth, kept fixed (space
+!      mapping). Nelder-Mead on the GPU, misfit weighted by the sd of the four
+!      cuts. Predicted / measured: 2.27/2.31 2.04/1.94 1.57/1.54 1.17/1.23
+!      1.01/0.97 0.89/0.88 0.87/0.91 0.89/0.95 0.97/0.99 1.19/1.16 1.39/1.41.
+!      Checked by a 75-increment thermal run before the full run (CAL75).
+!    - Fourth calibration (2026-10-18, these values): same targets and fit,
+!      ratio FE / surrogate taken from the CAL75 run of the third source
+!      (frame 15, 45 deg, steady from 18 deg): 0.93-1.29. CAL75 against the
+!      cuts: +2 / +7 / +9 / +6 / +4 % at 0-2 mm, -4 % at 3 mm, -10 % at 4 mm,
+!      -21 % at the root (1.11/1.41). Predicted / measured: 2.29/2.31
+!      1.98/1.94 1.54/1.54 1.22/1.23 0.98/0.97 0.90/0.88 0.88/0.91 0.88/0.95
+!      0.96/0.99 1.19/1.16 1.40/1.41. d_root at its bound (4.6 mm): the root
+!      cone is a short wide flare (r_bottom 1.46 mm) in the last 0.18 mm of
+!      the cone; the ratio at the root is the least reliable, check it.
+!    - mesh_factor = 0.948 (fourth source): 2070 W of the 2116 W absorbed in
+!      the weld land; 2182 W on the mesh, 1962 W between node lines (-10.1 %).
+!    - Check of the fourth source (CAL75b, 75 increments to 45 deg, crown
+!      27MnCr5, solidus envelope, mean of the steady frames 18-45 deg)
+!      against the mean of the four 180 deg cuts, 0 / 0.5 / ... / 5 mm:
+!      2.22/2.31 1.94/1.94 1.51/1.54 1.23/1.23 1.04/0.97 0.99/0.88 0.97/0.91
+!      0.97/0.95 0.98/0.99 1.17/1.16 1.35/1.41: rms 5.3 %, 9 of 11 depths
+!      within the scatter of the cuts (third source: rms 9.6 %, root -21 %).
+!      Centre of the fusion zone from the joint, towards the steel: +0.08 mm
+!      at the surface, +0.26 mm at 3 mm (cuts: mean +0.08 / +0.20). This is
+!      the source of the model (beam offset 0.2 mm kept).
+!      Third source, kept below for the record:
+!    - mesh_factor = 0.952: 2040 W of the 2068 W absorbed fall in the weld
 !      land; integrated on the DC3D8 mesh (2x2x2 Gauss points), beam at
 !      r = 55.2 mm on a node line as at every increment end, the source gives
-!      2139 W. Between two node lines it would give 1955 W (-8.6 %): the body
-!      radius (0.42-0.45 mm) is smaller than the circumferential element
+!      2143 W. Between two node lines it would give 1949 W (-9.1 %): the body
+!      radius (0.41 mm) is smaller than the circumferential element
 !      (0.58 mm), keep the increments aligned.
 !=======================================================================
 
@@ -85,24 +123,27 @@ module laser_dflux_mod
     ! 1. PROCESS PARAMETERS
     ! ------------------------------------------------------------------
     real(real64), parameter :: qtot_nominal = 4.00d6        ! Nominal beam power [mW = mJ/s] (4000 W)
-    real(real64), parameter :: eta_absorb   = 0.516d0       ! Share of the beam absorbed in the weld land (full penetration) [-]
+    real(real64), parameter :: eta_absorb   = 0.529d0       ! Share of the beam absorbed in the weld land (full penetration) [-]
     real(real64), parameter :: weld_radius  = 55.00d0       ! Circular joint radius [mm] (centre of the filler gap)
     real(real64), parameter :: beam_offset  = 0.20d0        ! Radial offset of the beam axis towards the steel crown [mm]
     real(real64), parameter :: travel_speed = 1500.0d0      ! Travel speed [mm/min] (25 mm/s)
     real(real64), parameter :: z_surface    = 25.00d0       ! Top irradiated surface Z coordinate [mm]
     real(real64), parameter :: cutoff_tol   = 1.0d-8        ! Gaussian tail cut-off, fraction of the peak [-]
-    real(real64), parameter :: mesh_factor  = 0.960d0       ! Correction of the power integrated on the mesh [-]
+    real(real64), parameter :: mesh_factor  = 0.948d0       ! Correction of the power integrated on the mesh [-]
 
     ! ------------------------------------------------------------------
     ! 2. SOURCE GEOMETRY AND POWER SPLIT
     ! ------------------------------------------------------------------
     real(real64), parameter :: depth_total  = 5.200d0        ! Penetration of the source, depth_cone + r_cap [mm]
-    real(real64), parameter :: d_up         = 0.750d0        ! Depth of the head cone [mm]
-    real(real64), parameter :: r_top        = 1.016d0        ! Head Gaussian radius at the surface [mm]
-    real(real64), parameter :: r_mid        = 0.454d0        ! Gaussian radius at the head / body junction [mm]
-    real(real64), parameter :: r_bottom     = 0.420d0        ! Body Gaussian radius at the bottom of the cone [mm] (the body narrows downwards)
+    real(real64), parameter :: d_up         = 0.816d0        ! Depth of the head cone [mm]
+    real(real64), parameter :: r_top        = 1.605d0        ! Head Gaussian radius at the surface [mm]
+    real(real64), parameter :: r_mid        = 0.395d0        ! Gaussian radius at the head / body junction [mm]
+    real(real64), parameter :: d_root       = 4.599d0        ! Depth of the body / root junction [mm]
+    real(real64), parameter :: r_neck       = 0.395d0        ! Gaussian radius at the body / root junction [mm]
+    real(real64), parameter :: r_bottom     = 1.457d0        ! Root Gaussian radius at the bottom of the cone [mm] (the root widens downwards)
     real(real64), parameter :: r_cap        = 0.420d0        ! Depth radius of the bottom (= r_bottom: hemisphere) [mm]
-    real(real64), parameter :: f_up         = 0.418d0        ! Fraction of the absorbed power in the head cone [-]
+    real(real64), parameter :: f_up         = 0.342d0        ! Fraction of the absorbed power in the head cone [-]
+    real(real64), parameter :: f_root       = 0.165d0        ! Fraction of the absorbed power in the root cone and bottom [-]
 
     ! ------------------------------------------------------------------
     ! 3. ANGULAR POWER SCHEDULE PARAMETERS
@@ -119,10 +160,12 @@ module laser_dflux_mod
     !   truncated cone of height h, radii a -> b:  h (a2 + a b + b2) / 3
     !   bottom: r_bottom2 * integral of exp(-3 u2 / r_cap2) du over u > 0 = r_bottom2 r_cap sqrt(pi / 3) / 2
     real(real64), parameter :: v_up       = d_up * (r_top**2 + r_top * r_mid + r_mid**2) / 3.0d0
-    real(real64), parameter :: v_low      = (depth_cone - d_up) * (r_mid**2 + r_mid * r_bottom + r_bottom**2) / 3.0d0
+    real(real64), parameter :: v_low      = (d_root - d_up) * (r_mid**2 + r_mid * r_neck + r_neck**2) / 3.0d0
+    real(real64), parameter :: v_root     = (depth_cone - d_root) * (r_neck**2 + r_neck * r_bottom + r_bottom**2) / 3.0d0
     real(real64), parameter :: v_cap      = r_bottom**2 * r_cap * sqrt(pi_const / 3.0d0) / 2.0d0
     real(real64), parameter :: q0_up      = 3.0d0 * f_up * q_abs / (pi_const * v_up)
-    real(real64), parameter :: q0_low     = 3.0d0 * (1.0d0 - f_up) * q_abs / (pi_const * (v_low + v_cap))
+    real(real64), parameter :: q0_low     = 3.0d0 * (1.0d0 - f_up - f_root) * q_abs / (pi_const * v_low)
+    real(real64), parameter :: q0_root    = 3.0d0 * f_root * q_abs / (pi_const * (v_root + v_cap))
     ! Distance, in units of the Gaussian radius, where the flux falls to cutoff_tol
     real(real64), parameter :: cut_factor = sqrt(-log(cutoff_tol) / 3.0d0)
 
@@ -152,7 +195,7 @@ contains
         end if
     end function power_factor
 
-    !> Volumetric flux of the double cone + hemispherical bottom at a point
+    !> Volumetric flux of the triple cone + hemispherical bottom at a point
     pure subroutine compute_flux(time_val, coords, q_vol)
         real(real64), intent(in)  :: time_val
         real(real64), intent(in)  :: coords(3)
@@ -172,18 +215,22 @@ contains
                     (coords(2) - r_beam * sin(theta_rad))**2
         z_local = max(z_surface - coords(3), 0.0d0)
 
-        ! Head cone, body cone, hemispherical bottom
+        ! Head cone, body cone, root cone, hemispherical bottom
         if (z_local <= d_up) then
             r0_z = r_top + (r_mid - r_top) * (z_local / d_up)
             q0_z = q0_up
             g_z  = 1.0d0
-        else if (z_local <= depth_cone) then
-            r0_z = r_mid + (r_bottom - r_mid) * ((z_local - d_up) / (depth_cone - d_up))
+        else if (z_local <= d_root) then
+            r0_z = r_mid + (r_neck - r_mid) * ((z_local - d_up) / (d_root - d_up))
             q0_z = q0_low
+            g_z  = 1.0d0
+        else if (z_local <= depth_cone) then
+            r0_z = r_neck + (r_bottom - r_neck) * ((z_local - d_root) / (depth_cone - d_root))
+            q0_z = q0_root
             g_z  = 1.0d0
         else
             r0_z = r_bottom
-            q0_z = q0_low
+            q0_z = q0_root
             g_z  = 0.0d0
             if (z_local - depth_cone <= cut_factor * r_cap) &
                 g_z = exp(-3.0d0 * (z_local - depth_cone)**2 / r_cap**2)

@@ -1,20 +1,20 @@
 *HEADING
-Crown gear / carrier laser weld with Ni 6082 filler - transient thermal analysis (phase transformations), raw filler (RLS), unsymmetric solver, linear tets DC3D4, source of the second calibration (job bimaterial_RLS_Thermal)
+Crown gear / carrier laser weld with Ni 6082 filler - transient thermal analysis (phase transformations), raw filler (RLS), unsymmetric solver, linear tets DC3D4, source of the fourth calibration (triple cone), crown 27MnCr5 (job bimaterial_RLS_Thermal)
 **
 *PHYSICAL CONSTANTS, ABSOLUTE ZERO=-273.15, STEFAN BOLTZMANN=5.67E-11
 **
 ** Units: mm, s, tonne, N, MPa, mJ, C
-** Crown gear 20MnCr5 (Material_20MnCr5.inp), carrier EN-GJS-600-10
+** Crown gear 27MnCr5 (Material_27MnCr5.inp), carrier EN-GJS-600-10
 ** (Material_GJS600_10.inp), filler wire Ni 6082 / Inconel 82 (Material_Inconel82_RLS.inp)
 ** Mesh: mesh_nodes.inp, mesh_elements_TH.inp, mesh_sets_RLS_TH.inp (build_run_mesh.py from
 ** bimaterial_assembly.inp, ANSA export fixed by fix_assembly.py)
 **
 ** Table types of the phase transformation framework: once, before the materials
 *INCLUDE, INPUT=Material_phase_trans_table_types.inp
-*INCLUDE, INPUT=Material_20MnCr5.inp
+*INCLUDE, INPUT=Material_27MnCr5.inp
 *INCLUDE, INPUT=Material_GJS600_10.inp
 ** Tets away from the weld: plain cards, no SDV (below Ac1, no transformation)
-*INCLUDE, INPUT=Material_20MnCr5_TET.inp
+*INCLUDE, INPUT=Material_27MnCr5_TET.inp
 *INCLUDE, INPUT=Material_GJS600_10_TET.inp
 *INCLUDE, INPUT=Material_Inconel82_RLS.inp
 *INCLUDE, INPUT=mesh_nodes.inp
