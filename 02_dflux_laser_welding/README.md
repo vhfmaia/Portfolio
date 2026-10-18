@@ -327,6 +327,12 @@ The stress decks (C3D8 / C3D4) read the temperatures of the thermal run from its
 - **Base on the flange.** The crown base is wider than the flange; the contact uses only the part of the base above the flange (`CROWN_BASE_IN`), the rest is a free face.
 - **Restart.** The press fit is computed once with `*RESTART, WRITE`; the weld and cooling restart from it, so the solver, the increment and NLGEOM can be changed without repeating it.
 
+<p align="center">
+  <img src="../99_images_and_miscelania/bimaterial_press_fit_stress.png" alt="Stresses of the press fit in an r-z section: hoop and von Mises stress of the crown and carrier, radial stress at the joint and contact pressure along the bore" width="100%">
+</p>
+
+<b>Result of the press fit</b> (r-z section at 60 deg, away from the three hold nodes; the filler is not in the model yet). The interference puts the crown in hoop tension (about +60 MPa next to the bore, up to about +115 MPa at its foot) and the seat wall of the carrier in hoop compression (about -60 MPa); the von Mises stress next to the joint is at most about 150 MPa, at the bottom corner of the chamber on the carrier side, and both parts stay elastic (plastic strain only at the hold nodes). The contact pressure is about 24 MPa along the middle of the fit and rises at both ends, to about 100 MPa at the lead-in chamfer and 120 MPa under the gas escape chamber, where the seat wall ends: the classic end peaks of a shrink fit. The upper peak lies in the fine hex mesh and the rest of the fit in the linear tets, so the jump at z = 13.5 (the hex / tet tie) is partly the mesh (section 3). The weld land above the chamber carries little of the press-fit stress (von Mises about 30 MPa): the weld starts from a lightly loaded joint.
+
 Status: the thermal run is verified; the stress run is being set up on short weld restarts (sections 8.1-8.3). With quadratic tets the stress model had 5.1 million equations and the weld restart ran out of memory in its fifth increment; with linear tets it has 2.82 million.
 
 ### 8.1 Why the weld stress step cuts back
