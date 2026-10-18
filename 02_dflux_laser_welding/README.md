@@ -14,7 +14,7 @@ A case-hardening steel crown gear (27MnCr5) is laser welded to an EN-GJS-600-10 
 <p align="center">
   <img src="../99_images_and_miscelania/bimaterial_weld_rls_blackbody.gif" alt="Bimaterial laser weld, thermal run: unrolled top surface, longitudinal section, weld cross-section and expected macrograph" width="100%">
 </p>
-<p align="center"><i>Thermal run (raw-wire filler, second source calibration), 0 to 60 deg: unrolled top surface, longitudinal section on the joint, weld cross-section (projection of the pool along the travel) with the solidus and Ac1 lines, and the expected macrograph. The pool is steady from about 27 deg.</i></p>
+<p align="center"><i>Thermal run with the heat source of the model (triple cone, fourth calibration, raw-wire filler, 27MnCr5 crown), 0 to 45 deg: unrolled top surface, longitudinal section on the joint, weld cross-section (projection of the pool along the travel) with the solidus and Ac1 lines, and the expected macrograph. The pool is steady from about 18-27 deg.</i></p>
 
 ---
 
@@ -199,7 +199,7 @@ The crown, the carrier and the filler use the built-in metallurgical phase trans
 | Cooling | A -> F 550 to 800 C and A -> B 385 to 545 C (JMA); A -> M below Ms = 385 C (Koistinen-Marburger, gamma = 0.01 1/K) | A -> F 600 to 930 C, A -> B 290 to 600 C (ausferrite), A -> M below 290 C | none |
 | Card | `Material_20MnCr5.inp` | `Material_GJS600_10.inp` | `Material_Inconel82_RLS.inp` |
 
-The press fit, the stress run and the thermal deck use the crown steel of the theses, 27MnCr5 (<code>Material_27MnCr5.inp</code> and <code>_TET.inp</code>, in <code>THERMAL_RLS</code> and <code>PRESS_RLS</code>): the same card structure and thermal property values, with Ac1 = 732 C, Ac3 = 815 C, Ms = 372 C and a solidus of 1455 C from its composition, built from published data and checked on one element in [07_metallurgical_phase_transformation](../07_metallurgical_phase_transformation/). The thermal deck uses it too since the third source calibration (section 9); the first full thermal run, behind the animation above and the hardness estimate of section 9, used the 20MnCr5 card.
+The press fit, the stress run and the thermal deck use the crown steel of the theses, 27MnCr5 (<code>Material_27MnCr5.inp</code> and <code>_TET.inp</code>, in <code>THERMAL_RLS</code> and <code>PRESS_RLS</code>): the same card structure and thermal property values, with Ac1 = 732 C, Ac3 = 815 C, Ms = 372 C and a solidus of 1455 C from its composition, built from published data and checked on one element in [07_metallurgical_phase_transformation](../07_metallurgical_phase_transformation/). The thermal deck uses it too since the third source calibration (section 9); the first full thermal run, behind the hardness estimate of section 9, used the 20MnCr5 card.
 
 <b>Properties depend on the phases.</b> Density, elastic constants, thermal expansion, conductivity, specific heat and the flow curves are given per phase (<code>DEPENDENCIES</code> on the phase fractions), so the thermal run sees the heat capacity of each phase and the stress run sees the transformation strains and the hardening of bainite and martensite. The specific heat carries the magnetic (Curie) peak on the ferrite only; the ferrite and austenite curves meet at Ac3, so the switch causes no jump in heat capacity.
 
@@ -394,7 +394,7 @@ Peak temperature in the keyhole: 2 697 C, below the boiling point of iron (the s
 
 ### Hardness from the phase fractions (first estimate)
 
-<b>Which run.</b> The hardness below comes from the first full thermal run (second source, 20MnCr5 crown, the run behind the animation at the top), not from the check run above; it will be redone on the full run of the fourth source.
+<b>Which run.</b> The hardness below comes from the first full thermal run (second source, 20MnCr5 crown), not from the check run above; it will be redone on the full run of the fourth source.
 
 <b>Which measurements.</b> The macrograph of Nogueira (2021) has no hardness traverses, so the hardness is compared with the HV1 traverses of Neto (2023) [2], measured on welds of the same process at 0.5, 2 and 4 mm below the surface: five parts cut at 180 deg, indents every 0.15 mm.
 

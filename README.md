@@ -48,7 +48,7 @@ Detailed formulation, kinematic equations, FEA verification, and post-processing
 
 <p align="center">
   <a href="02_dflux_laser_welding/README.md">
-    <img src="99_images_and_miscelania/bimaterial_weld_rls_blackbody.gif" alt="Abaqus DFLUX bimaterial 20MnCr5 / EN-GJS-600-10 laser weld thermal simulation with weld cross-section and expected macrograph" width="100%" />
+    <img src="99_images_and_miscelania/bimaterial_weld_rls_blackbody.gif" alt="Abaqus DFLUX bimaterial 27MnCr5 / EN-GJS-600-10 laser weld thermal simulation with weld cross-section and expected macrograph" width="100%" />
   </a>
 </p>
 
