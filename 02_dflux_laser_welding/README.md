@@ -128,6 +128,15 @@ with <i>d</i>, <i>r</i><sub>1</sub>, <i>r</i><sub>2</sub> the height and end rad
 
 <b>Which cut.</b> Each macrograph figure of the theses shows two cuts of the same weld: (a) at 0 deg, where the end of the weld overlaps its start (two passes, more filler, cap 0.41-1.34 mm), and (b) at 180 deg, opposite the overlap: the steady weld. The model in steady state is calibrated on the mean of the four 180 deg cuts at 4 kW, Nogueira (2021) Fig. 6.11(b), 6.12(b), 6.13(b) and Neto (2023) Fig. 6.11(c) [1, 2], which agree within 0.05-0.12 mm: 2.31 mm at the surface, a neck of 0.88 mm at 2.5 mm, and a root that widens again to 1.41 mm at the chamber, on the cast-iron side in all four. The first two calibrations used Fig. 6.13(a), which is the overlap cut.
 
+<b>Two theses, two roles.</b> The source is calibrated on the macrographs of Nogueira (2021): three of the four cuts
+are his, and the side of the joint where the head lies follows his cuts (section 9). Nogueira has no hardness
+traverses, so the HV1 traverses of Neto (2023), measured on welds of the same process, are the comparison for the
+hardness. Neto's 180 deg cut is in the mean width above (it agrees with the Nogueira cuts within their scatter), but
+its section differs from theirs: the head leans to the cast iron and the body is centred on the joint, where the
+Nogueira welds lean to the steel. Its fusion line is drawn next to the Nogueira range in section 9 to show that
+difference, a scatter between parts that the model, calibrated on Nogueira, does not follow, and that explains part
+of the deviations of the hardness comparison.
+
 <b>Calibration.</b> A conduction surrogate (moving point sources, effective properties, fast enough for an optimiser) is fitted to the measured widths, and the Abaqus run of each source corrects the next fit (space mapping): the ratio of the Abaqus width to the surrogate width at each depth is kept fixed and the source is fitted so that ratio x surrogate matches the target. Each new source is checked by a 75-increment thermal run (to 45 deg; the pool is steady from about 18-27 deg) before the full run.
 
 | Source | Target | Fit | Check in Abaqus (widths against the target) |
@@ -367,7 +376,7 @@ Results of the check run of the <b>fourth calibration</b> of the source (section
   <img src="../99_images_and_miscelania/bimaterial_fusion_vs_180deg_cuts.svg" alt="Fusion-zone width against depth, model against the mean of the four 180 deg cuts, and the two sides of the joint against the side positions of each cut" width="100%">
 </p>
 
-The reference is the steady weld: the mean of the four 180 deg cuts at 4 kW, Nogueira (2021) Fig. 6.11(b), 6.12(b), 6.13(b) and Neto (2023) Fig. 6.11(c) [1, 2], read every 0.5 mm (section 4). On the right, the sides: a cut gives the side positions only where the centre of its fusion zone was measured (width / 2 minus and plus the centre offset, at the surface and at 3 mm).
+The reference is the steady weld: the mean of the four 180 deg cuts at 4 kW, Nogueira (2021) Fig. 6.11(b), 6.12(b), 6.13(b) and Neto (2023) Fig. 6.11(c) [1, 2], read every 0.5 mm (section 4). On the left the widths, on the right the fusion line on each side of the joint: the range of the three Nogueira cuts (shaded) and the Neto cut (line). The cuts give the width at every 0.5 mm and the centre of their fusion zone at the surface and at 3 mm only; their sides are drawn as width / 2 minus and plus that centre offset, linear between 0 and 3 mm, and below 3 mm with the steel side kept straight and the root widening into the cast iron, as read on the cuts.
 
 | Depth | 180 deg cuts, mean (sd) | Model, fusion width | Difference | Model, cast-iron side / steel side |
 | :--- | :--- | :--- | :--- | :--- |
@@ -386,7 +395,7 @@ The reference is the steady weld: the mean of the four 180 deg cuts at 4 kW, Nog
 
 <b>Widths.</b> rms 5.3 % over the eleven depths, and 9 of 11 within the scatter of the four cuts; the largest difference is at the neck (+13 %, 0.11 mm, half an element across the joint). The root widens again at the chamber, on the cast-iron side, as in the cuts (1.35 against 1.41 mm): this is the root cone of the source, the power that reaches the bottom of the land around the open root. For comparison, the second source (double cone, the first full run) was +22 % at 1 mm, -20 % at 4 mm and -60 % at the root against the same cuts.
 
-<b>Sides.</b> Below the head the pool sits mostly in the steel: at 3 mm the model has 0.22 mm on the cast-iron side and 0.75 mm on the steel side, inside the three Nogueira cuts (0.13-0.26 / 0.66-0.83 mm); the Neto cut, centred on the joint there (0.48 / 0.38 mm), is the exception. Below 2.5 mm the cast iron melts 0.07-0.41 mm beyond the gap face. The centre of the model's fusion zone is +0.08 mm from the joint at the surface and +0.26 mm at 3 mm, against the mean of the cuts, +0.08 / +0.20 mm. <b>The head is the open point:</b> the model's head is nearly centred (1.03 / 1.20 mm), while the Nogueira cuts lean to the steel (0.76-0.82 / 1.46-1.51 mm) and the Neto cut to the cast iron (1.67 / 0.77 mm). The source is calibrated on the total width, which fixes the head width but not its side; the cuts themselves disagree on it.
+<b>Sides.</b> Below the head the pool sits mostly in the steel: at 3 mm the model has 0.22 mm on the cast-iron side and 0.75 mm on the steel side, inside the three Nogueira cuts (0.13-0.26 / 0.66-0.83 mm); the Neto cut, centred on the joint there (0.48 / 0.38 mm), is the exception. Below 2.5 mm the cast iron melts 0.07-0.41 mm beyond the gap face. The centre of the model's fusion zone is +0.08 mm from the joint at the surface and +0.26 mm at 3 mm, against the mean of the cuts, +0.08 / +0.20 mm. <b>The head is the open point:</b> the model's head is nearly centred (1.03 / 1.20 mm), while the Nogueira cuts lean to the steel (0.76-0.82 / 1.46-1.51 mm) and the Neto cut to the cast iron (1.67 / 0.77 mm). The source is calibrated on the total width, which fixes the head width but not its side; the cuts themselves disagree on it. The Neto cut, the one whose hardness traverses are used below, is on the other side of the Nogueira range at the head and centred at 3 mm: the fusion line of the model is farther from it than from the Nogueira cuts, and the hardness comparison inherits that difference.
 
 <b>Heat-affected zone.</b> Above Ac1 (732 C in the steel, 850 C in the cast iron): 3.1 mm wide at the surface (1.30 mm on the cast-iron side, 1.81 mm on the steel side), 2.0 mm from 3 mm down.
 
@@ -396,7 +405,7 @@ Peak temperature in the keyhole: 2 697 C, below the boiling point of iron (the s
 
 <b>Which run.</b> The hardness below comes from the first full thermal run (second source, 20MnCr5 crown), not from the check run above; it will be redone on the full run of the fourth source.
 
-<b>Which measurements.</b> The macrograph of Nogueira (2021) has no hardness traverses, so the hardness is compared with the HV1 traverses of Neto (2023) [2], measured on welds of the same process at 0.5, 2 and 4 mm below the surface: five parts cut at 180 deg, indents every 0.15 mm.
+<b>Which measurements.</b> The heat source is calibrated on the Nogueira (2021) macrographs, which have no hardness traverses, so the hardness is compared with the HV1 traverses of Neto (2023) [2], measured on welds of the same process at 0.5, 2 and 4 mm below the surface: five parts cut at 180 deg, indents every 0.15 mm.
 
 <b>Which steel.</b> The crown of this thermal run is 20MnCr5, the stand-in first used because that grade has far more published data (CCT diagrams, transformation kinetics, thermophysical properties) than the crown steel of the theses, a 27MnCr5 (Nogueira, Tab. 3.1: C 0.23-0.31, Mn 1.10-1.40, Cr 1.00-1.40). The press fit and the stress run now use a 27MnCr5 card (built and verified in [folder 07](../07_metallurgical_phase_transformation/)), and the thermal run will be repeated with it; the phase fractions below are still those of 20MnCr5. The hardness is computed with the chemistry of the theses (middle of the ranges: C 0.27, Mn 1.25, Cr 1.20; Si 0.25 assumed), because the traverses were measured on that steel. The mix carries an error that is accepted: with more carbon the real steel has a lower Ms and a higher hardenability, so its phase fractions would not be exactly those of the 20MnCr5 run. The carbon content alone moves the martensite hardness by about 10 % (Maynier gives about 490 HV with C 0.195, 557 HV with C 0.27).
 
@@ -422,7 +431,7 @@ $$HV_B = -323 + 185\,C + 330\,Si + 153\,Mn + 65\,Ni + 144\,Cr + 191\,Mo + \log V
 | 2 mm | 1.23 / 0.90 mm | 0.55 / 0.60 mm | 558 / 525 HV | 729 / 496 HV |
 | 4 mm | 0.75 / 0.90 mm | 0.56 / 0.60 mm | 563 / 543 HV | 544 / 578 HV |
 
-Neto values: medians of the five parts. The peak hardness of the steel HAZ is within 2-6 %, and the width of the hard steel band is now 0.55 mm at every depth against 0.60-0.75 mm measured (0.28-0.83 mm with the first calibration). The fusion-zone widths are read per element here (0.22-0.27 mm), so they step: at 2 mm the model is still 0.3 mm wider than the median traverse, at 4 mm 0.15 mm narrower.
+Neto values: medians of the five parts. The peak hardness of the steel HAZ is within 2-6 %, and the width of the hard steel band is now 0.55 mm at every depth against 0.60-0.75 mm measured (0.28-0.83 mm with the first calibration). The fusion-zone widths are read per element here (0.22-0.27 mm), so they step: at 2 mm the model is still 0.3 mm wider than the median traverse, at 4 mm 0.15 mm narrower. Part of these differences is the section itself: the model is calibrated on the Nogueira welds, whose body lies in the steel, while the Neto welds of the traverses are centred on the joint below the head (section 9), so the fusion line, and with it the start of each hardness band, sits at a different distance from the joint in the two.
 
 <b>Limits of the estimate</b>
 
