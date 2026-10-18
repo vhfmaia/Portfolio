@@ -52,10 +52,10 @@ Detailed formulation, kinematic equations, FEA verification, and post-processing
   </a>
 </p>
 
-A 20MnCr5 crown gear laser welded to an EN-GJS-600-10 differential carrier with a Ni 6082 filler wire (<i>R</i> = 55 mm, 4 kW, 1.5 m/min, full penetration of a 5 mm weld land into a gas escape chamber, press fit below). The animation shows the unrolled top surface, the longitudinal section on the joint, the projected weld cross-section with the solidus and Ac1 lines of each material, and the expected etched macrograph.
+A 27MnCr5 crown gear laser welded to an EN-GJS-600-10 differential carrier with a Ni 6082 filler wire (<i>R</i> = 55 mm, 4 kW, 1.5 m/min, full penetration of a 5 mm weld land into a gas escape chamber, press fit below). The animation shows the unrolled top surface, the longitudinal section on the joint, the projected weld cross-section with the solidus and Ac1 lines of each material, and the expected etched macrograph.
 
 #### Key Highlights:
-- **Double conical keyhole source (`DFLUX`):** nail-head weld (wide head, narrow body, hemispherical tip), calibrated on a published macrograph, with the power through the keyhole root lost into the chamber.
+- **Triple conical keyhole source (`DFLUX`):** nail-head weld (wide head, narrow body) with the root that widens again at the gas escape chamber, calibrated on four published 180 deg cuts by space mapping (fusion width within 5.3 % rms from the surface to the root).
 - **Mesh built for a moving source:** a quad section revolved in 600 steps of 0.6 deg, one element per increment so the beam sits on a node at every increment end; tetrahedra away from the weld, tied, on plain cards.
 - **Metallurgy in all three materials:** the Abaqus phase transformation framework (`ABQ_PHASE_TRANS`) with phase-dependent properties, JMA / Koistinen-Marburger kinetics and secant transformation strains.
 - **Filler as a raw wire (RLS state):** the wire is in the model from the start and becomes weld metal where the computed temperature melts it, in one weld step, compared with classic element activation (`*MODEL CHANGE`) on the same mesh.
@@ -142,14 +142,14 @@ Formulation, parameter provenance, meshing strategy and results are available in
 │   ├── gear_torque_simulation.gif             # Drive + coast three-viewport animation (6 FPS)  
 │   ├── gear_shaft_cutaway.png                 # Section view of the crown gear / carrier CAD geometry (PNG)
 │   ├── stress_front_view_flaw_ends.png        # Front-view stress field, drive against coast, weld flaw ends marked (PNG)
-│   ├── double_cone_heat_source_plot.svg       # 4-Panel Double Conical Keyhole Source, Crown Gear / Carrier Weld (SVG)
+│   ├── triple_cone_heat_source_plot.svg       # 4-Panel Triple Conical Keyhole Source, Crown Gear / Carrier Weld (SVG)
+│   ├── bimaterial_fusion_vs_180deg_cuts.svg   # Fusion zone of the model against the 180 deg cuts of the theses (SVG)
 │   ├── bimaterial_weld_rls_blackbody.gif      # Bimaterial weld thermal animation with expected macrograph (GIF)
 │   ├── bimaterial_section.svg / _mesh_section.svg  # Joint section and swept hex mesh (SVG)
 │   ├── bimaterial_filler_ea_vs_rls.svg        # Filler: element activation vs raw wire (SVG)
 │   ├── bimaterial_rls_phase_map.svg           # RLS state and phase transformations (SVG)
 │   ├── bimaterial_weld_workflow.svg           # Analysis chain of the weld model (SVG)
 │   ├── bimaterial_courant_number.gif          # Courant number below / equal to / above 1 for the moving source (GIF)
-│   ├── bimaterial_macrograph_vs_nogueira.png  # Measured vs simulated macrograph, Nogueira (2021), CC BY 4.0 (PNG)
 │   ├── bimaterial_hardness_vs_neto.png        # Model hardness vs HV1 traverses, Neto (2023), CC BY 4.0 (PNG)
 │   ├── macrograph_nogueira_2021_fig6_13a.jpg  # Published nail-head weld macrograph, Nogueira (2021), CC BY 4.0 (JPG)
 │   ├── uinter_3state_state_machine.svg        # UINTER 3-State Contact State Machine & Won Criteria (SVG)
